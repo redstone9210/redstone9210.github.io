@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haven - Discord Style</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #313338;
+            color: #dbdee1;
+            overflow: hidden;
+        }
+        .auth-screen { display: flex; justify-content: center; align-items: center; height: 100vh; background: #5865f2; }
+        .auth-box { background: #313338; padding: 32px; border-radius: 5px; box-shadow: 0 2px 10px 0 rgba(0,0,0,.2); width: 480px; }
+        .auth-box h2 { text-align: center; margin-bottom: 8px; color: #f2f3f5; font-size: 24px; font-weight: 600; }
+        .auth-box .subtitle { text-align: center; color: #b5bac1; font-size: 16px; margin-bottom: 20px; }
+        .auth-box input { width: 100%; padding: 10px; margin-bottom: 20px; background: #1e1f22; border: 1px solid #1e1f22; border-radius: 3px; color: #dbdee1; font-size: 16px; transition: border-color 0.2s; }
+        .auth-box input:focus { outline: none; border-color: #5865f2; }
+        .auth-box label { display: block; margin-bottom: 8px; color: #b5bac1; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .auth-box button { width: 100%; padding: 10px; background: #5865f2; border: none; border-radius: 3px; color: white; font-size: 16px; cursor: pointer; font-weight: 500; margin-bottom: 8px; transition: background 0.2s; }
+        .auth-box button:hover { background: #4752c4; }
+        .auth-toggle { text-align: left; margin-top: 8px; color: #949ba4; font-size: 14px; }
+        .auth-toggle a { color: #00a8fc; cursor: pointer; text-decoration: none; }
+        .auth-toggle a:hover { text-decoration: underline; }
+        .error-msg, .success-msg { padding: 10px; border-radius: 3px; margin-bottom: 20px; font-size: 14px; }
+        .error-msg { background: #f23f42; color: white; }
+        .success-msg { background: #23a55a; color: white; }
+        .chat-container { display: none; height: 100vh; flex-direction: row; }
+        .sidebar { width: 240px; background: #2b2d31; display: flex; flex-direction: column; }
+        .server-name { padding: 16px; font-weight: 600; color: #f2f3f5; font-size: 16px; border-bottom: 1px solid #1e1f22; box-shadow: 0 1px 0 rgba(4,4,5,0.2), 0 1.5px 0 rgba(6,6,7,0.05), 0 2px 0 rgba(4,4,5,0.05); }
+        .channels { flex: 1; overflow-y: auto; padding: 8px; }
+        .channel-category { color: #949ba4; font-size: 12px; font-weight: 600; margin: 16px 8px 4px 8px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.02em; }
+        .add-channel-btn { background: none; color: #949ba4; border: none; width: 18px; height: 18px; cursor: pointer; font-size: 18px; line-height: 1; transition: color 0.2s; }
+        .add-channel-btn:hover { color: #dbdee1; }
+        .channel { padding: 6px 8px; margin: 2px 0; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; color: #949ba4; transition: all 0.2s; font-size: 16px; }
+        .channel:hover { background: #35373c; color: #dbdee1; }
+        .channel.active { background: #404249; color: #f2f3f5; }
+        .channel-name { display: flex; align-items: center; flex: 1; font-weight: 500; }
+        .channel-name::before { content: '#'; margin-right: 6px; font-size: 20px; color: #80848e; }
+        .channel.active .channel-name::before { color: #b5bac1; }
+        .delete-channel-btn { background: #da373c; color: white; border: none; padding: 2px 6px; border-radius: 3px; font-size: 11px; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
+        .channel:hover .delete-channel-btn { opacity: 1; }
+        .user-info { padding: 8px; background: #232428; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500; }
+        .user-info button { padding: 4px 8px; background: #da373c; border: none; border-radius: 3px; color: white; cursor: pointer; font-size: 12px; transition: background 0.2s; }
+        .user-info button:hover { background: #a12d30; }
+        .chat-area { flex: 1; display: flex; flex-direction: column; background: #313338; }
+        .chat-header { padding: 12px 16px; background: #313338; border-bottom: 1px solid #1e1f22; box-shadow: 0 1px 0 rgba(4,4,5,0.2), 0 1.5px 0 rgba(6,6,7,0.05), 0 2px 0 rgba(4,4,5,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .chat-header-left { flex: 1; }
+        .chat-header-title { font-weight: 600; font-size: 16px; display: flex; align-items: center; color: #f2f3f5; }
+        .chat-header-title::before { content: '#'; color: #80848e; margin-right: 8px; font-size: 24px; }
+        .chat-topic { font-size: 13px; color: #b5bac1; font-weight: 400; margin-top: 4px; }
+        .help-button { background: #5865f2; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s; }
+        .help-button:hover { background: #4752c4; }
+        .messages { flex: 1; overflow-y: auto; padding: 16px; }
+        .message { margin-bottom: 16px; display: flex; padding: 4px 16px 4px 72px; position: relative; transition: background 0.1s; }
+        .message:hover { background: #2e3035; }
+        .message-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #5865f2 0%, #7289da 100%); position: absolute; left: 16px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; color: white; cursor: pointer; transition: border-radius 0.2s; }
+        .message-avatar:hover { border-radius: 35%; }
+        .message-content { flex: 1; min-width: 0; }
+        .message-header { display: flex; align-items: baseline; margin-bottom: 2px; }
+        .message-username { font-weight: 600; margin-right: 8px; font-size: 15px; color: #f2f3f5; cursor: pointer; transition: text-decoration 0.1s; }
+        .message-username:hover { text-decoration: underline; }
+        .message-time { font-size: 12px; color: #949ba4; font-weight: 500; }
+        .message-text { color: #dbdee1; line-height: 1.375; font-size: 16px; word-wrap: break-word; }
+        .message-buttons { position: absolute; top: -16px; right: 16px; background: #313338; border: 1px solid #1e1f22; border-radius: 4px; padding: 4px; display: none; box-shadow: 0 2px 10px 0 rgba(0,0,0,0.2); }
+        .message:hover .message-buttons { display: flex; gap: 4px; }
+        .message-btn { background: none; border: none; padding: 4px 8px; cursor: pointer; font-size: 20px; color: #b5bac1; transition: color 0.2s; }
+        .message-btn:hover { color: #dbdee1; }
+        .message-input-area { padding: 16px; background: #313338; }
+        .message-input { width: 100%; padding: 11px 16px; background: #383a40; border: none; border-radius: 8px; color: #dbdee1; font-size: 15px; font-family: inherit; }
+        .message-input:focus { outline: none; }
+        .message-input::placeholder { color: #6d6f78; }
+        .admin-panel { width: 320px; background: #2b2d31; border-left: 1px solid #1e1f22; display: none; flex-direction: column; overflow-y: auto; }
+        .admin-panel.show { display: flex; }
+        .admin-header { padding: 16px; font-weight: 600; background: #da373c; color: white; font-size: 14px; text-align: center; border-bottom: 1px solid #1e1f22; }
+        .owner-header { background: linear-gradient(135deg, #faa61a 0%, #f57c00 100%); }
+        .admin-section { padding: 16px; border-bottom: 1px solid #1e1f22; }
+        .admin-section h4 { color: #949ba4; font-size: 12px; text-transform: uppercase; margin-bottom: 12px; font-weight: 600; letter-spacing: 0.02em; }
+        .collapsible-header { cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #383a40; border-radius: 4px; transition: background 0.2s; margin-bottom: 8px; }
+        .collapsible-header:hover { background: #404249; }
+        .collapsible-header::after { content: '▼'; font-size: 10px; transition: transform 0.2s; color: #949ba4; }
+        .collapsible-header.collapsed::after { transform: rotate(-90deg); }
+        .collapsible-content { max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s; opacity: 1; }
+        .collapsible-content.collapsed { max-height: 0; opacity: 0; }
+        .admin-users { max-height: 400px; overflow-y: auto; }
+        .admin-user { padding: 12px; background: #383a40; margin-bottom: 8px; border-radius: 4px; transition: background 0.2s; }
+        .admin-user:hover { background: #404249; }
+        .admin-user.banned { border-left: 3px solid #da373c; }
+        .admin-user-name { font-weight: 600; color: #f2f3f5; font-size: 14px; margin-bottom: 8px; cursor: pointer; }
+        .admin-user-name:hover { text-decoration: underline; }
+        .admin-user-buttons { display: flex; gap: 6px; flex-wrap: wrap; }
+        .admin-user button { padding: 6px 12px; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: 500; transition: filter 0.2s; flex: 1; min-width: 80px; }
+        .admin-user button:hover { filter: brightness(0.9); }
+        .ban-btn { background: #da373c; color: white; }
+        .unban-btn { background: #23a55a; color: white; }
+        .view-activity-btn { background: #5865f2; color: white; }
+        .delete-account-btn { background: #ed4245; color: white; }
+        .owner-controls { padding: 16px; border-top: 2px solid #faa61a; background: #1e1f22; }
+        .owner-controls h4 { color: #faa61a; font-size: 12px; text-transform: uppercase; margin-bottom: 12px; font-weight: 600; letter-spacing: 0.02em; }
+        .owner-control-btn { width: 100%; padding: 10px; margin-bottom: 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+        .reset-messages-btn { background: #ed4245; color: white; }
+        .reset-messages-btn:hover { background: #c03537; }
+        .maintenance-btn { background: #faa61a; color: white; }
+        .maintenance-btn:hover { background: #f57c00; }
+        .maintenance-btn.active { background: #23a55a; }
+        .maintenance-btn.active:hover { background: #1e8e4f; }
+        .unban-tool-btn { background: #5865f2; color: white; }
+        .unban-tool-btn:hover { background: #4752c4; }
+        .banned-word-input-area { display: flex; gap: 8px; margin-bottom: 12px; }
+        .banned-word-input-area input { flex: 1; padding: 8px; background: #1e1f22; border: 1px solid #1e1f22; border-radius: 3px; color: #dbdee1; font-size: 14px; }
+        .banned-word-input-area input:focus { outline: none; border-color: #5865f2; }
+        .banned-word-input-area button { padding: 8px 12px; background: #23a55a; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .banned-words-list { max-height: 200px; overflow-y: auto; }
+        .banned-word-item { padding: 8px 12px; background: #383a40; margin-bottom: 6px; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .remove-word-btn { background: #da373c; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 11px; }
+        .reports-badge { background: #da373c; color: white; border-radius: 12px; padding: 2px 6px; font-size: 11px; font-weight: 700; margin-left: 8px; }
+        .report-item { padding: 12px; background: #383a40; margin-bottom: 8px; border-radius: 4px; border-left: 3px solid #da373c; }
+        .report-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .report-type { font-weight: 600; color: #da373c; font-size: 12px; }
+        .report-time { font-size: 11px; color: #949ba4; }
+        .report-content { color: #dbdee1; font-size: 13px; margin-bottom: 8px; }
+        .report-dismiss { background: #23a55a; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 12px; width: 100%; }
+        .badge { padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; margin-left: 6px; text-transform: uppercase; }
+        .owner-badge { background: #faa61a; color: white; }
+        .admin-badge { background: #da373c; color: white; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.show { display: flex; }
+        .modal-content { background: #313338; padding: 32px; border-radius: 4px; box-shadow: 0 8px 16px rgba(0,0,0,0.24); width: 440px; max-height: 80vh; overflow-y: auto; }
+        .modal-content h3 { text-align: center; margin-bottom: 24px; color: #f2f3f5; font-size: 24px; font-weight: 600; }
+        .modal-content input, .modal-content textarea { width: 100%; padding: 10px; margin-bottom: 16px; background: #1e1f22; border: 1px solid #1e1f22; border-radius: 3px; color: #dbdee1; font-size: 16px; font-family: inherit; }
+        .modal-content input:focus, .modal-content textarea:focus { outline: none; border-color: #5865f2; }
+        .modal-content textarea { min-height: 100px; resize: vertical; }
+        .modal-content button { width: 48%; padding: 10px; border: none; border-radius: 3px; cursor: pointer; font-size: 14px; font-weight: 500; }
+        .modal-content .primary-btn { background: #5865f2; color: white; margin-right: 4%; }
+        .modal-content .primary-btn:hover { background: #4752c4; }
+        .modal-content .secondary-btn { background: #4e5058; color: white; }
+        .modal-content .secondary-btn:hover { background: #5d6269; }
+        .user-activity-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); justify-content: center; align-items: center; z-index: 1000; }
+        .user-activity-modal.show { display: flex; }
+        .user-activity-content { background: #313338; padding: 32px; border-radius: 4px; box-shadow: 0 8px 16px rgba(0,0,0,0.24); width: 700px; max-height: 85vh; overflow-y: auto; }
+        .user-activity-header { background: #2b2d31; padding: 16px; border-radius: 4px; margin-bottom: 20px; border-left: 4px solid #5865f2; }
+        .user-name { font-size: 20px; font-weight: 600; color: #f2f3f5; margin-bottom: 4px; }
+        .user-email { font-size: 14px; color: #b5bac1; }
+        .channel-section-header { background: #383a40; padding: 12px; border-radius: 4px; font-weight: 600; color: #f2f3f5; margin-bottom: 8px; cursor: pointer; display: flex; justify-content: space-between; transition: background 0.2s; }
+        .channel-section-header:hover { background: #404249; }
+        .message-count { background: #5865f2; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+        .channel-messages { background: #2b2d31; padding: 12px; border-radius: 4px; margin-bottom: 16px; }
+        .user-message-item { padding: 12px; background: #383a40; margin-bottom: 8px; border-radius: 4px; border-left: 3px solid #5865f2; }
+        .message-meta { font-size: 11px; color: #949ba4; margin-bottom: 6px; }
+        .close-activity-btn { width: 100%; padding: 10px; background: #da373c; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px; font-weight: 500; margin-top: 16px; }
+        .help-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); justify-content: center; align-items: center; z-index: 1000; }
+        .help-modal.show { display: flex; }
+        .help-content { background: #313338; padding: 32px; border-radius: 8px; width: 500px; max-height: 80vh; overflow-y: auto; }
+        .help-content h2 { color: #f2f3f5; margin-bottom: 20px; text-align: center; }
+        .help-option { background: #2b2d31; padding: 16px; margin-bottom: 12px; border-radius: 4px; cursor: pointer; transition: background 0.2s; border-left: 4px solid #5865f2; }
+        .help-option:hover { background: #383a40; }
+        .help-option h3 { color: #5865f2; font-size: 16px; margin-bottom: 4px; }
+        .help-option p { color: #b5bac1; font-size: 14px; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #2b2d31; }
+        ::-webkit-scrollbar-thumb { background: #1a1b1e; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #141517; }
+        .hidden { display: none !important; }
+        .banned-screen { display: none; height: 100vh; background: #da373c; justify-content: center; align-items: center; flex-direction: column; color: white; }
+        .banned-screen.show { display: flex; }
+        .banned-box { background: rgba(0, 0, 0, 0.3); padding: 60px; border-radius: 8px; text-align: center; max-width: 500px; }
+        .banned-box h1 { font-size: 48px; margin-bottom: 20px; }
+        .banned-box p { font-size: 18px; margin-bottom: 24px; }
+        .banned-box button { padding: 12px 24px; background: white; color: #da373c; border: none; border-radius: 3px; font-size: 16px; font-weight: 500; cursor: pointer; margin: 0 8px; }
+        .maintenance-screen { display: none; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); justify-content: center; align-items: center; flex-direction: column; color: white; }
+        .maintenance-screen.show { display: flex; }
+        .maintenance-box { background: rgba(0, 0, 0, 0.3); padding: 60px; border-radius: 8px; text-align: center; max-width: 500px; }
+        .maintenance-box h1 { font-size: 48px; margin-bottom: 20px; }
+        .maintenance-box p { font-size: 18px; margin-bottom: 24px; }
+        .warning-banner { background: #faa61a; color: white; padding: 12px 16px; text-align: center; font-weight: 600; font-size: 14px; }
+        .maintenance-active-banner { background: #faa61a; color: white; padding: 12px 16px; text-align: center; font-weight: 600; font-size: 14px; display: none; }
+        .maintenance-active-banner.show { display: block; }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-box">
+            <h2 id="authTitle">Create an account</h2>
+            <p class="subtitle" id="authSubtitle">We're so excited to see you!</p>
+            <div id="usernameField" style="margin-bottom: 20px;">
+                <label>USERNAME</label>
+                <input type="text" id="usernameInput" />
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label>EMAIL</label>
+                <input type="email" id="emailInput" />
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label>PASSWORD</label>
+                <input type="password" id="passwordInput" />
+            </div>
+            <div id="confirmPasswordField" style="margin-bottom: 20px;">
+                <label>CONFIRM PASSWORD</label>
+                <input type="password" id="confirmPasswordInput" />
+            </div>
+            <div class="error-msg hidden" id="errorMsg"></div>
+            <div class="success-msg hidden" id="successMsg"></div>
+            <button onclick="handleAuth()" id="authButton">Continue</button>
+            <div class="auth-toggle">
+                <span id="authToggleText">Already have an account?</span>
+                <a onclick="toggleAuthMode()" id="authToggleLink">Login</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Banned Screen -->
+    <div class="banned-screen" id="bannedScreen">
+        <div class="banned-box">
+            <h1>🚫</h1>
+            <h1>You are banned</h1>
+            <p>Your account has been banned from Haven Chat.</p>
+            <p>Contact this email <b>haventeam3@gmail.com</b> if you believe this was a mistake.</p>
+            <button onclick="logout()">Back to Login</button>
+        </div>
+    </div>
+
+    <!-- Maintenance Screen -->
+    <div class="maintenance-screen" id="maintenanceScreen">
+        <div class="maintenance-box">
+            <h1>🔧</h1>
+            <h1>Under Maintenance</h1>
+            <p>Sorry for the trouble, we are under maintenance.</p>
+            <p>Please log back in in a bit.</p>
+        </div>
+    </div>
+
+    <!-- Main Chat -->
+    <div class="chat-container" id="chatContainer">
+        <div class="sidebar">
+            <div class="server-name">Haven Chat</div>
+            <div class="channels" id="channelsContainer">
+                <div class="channel-category">
+                    <span>Text Channels</span>
+                    <button class="add-channel-btn" onclick="openCreateChannelModal()">+</button>
+                </div>
+                <div class="channel active" onclick="switchChannel('room 1', '')">
+                    <span class="channel-name">room 1</span>
+                </div>
+                <div class="channel" onclick="switchChannel('room 2', '')">
+                    <span class="channel-name">room 2</span>
+                </div>
+                <div class="channel" onclick="switchChannel('room 3', '')">
+                    <span class="channel-name">room 3</span>
+                </div>
+                <div class="channel" onclick="switchChannel('room 4', '')">
+                    <span class="channel-name">room 4</span>
+                </div>
+                <div id="customChannelsSection" class="hidden">
+                    <div class="channel-category">Custom Channels</div>
+                    <div id="customChannelsList"></div>
+                </div>
+            </div>
+            <div class="user-info">
+                <span id="currentUser"></span>
+                <button onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div id="maintenanceActiveBanner" class="maintenance-active-banner">
+                🔧 Maintenance Mode Active - Only owners can access the chat
+            </div>
+            <div id="warningBanner" class="warning-banner hidden">
+                ⚠️ Strike <span id="strikeCount">0</span>/3 - Watch your language!
+            </div>
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <div class="chat-header-title" id="chatHeader">room 1</div>
+                    <div class="chat-topic" id="chatTopic"></div>
+                </div>
+                <button class="help-button hidden" id="helpButton" onclick="openHelpModal()">report</button>
+            </div>
+            <div class="messages" id="messages"></div>
+            <div class="message-input-area">
+                <input type="text" class="message-input" id="messageInput" placeholder="Message #room-1" onkeypress="handleKeyPress(event)" />
+            </div>
+        </div>
+
+        <div class="admin-panel" id="adminPanel">
+            <div class="admin-header" id="adminPanelHeader">ADMIN PANEL</div>
+            <div class="admin-section" id="reportsSection">
+                <div class="collapsible-header" onclick="toggleCollapsible('reportsContent')" id="reportsHeader">
+                    <span>Reports<span class="reports-badge hidden" id="reportsBadge">0</span></span>
+                </div>
+                <!-- Admin Panel (for admins only) -->
+                <div class="admin-panel" id="adminPanel">
+            <div class="admin-header">🛡️ ADMIN PANEL</div>
+        <div class="admin-section">
+        <div class="collapsible-header" onclick="toggleCollapsible('adminReportsContent')">
+            <span>Reports<span class="reports-badge hidden" id="adminReportsBadge">0</span></span>
+        </div>
+        <div class="collapsible-content collapsed" id="adminReportsContent">
+            <div id="adminReportsList"></div>
+        </div>
+    </div>
+    <div class="admin-section">
+        <h4>Users</h4>
+        <div class="admin-users" id="adminAdminUsers"></div>
+    </div>
+    <div class="admin-section">
+        <div class="collapsible-header collapsed" onclick="toggleCollapsible('adminBannedWordsContent')">
+            <span>Banned Words</span>
+        </div>
+        <div class="collapsible-content collapsed" id="adminBannedWordsContent">
+            <div class="banned-word-input-area">
+                <input type="text" id="adminNewBannedWord" placeholder="Add word..." />
+                <button onclick="addBannedWordAdmin()">Add</button>
+            </div>
+            <div class="banned-words-list" id="adminBannedWordsList"></div>
+        </div>
+    </div>
+</div>
+                <div class="collapsible-content collapsed" id="reportsContent">
+                    <div id="reportsList"></div>
+                </div>
+            </div>
+            <div class="admin-section">
+                <h4>Users</h4>
+                <div class="admin-users" id="adminUsers"></div>
+            </div>
+            <div class="admin-section" id="bannedWordsSection">
+                <div class="collapsible-header collapsed" onclick="toggleCollapsible('bannedWordsContent')">
+                    <span>Banned Words</span>
+                </div>
+                <div class="collapsible-content collapsed" id="bannedWordsContent">
+                    <div class="banned-word-input-area">
+                        <input type="text" id="newBannedWord" placeholder="Add word..." />
+                        <button onclick="addBannedWord()">Add</button>
+                    </div>
+                    <div class="banned-words-list" id="bannedWordsList"></div>
+                </div>
+            </div>
+            <div class="owner-controls hidden" id="ownerControls">
+                <h4>👑 Owner Controls</h4>
+                <button class="owner-control-btn reset-messages-btn" onclick="resetAllMessages()">🗑️ Reset All Messages</button>
+                <button class="owner-control-btn maintenance-btn" id="maintenanceToggleBtn" onclick="toggleMaintenanceMode()">🔧 Enable Maintenance</button>
+                <button class="owner-control-btn unban-tool-btn" onclick="openUnbanTool()">🔓 Emergency Unban Tool</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Channel Modal -->
+    <div class="modal" id="createChannelModal">
+        <div class="modal-content">
+            <h3>Create Channel</h3>
+            <input type="text" id="newChannelName" placeholder="Channel name" maxlength="30" />
+            <textarea id="newChannelTopic" placeholder="Channel topic (optional)" maxlength="200"></textarea>
+            <div class="error-msg hidden" id="channelError"></div>
+            <div>
+                <button class="primary-btn" onclick="createNewChannel()">Create</button>
+                <button class="secondary-btn" onclick="closeCreateChannelModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Password Modal -->
+    <div class="modal" id="maintenanceModal">
+        <div class="modal-content">
+            <h3>🔧 Enter Maintenance Password</h3>
+            <input type="password" id="maintenancePassword" placeholder="Enter password" />
+            <div class="error-msg hidden" id="maintenanceError"></div>
+            <div>
+                <button class="primary-btn" onclick="activateMaintenanceMode()">Activate</button>
+                <button class="secondary-btn" onclick="closeMaintenanceModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Activity Modal -->
+    <div class="user-activity-modal" id="userActivityModal">
+        <div class="user-activity-content">
+            <h3>User Activity</h3>
+            <div class="user-activity-header">
+                <div class="user-name" id="activityUserName"></div>
+                <div class="user-email" id="activityUserEmail"></div>
+            </div>
+            <div id="activityChannelsList"></div>
+            <button class="close-activity-btn" onclick="closeUserActivityModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="help-modal" id="helpModal">
+        <div class="help-content">
+            <h2>🆘 Need Help?</h2>
+            <div class="help-option" onclick="reportBullying()">
+                <h3>Report Bullying</h3>
+                <p>Someone is being mean or bullying you</p>
+            </div>
+            <div class="help-option" onclick="reportProblem()">
+                <h3>Report a Problem</h3>
+                <p>Technical issues or bugs</p>
+            </div>
+            <div class="help-option" onclick="contactAdmin()">
+                <h3>Contact Admin</h3>
+                <p>Send a message to administrators</p>
+            </div>
+            <button class="secondary-btn" style="width: 100%; margin-top: 16px;" onclick="closeHelpModal()">Close</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6uKGFMQEUCR9IQot1wdgjDmhAXioJOUo",
+            authDomain: "school-dis.firebaseapp.com",
+            databaseURL: "https://school-dis-default-rtdb.firebaseio.com",
+            projectId: "school-dis",
+            storageBucket: "school-dis.firebasestorage.app",
+            messagingSenderId: "53033292390",
+            appId: "1:53033292390:web:f9991ea57386a1ab5f13a7",
+            measurementId: "G-XLLRWR6KM4"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let currentUser = null, currentChannel = 'room 1', currentChannelTopic = '';
+        let isOwner = false, isAdmin = false, isModerator = false, isBanned = false;
+        let isSignupMode = true, banListener = null, maintenanceListener = null;
+        let blockedUsers = [], customChannels = {}, reports = {};
+        let isMaintenanceMode = false;
+        
+        const OWNER_EMAILS = ['redstoneb3@gmail.com', 'haventeam3@gmail.com'];
+        const ADMIN_EMAILS = ['work.redstoneb5@gmail.com', '31christianhwang@usd266.com'];
+        const MAINTENANCE_PASSWORD = 'owner123';
+        const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+        
+        // Banned channel name words
+        const BANNED_CHANNEL_WORDS = ['fuck', 'shit', 'bitch', 'ass', 'damn', 'nigger', 'nigga', 'nazi', 'hitler', 'porn', 'sex', 'nsfw'];
+        
+        let users = JSON.parse(localStorage.getItem('users') || '{}');
+        let userStrikes = JSON.parse(localStorage.getItem('userStrikes') || '{}');
+        let bannedWords = ['fuck', 'shit', 'damn', 'hell', 'ass', 'bitch', 'bastard', 'crap'];
+        const racistSlurs = ['nigger', 'nigga', 'chink', 'spic', 'kike', 'wetback', 'raghead'];
+
+        function isProtectedAccount(email) {
+            return OWNER_EMAILS.includes(email);
+        }
+
+        function isAdminAccount(email) {
+            return ADMIN_EMAILS.includes(email);
+        }
+
+        function ensureProtectedAccountNotBanned(email) {
+            return new Promise((resolve) => {
+                if (!isProtectedAccount(email)) {
+                    resolve();
+                    return;
+                }
+                const userKey = email.replace(/\./g, '_');
+                database.ref('banned/' + userKey).remove().then(() => {
+                    if (userStrikes[email]) {
+                        delete userStrikes[email];
+                        localStorage.setItem('userStrikes', JSON.stringify(userStrikes));
+                    }
+                    if (currentUser === email) {
+                        isBanned = false;
+                    }
+                    resolve();
+                }).catch(() => resolve());
+            });
+        }
+
+        function checkUserRole(email) {
+            if (isProtectedAccount(email)) {
+                ensureProtectedAccountNotBanned(email);
+                return 'owner';
+            } else if (isAdminAccount(email)) {
+                return 'admin';
+            }
+            return 'user';
+        }
+
+        function toggleCollapsible(contentId) {
+            const content = document.getElementById(contentId);
+            const header = event.currentTarget;
+            content.classList.toggle('collapsed');
+            header.classList.toggle('collapsed');
+        }
+
+        function loadReports() {
+            database.ref('reports').on('value', (snapshot) => {
+                reports = snapshot.exists() ? snapshot.val() : {};
+                displayReports();
+            });
+        }
+
+        function displayReports() {
+            const reportsList = document.getElementById('reportsList');
+            const reportsBadge = document.getElementById('reportsBadge');
+            const reportsArray = Object.keys(reports).map(key => ({ id: key, ...reports[key] }));
+            
+            if (reportsArray.length === 0) {
+                reportsList.innerHTML = '<div style="text-align:center; color:#949ba4; padding:20px; font-style:italic;">No reports</div>';
+                reportsBadge.classList.add('hidden');
+                return;
+            }
+            
+            reportsBadge.textContent = reportsArray.length;
+            reportsBadge.classList.remove('hidden');
+            reportsList.innerHTML = '';
+            
+            reportsArray.sort((a, b) => b.timestamp - a.timestamp).forEach(report => {
+                const date = new Date(report.timestamp);
+                const timeStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                let content = `<strong>${report.reporter}</strong>: ${report.message}`;
+                
+                const reportDiv = document.createElement('div');
+                reportDiv.className = 'report-item';
+                reportDiv.innerHTML = `
+                    <div class="report-header">
+                        <span class="report-type">HELP REQUEST</span>
+                        <span class="report-time">${timeStr}</span>
+                    </div>
+                    <div class="report-content">${content}</div>
+                    <button class="report-dismiss" onclick="dismissReport('${report.id}')">Dismiss</button>
+                `;
+                reportsList.appendChild(reportDiv);
+            });
+        }
+
+        function dismissReport(reportId) {
+            if (isOwner || isAdmin) database.ref('reports/' + reportId).remove();
+        }
+
+        function loadCustomSettings() {
+            database.ref('settings/bannedWords').once('value', (snapshot) => {
+                if (snapshot.exists()) bannedWords = snapshot.val();
+                if (isOwner) loadBannedWordsList();
+            });
+            
+            database.ref('customChannels').on('value', (snapshot) => {
+                customChannels = snapshot.exists() ? snapshot.val() : {};
+                loadCustomChannels();
+            });
+        }
+
+        function loadCustomChannels() {
+            const list = document.getElementById('customChannelsList');
+            const section = document.getElementById('customChannelsSection');
+            list.innerHTML = '';
+            
+            if (Object.keys(customChannels).length === 0) {
+                section.classList.add('hidden');
+                return;
+            }
+            
+            section.classList.remove('hidden');
+            Object.keys(customChannels).forEach(name => {
+                const channel = customChannels[name];
+                const div = document.createElement('div');
+                div.className = 'channel';
+                div.onclick = () => switchChannel(name, channel.topic);
+                const canDelete = isAdmin || isOwner || isModerator;
+                div.innerHTML = `
+                    <span class="channel-name">${name}</span>
+                    ${canDelete ? `<button class="delete-channel-btn" onclick="deleteChannel(event, '${name}')">×</button>` : ''}
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function openCreateChannelModal() {
+            document.getElementById('createChannelModal').classList.add('show');
+            document.getElementById('newChannelName').value = '';
+            document.getElementById('newChannelTopic').value = '';
+            document.getElementById('channelError').classList.add('hidden');
+        }
+
+        function closeCreateChannelModal() {
+            document.getElementById('createChannelModal').classList.remove('show');
+        }
+
+        function createNewChannel() {
+            const name = document.getElementById('newChannelName').value.trim().toLowerCase();
+            const topic = document.getElementById('newChannelTopic').value.trim();
+            const errorEl = document.getElementById('channelError');
+            
+            if (!name) {
+                errorEl.textContent = 'Please enter a channel name';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            if (!/^[a-z0-9_-]+$/.test(name)) {
+                errorEl.textContent = 'Only letters, numbers, hyphens, and underscores allowed';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            
+            // Check for banned words in channel name
+            const hasBannedWord = BANNED_CHANNEL_WORDS.some(word => name.includes(word));
+            if (hasBannedWord) {
+                errorEl.textContent = 'Channel name contains inappropriate content';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            
+            const defaults = ['room 1', 'room 2', 'room 3', 'room 4'];
+            if (defaults.includes(name) || customChannels[name]) {
+                errorEl.textContent = 'Channel already exists';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            
+            database.ref('customChannels/' + name).set({
+                name, topic: topic || '', createdBy: currentUser, createdAt: Date.now()
+            }).then(() => closeCreateChannelModal());
+        }
+
+        function deleteChannel(event, name) {
+            event.stopPropagation();
+            if (!isAdmin && !isOwner && !isModerator) return;
+            if (confirm(`Delete #${name}? All messages will be lost.`)) {
+                database.ref('customChannels/' + name).remove();
+                database.ref('messages/' + name).remove();
+                if (currentChannel === name) switchChannel('room 1', '');
+            }
+        }
+
+        function switchChannel(channel, topic) {
+            currentChannel = channel;
+            currentChannelTopic = topic || '';
+            document.getElementById('chatHeader').textContent = channel;
+            document.getElementById('chatTopic').textContent = topic || '';
+            document.getElementById('messageInput').placeholder = `Message #${channel}`;
+            document.querySelectorAll('.channel').forEach(ch => ch.classList.remove('active'));
+            event.target.closest('.channel').classList.add('active');
+            loadMessages();
+        }
+
+        function loadBannedWordsList() {
+            const list = document.getElementById('bannedWordsList');
+            list.innerHTML = '';
+            bannedWords.forEach(word => {
+                const item = document.createElement('div');
+                item.className = 'banned-word-item';
+                item.innerHTML = `<span>${word}</span><button class="remove-word-btn" onclick="removeBannedWord('${word}')">Remove</button>`;
+                list.appendChild(item);
+            });
+        }
+
+        function addBannedWord() {
+            const word = document.getElementById('newBannedWord').value.trim().toLowerCase();
+            if (!word) return;
+            if (bannedWords.includes(word)) {
+                alert('Word already banned');
+                return;
+            }
+            bannedWords.push(word);
+            database.ref('settings/bannedWords').set(bannedWords).then(() => {
+                document.getElementById('newBannedWord').value = '';
+                loadBannedWordsList();
+            });
+        }
+
+        function removeBannedWord(word) {
+            if (confirm(`Remove "${word}"?`)) {
+                bannedWords = bannedWords.filter(w => w !== word);
+                database.ref('settings/bannedWords').set(bannedWords).then(() => loadBannedWordsList());
+            }
+        }
+
+        function setupMaintenanceListener() {
+            maintenanceListener = database.ref('maintenance');
+            maintenanceListener.on('value', (snapshot) => {
+                const maintenanceActive = snapshot.exists() && snapshot.val() === true;
+                isMaintenanceMode = maintenanceActive;
+                
+                updateMaintenanceUI(maintenanceActive);
+                
+                if (maintenanceActive && !isOwner && !isAdmin) {
+                    showMaintenanceScreen();
+                }
+            });
+        }
+
+        function updateMaintenanceUI(active) {
+            const banner = document.getElementById('maintenanceActiveBanner');
+            const toggleBtn = document.getElementById('maintenanceToggleBtn');
+            
+            if (active) {
+                if (isOwner || isAdmin) {
+                    banner.classList.add('show');
+                }
+                if (toggleBtn) {
+                    toggleBtn.textContent = '✅ Disable Maintenance';
+                    toggleBtn.classList.add('active');
+                }
+            } else {
+                banner.classList.remove('show');
+                if (toggleBtn) {
+                    toggleBtn.textContent = '🔧 Enable Maintenance';
+                    toggleBtn.classList.remove('active');
+                }
+            }
+        }
+
+        function toggleMaintenanceMode() {
+            if (!isOwner) return;
+            
+            database.ref('maintenance').once('value', (snapshot) => {
+                const currentState = snapshot.exists() && snapshot.val() === true;
+                
+                if (currentState) {
+                    if (confirm('Disable maintenance mode? All users will be able to access the chat.')) {
+                        database.ref('maintenance').set(false).then(() => {
+                            alert('Maintenance mode disabled!');
+                        });
+                    }
+                } else {
+                    openMaintenanceModal();
+                }
+            });
+        }
+
+        function openMaintenanceModal() {
+            document.getElementById('maintenanceModal').classList.add('show');
+            document.getElementById('maintenancePassword').value = '';
+            document.getElementById('maintenanceError').classList.add('hidden');
+        }
+
+        function closeMaintenanceModal() {
+            document.getElementById('maintenanceModal').classList.remove('show');
+        }
+
+        function activateMaintenanceMode() {
+            const password = document.getElementById('maintenancePassword').value;
+            if (password === MAINTENANCE_PASSWORD) {
+                database.ref('maintenance').set(true).then(() => {
+                    closeMaintenanceModal();
+                    alert('Maintenance mode activated! Regular users will be kicked out.');
+                });
+            } else {
+                document.getElementById('maintenanceError').textContent = 'Incorrect password!';
+                document.getElementById('maintenanceError').classList.remove('hidden');
+            }
+        }
+
+        function showMaintenanceScreen() {
+            if (maintenanceListener) maintenanceListener.off();
+            if (banListener) banListener.off();
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('chatContainer').style.display = 'none';
+            document.getElementById('bannedScreen').classList.remove('show');
+            document.getElementById('maintenanceScreen').classList.add('show');
+        }
+
+        function openUnbanTool() {
+            if (!isOwner) return;
+            window.open('unban.html', '_blank');
+        }
+
+        window.onload = function() {
+            const savedUser = localStorage.getItem('loggedInUser');
+            if (savedUser && !checkLoginExpiration()) {
+                currentUser = savedUser;
+                const role = checkUserRole(currentUser);
+                isOwner = (role === 'owner');
+                isAdmin = (role === 'owner' || role === 'admin');
+                ensureProtectedAccountNotBanned(currentUser).then(() => {
+                    return checkBanStatus();
+                }).then(() => {
+                    if (!isBanned) {
+                        return database.ref('maintenance').once('value');
+                    }
+                }).then((snapshot) => {
+                    if (snapshot) {
+                        const maintenanceActive = snapshot.exists() && snapshot.val() === true;
+                        isMaintenanceMode = maintenanceActive;
+                        
+                        if (maintenanceActive && !isOwner && !isAdmin) {
+                            showMaintenanceScreen();
+                        } else {
+                            updateLastActivity();
+                            showChat();
+                            setupMaintenanceListener();
+                        }
+                    }
+                });
+            } else {
+                localStorage.removeItem('loggedInUser');
+                localStorage.removeItem('lastLoginTime');
+                updateAuthUI();
+            }
+            loadCustomSettings();
+        };
+
+        function toggleAuthMode() {
+            isSignupMode = !isSignupMode;
+            updateAuthUI();
+            clearAuthMessages();
+        }
+
+        function updateAuthUI() {
+            const title = document.getElementById('authTitle');
+            const subtitle = document.getElementById('authSubtitle');
+            const button = document.getElementById('authButton');
+            const toggleText = document.getElementById('authToggleText');
+            const toggleLink = document.getElementById('authToggleLink');
+            const usernameField = document.getElementById('usernameField');
+            const confirmField = document.getElementById('confirmPasswordField');
+            
+            if (isSignupMode) {
+                title.textContent = 'Create an account';
+                subtitle.textContent = "We're so excited to see you!";
+                button.textContent = 'Continue';
+                toggleText.textContent = 'Already have an account?';
+                toggleLink.textContent = 'Login';
+                usernameField.classList.remove('hidden');
+                confirmField.classList.remove('hidden');
+            } else {
+                title.textContent = 'Welcome back!';
+                subtitle.textContent = "We're so excited to see you again!";
+                button.textContent = 'Log In';
+                toggleText.textContent = "Need an account?";
+                toggleLink.textContent = 'Register';
+                usernameField.classList.add('hidden');
+                confirmField.classList.add('hidden');
+            }
+        }
+
+        function handleAuth() {
+            isSignupMode ? signup() : login();
+        }
+
+        function signup() {
+            const username = document.getElementById('usernameInput').value.trim();
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            const confirmPassword = document.getElementById('confirmPasswordInput').value;
+            
+            if (!username || !email || !password || !confirmPassword) {
+                showError('Please fill in all fields');
+                return;
+            }
+            if (password !== confirmPassword) {
+                showError('Passwords do not match');
+                return;
+            }
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters');
+                return;
+            }
+            if (users[email]) {
+                showError('Email already registered');
+                return;
+            }
+            if (Object.values(users).some(u => u.username.toLowerCase() === username.toLowerCase())) {
+                showError('Username taken');
+                return;
+            }
+            
+            users[email] = { username, password, createdAt: new Date().toISOString() };
+            localStorage.setItem('users', JSON.stringify(users));
+            database.ref('users/' + email.replace(/\./g, '_')).set({
+                username, createdAt: new Date().toISOString()
+            });
+            
+            showSuccess('Account created!');
+            setTimeout(() => {
+                currentUser = email;
+                localStorage.setItem('loggedInUser', email);
+                updateLastActivity();
+                const role = checkUserRole(currentUser);
+                isOwner = (role === 'owner');
+                isAdmin = (role === 'owner' || role === 'admin');
+                
+                database.ref('maintenance').once('value', (snapshot) => {
+                    const maintenanceActive = snapshot.exists() && snapshot.val() === true;
+                    if (maintenanceActive && !isOwner && !isAdmin) {
+                        showMaintenanceScreen();
+                    } else {
+                        showChat();
+                        setupMaintenanceListener();
+                    }
+                });
+            }, 1000);
+        }
+
+        function login() {
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            
+            if (!email || !password) {
+                showError('Please enter email and password');
+                return;
+            }
+            if (!users[email]) {
+                showError('Account not found');
+                return;
+            }
+            if (users[email].password !== password) {
+                showError('Invalid password');
+                return;
+            }
+            
+            currentUser = email;
+            localStorage.setItem('loggedInUser', email);
+            updateLastActivity();
+            const role = checkUserRole(currentUser);
+            isOwner = (role === 'owner');
+            isAdmin = (role === 'owner' || role === 'admin');
+            ensureProtectedAccountNotBanned(currentUser).then(() => {
+                return checkBanStatus();
+            }).then(() => {
+                return database.ref('maintenance').once('value');
+            }).then((snapshot) => {
+                const maintenanceActive = snapshot.exists() && snapshot.val() === true;
+                if (maintenanceActive && !isOwner && !isAdmin) {
+                    showMaintenanceScreen();
+                } else {
+                    showChat();
+                    setupMaintenanceListener();
+                }
+            });
+        }
+
+        function showChat() {
+            if (isProtectedAccount(currentUser)) {
+                isBanned = false;
+            }
+            if (isBanned) {
+                showBannedScreen();
+                return;
+            }
+            
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('chatContainer').style.display = 'flex';
+            document.getElementById('bannedScreen').classList.remove('show');
+            document.getElementById('maintenanceScreen').classList.remove('show');
+            
+            const displayName = users[currentUser]?.username || currentUser.split('@')[0];
+            let badge = '';
+            if (isOwner) {
+                badge = '<span class="badge owner-badge">Owner</span>';
+                document.getElementById('adminPanelHeader').textContent = 'OWNER PANEL';
+                document.getElementById('adminPanelHeader').classList.add('owner-header');
+            } else if (isAdmin) {
+                badge = '<span class="badge admin-badge">Admin</span>';
+                document.getElementById('adminPanelHeader').textContent = 'ADMIN PANEL';
+            }
+            document.getElementById('currentUser').innerHTML = displayName + badge;
+            
+            if (!isProtectedAccount(currentUser) && !isAdmin && !isModerator) {
+                banListener = database.ref('banned/' + currentUser.replace(/\./g, '_'));
+                banListener.on('value', (snapshot) => {
+                    if (snapshot.exists() && snapshot.val() === true) {
+                        isBanned = true;
+                        showBannedScreen();
+                    }
+                });
+            }
+            
+            if (isOwner || isAdmin) {
+                document.getElementById('adminPanel').classList.add('show');
+                loadAdminPanel();
+                loadReports();
+                document.getElementById('reportsSection').classList.remove('hidden');
+                
+                // Owner-only controls
+                if (isOwner) {
+                    document.getElementById('ownerControls').classList.remove('hidden');
+                    document.getElementById('bannedWordsSection').classList.remove('hidden');
+                    loadBannedWordsList();
+                } else {
+                    document.getElementById('ownerControls').classList.add('hidden');
+                    document.getElementById('bannedWordsSection').classList.add('hidden');
+                }
+                
+                database.ref('maintenance').once('value', (snapshot) => {
+                    const maintenanceActive = snapshot.exists() && snapshot.val() === true;
+                    updateMaintenanceUI(maintenanceActive);
+                });
+            } else {
+                document.getElementById('helpButton').classList.remove('hidden');
+            }
+            
+            blockedUsers = JSON.parse(localStorage.getItem('blockedUsers_' + currentUser) || '[]');
+            updateLastActivity();
+            loadCustomSettings();
+            loadMessages();
+            setInterval(updateLastActivity, 60000);
+        }
+
+        function showBannedScreen() {
+            if (isProtectedAccount(currentUser)) {
+                isBanned = false;
+                return;
+            }
+            if (banListener) banListener.off();
+            if (maintenanceListener) maintenanceListener.off();
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('chatContainer').style.display = 'none';
+            document.getElementById('maintenanceScreen').classList.remove('show');
+            document.getElementById('bannedScreen').classList.add('show');
+        }
+
+        function showError(msg) {
+            document.getElementById('errorMsg').textContent = msg;
+            document.getElementById('errorMsg').classList.remove('hidden');
+            document.getElementById('successMsg').classList.add('hidden');
+        }
+
+        function showSuccess(msg) {
+            document.getElementById('successMsg').textContent = msg;
+            document.getElementById('successMsg').classList.remove('hidden');
+            document.getElementById('errorMsg').classList.add('hidden');
+        }
+
+        function clearAuthMessages() {
+            document.getElementById('errorMsg').classList.add('hidden');
+            document.getElementById('successMsg').classList.add('hidden');
+        }
+
+        function logout() {
+            if (maintenanceListener) maintenanceListener.off();
+            if (banListener) banListener.off();
+            localStorage.removeItem('loggedInUser');
+            localStorage.removeItem('lastLoginTime');
+            location.reload();
+        }
+
+        function checkLoginExpiration() {
+            const lastLogin = localStorage.getItem('lastLoginTime');
+            if (!lastLogin) return true;
+            return (Date.now() - parseInt(lastLogin)) > THREE_DAYS_MS;
+        }
+
+        function updateLastActivity() {
+            localStorage.setItem('lastLoginTime', Date.now().toString());
+            if (currentUser) {
+                database.ref('users/' + currentUser.replace(/\./g, '_') + '/lastActive').set(Date.now());
+            }
+        }
+
+        function loadMessages() {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = '';
+            database.ref('messages/' + currentChannel).off();
+            database.ref('messages/' + currentChannel).limitToLast(50).on('child_added', (snapshot) => {
+                addMessageToUI(snapshot.val(), snapshot.key);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            });
+            database.ref('messages/' + currentChannel).on('child_removed', (snapshot) => {
+                const el = document.querySelector(`[data-message-id="${snapshot.key}"]`);
+                if (el) el.remove();
+            });
+        }
+
+        function addMessageToUI(msg, messageId) {
+            if (blockedUsers.includes(msg.user)) return;
+            
+            const messagesDiv = document.getElementById('messages');
+            const messageEl = document.createElement('div');
+            messageEl.className = 'message';
+            messageEl.setAttribute('data-message-id', messageId);
+            
+            const initial = msg.user.charAt(0).toUpperCase();
+            const time = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const canDelete = isAdmin || isOwner || isModerator;
+            
+            messageEl.innerHTML = `
+                <div class="message-avatar" onclick="viewUserActivity('${msg.email}')" title="Click to view activity">${initial}</div>
+                <div class="message-content">
+                    <div class="message-header">
+                        <span class="message-username" onclick="viewUserActivity('${msg.email}')">${msg.user}</span>
+                        <span class="message-time">${time}</span>
+                    </div>
+                    <div class="message-text">${msg.text}</div>
+                </div>
+                ${canDelete ? `<div class="message-buttons">
+                    <button class="message-btn" onclick="deleteMessage('${messageId}')" title="Delete">🗑️</button>
+                </div>` : ''}
+            `;
+            messagesDiv.appendChild(messageEl);
+        }
+
+        function deleteMessage(messageId) {
+            if (!isAdmin && !isOwner && !isModerator) return;
+            if (confirm('Delete this message?')) {
+                database.ref('messages/' + currentChannel + '/' + messageId).remove();
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') sendMessage();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            if (isProtectedAccount(currentUser)) {
+                const displayName = users[currentUser]?.username || currentUser.split('@')[0];
+                database.ref('messages/' + currentChannel).push({
+                    user: displayName, email: currentUser, text, timestamp: new Date().toISOString()
+                });
+                input.value = '';
+                return;
+            }
+            
+            if (isBanned) {
+                alert('You are banned');
+                input.value = '';
+                return;
+            }
+            
+            const lowerText = text.toLowerCase();
+            if (racistSlurs.some(slur => lowerText.includes(slur))) {
+                database.ref('banned/' + currentUser.replace(/\./g, '_')).set(true);
+                alert('Banned for using racist language');
+                isBanned = true;
+                showBannedScreen();
+                return;
+            }
+            
+            if (bannedWords.some(word => lowerText.includes(word))) {
+                if (!userStrikes[currentUser]) userStrikes[currentUser] = 0;
+                userStrikes[currentUser]++;
+                localStorage.setItem('userStrikes', JSON.stringify(userStrikes));
+                document.getElementById('strikeCount').textContent = userStrikes[currentUser];
+                document.getElementById('warningBanner').classList.remove('hidden');
+                
+                if (userStrikes[currentUser] >= 3) {
+                    database.ref('banned/' + currentUser.replace(/\./g, '_')).set(true);
+                    alert('Banned for excessive profanity (3 strikes)');
+                    isBanned = true;
+                    showBannedScreen();
+                    return;
+                }
+                setTimeout(() => document.getElementById('warningBanner').classList.add('hidden'), 3000);
+                input.value = '';
+                return;
+            }
+            
+            const displayName = users[currentUser]?.username || currentUser.split('@')[0];
+            database.ref('messages/' + currentChannel).push({
+                user: displayName, email: currentUser, text, timestamp: new Date().toISOString()
+            });
+            input.value = '';
+        }
+
+        function loadAdminPanel() {
+            const adminUsersDiv = document.getElementById('adminUsers');
+            adminUsersDiv.innerHTML = '';
+            const now = Date.now();
+            
+            OWNER_EMAILS.forEach(email => ensureProtectedAccountNotBanned(email));
+            
+            database.ref('banned').once('value', (bannedSnapshot) => {
+                const bannedData = bannedSnapshot.val() || {};
+                const bannedEmails = Object.keys(bannedData).map(key => key.replace(/_/g, '.'));
+                
+                database.ref('users').once('value', (snapshot) => {
+                    const firebaseUsers = snapshot.val() || {};
+                    const allEmails = new Set([...Object.keys(users)]);
+                    Object.keys(firebaseUsers).forEach(key => allEmails.add(key.replace(/_/g, '.')));
+                    bannedEmails.forEach(email => allEmails.add(email));
+                    
+                    allEmails.forEach(email => {
+                        if (isProtectedAccount(email) || isAdminAccount(email)) return;
+                        
+                        const userKey = email.replace(/\./g, '_');
+                        const lastActive = firebaseUsers[userKey]?.lastActive || 0;
+                        const isInactive = (now - lastActive) > THREE_DAYS_MS;
+                        if (isInactive && lastActive !== 0 && !bannedEmails.includes(email)) return;
+                        
+                        const isBannedUser = bannedEmails.includes(email);
+                        const userDiv = document.createElement('div');
+                        userDiv.className = 'admin-user' + (isBannedUser ? ' banned' : '');
+                        const displayName = users[email]?.username || email.split('@')[0];
+                        
+                        userDiv.innerHTML = `
+                            <div class="admin-user-name" onclick="viewUserActivity('${email}')">${displayName}${isBannedUser ? ' <small>(BANNED)</small>' : ''}</div>
+                            <div class="admin-user-buttons">
+                                <button class="view-activity-btn" onclick="viewUserActivity('${email}')">View Activity</button>
+                                <button class="${isBannedUser ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${email}')">
+                                    ${isBannedUser ? 'Unban' : 'Ban'}
+                                </button>
+                                ${isOwner ? `<button class="delete-account-btn" onclick="deleteAccount('${email}')">Delete Account</button>` : ''}
+                            </div>
+                        `;
+                        adminUsersDiv.appendChild(userDiv);
+                    });
+                });
+            });
+        }
+
+        function toggleBan(email) {
+            if (!isOwner && !isAdmin) return;
+            if (isProtectedAccount(email)) {
+                alert('Cannot ban owner account!');
+                ensureProtectedAccountNotBanned(email);
+                return;
+            }
+            
+            const userKey = email.replace(/\./g, '_');
+            database.ref('banned/' + userKey).once('value', (snapshot) => {
+                if (snapshot.exists() && snapshot.val() === true) {
+                    database.ref('banned/' + userKey).remove().then(() => {
+                        if (userStrikes[email]) {
+                            delete userStrikes[email];
+                            localStorage.setItem('userStrikes', JSON.stringify(userStrikes));
+                        }
+                        loadAdminPanel();
+                    });
+                } else {
+                    database.ref('banned/' + userKey).set(true).then(() => loadAdminPanel());
+                }
+            });
+        }
+
+        function deleteAccount(email) {
+            if (!isOwner) return;
+            if (isProtectedAccount(email) || isAdminAccount(email)) {
+                alert('Cannot delete owner or admin accounts!');
+                return;
+            }
+            
+            if (confirm(`Are you sure you want to permanently delete the account for ${email}?\n\nThis will:\n- Delete their user data\n- Delete all their messages\n- Remove them from the system\n\nThis action CANNOT be undone!`)) {
+                const userKey = email.replace(/\./g, '_');
+                const displayName = users[email]?.username || email.split('@')[0];
+                
+                // Delete from local storage
+                if (users[email]) {
+                    delete users[email];
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+                
+                // Delete from Firebase
+                database.ref('users/' + userKey).remove();
+                database.ref('banned/' + userKey).remove();
+                
+                // Delete all messages from this user in all channels
+                const allChannels = ['room 1', 'room 2', 'room 3', 'room 4'];
+                Object.keys(customChannels).forEach(ch => allChannels.push(ch));
+                
+                allChannels.forEach(channel => {
+                    database.ref('messages/' + channel).once('value', (snapshot) => {
+                        snapshot.forEach(child => {
+                            const msg = child.val();
+                            if (msg.email === email || msg.user === displayName) {
+                                database.ref('messages/' + channel + '/' + child.key).remove();
+                            }
+                        });
+                    });
+                });
+                
+                alert(`Account for ${email} has been permanently deleted.`);
+                loadAdminPanel();
+            }
+        }
+
+        function checkBanStatus() {
+            return new Promise((resolve) => {
+                if (isProtectedAccount(currentUser)) {
+                    isBanned = false;
+                    resolve();
+                    return;
+                }
+                const userKey = currentUser.replace(/\./g, '_');
+                database.ref('banned/' + userKey).once('value', (snapshot) => {
+                    if (snapshot.exists() && snapshot.val() === true) isBanned = true;
+                    resolve();
+                });
+            });
+        }
+
+        function viewUserActivity(email) {
+            if (!isOwner && !isAdmin) return;
+            const username = users[email]?.username || email.split('@')[0];
+            document.getElementById('activityUserName').textContent = username;
+            document.getElementById('activityUserEmail').textContent = email;
+            
+            const allChannels = ['room 1', 'room 2', 'room 3', 'room 4'];
+            Object.keys(customChannels).forEach(ch => allChannels.push(ch));
+            
+            const activityList = document.getElementById('activityChannelsList');
+            activityList.innerHTML = '<div style="text-align:center; color:#949ba4; padding:20px;">Loading...</div>';
+            document.getElementById('userActivityModal').classList.add('show');
+            
+            Promise.all(allChannels.map(ch => {
+                return database.ref('messages/' + ch).once('value').then(snapshot => {
+                    const messages = [];
+                    snapshot.forEach(child => {
+                        const msg = child.val();
+                        if (msg.user === username || msg.email === email) {
+                            messages.push({ ...msg, id: child.key });
+                        }
+                    });
+                    return { channelName: ch, messages };
+                });
+            })).then(results => {
+                activityList.innerHTML = '';
+                const channelsWithMessages = results.filter(r => r.messages.length > 0);
+                
+                if (channelsWithMessages.length === 0) {
+                    activityList.innerHTML = '<div style="text-align:center; color:#949ba4; padding:30px; font-style:italic;">No messages found</div>';
+                    return;
+                }
+                
+                channelsWithMessages.forEach(result => {
+                    const section = document.createElement('div');
+                    section.className = 'channel-section';
+                    
+                    const header = document.createElement('div');
+                    header.className = 'channel-section-header';
+                    header.innerHTML = `<span># ${result.channelName}</span><span class="message-count">${result.messages.length}</span>`;
+                    
+                    const msgs = document.createElement('div');
+                    msgs.className = 'channel-messages';
+                    msgs.style.display = 'none';
+                    
+                    result.messages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(msg => {
+                        const item = document.createElement('div');
+                        item.className = 'user-message-item';
+                        const date = new Date(msg.timestamp);
+                        item.innerHTML = `
+                            <div class="message-meta">${date.toLocaleDateString()} ${date.toLocaleTimeString()}</div>
+                            <div class="message-content">${msg.text}</div>
+                        `;
+                        msgs.appendChild(item);
+                    });
+                    
+                    header.onclick = () => msgs.style.display = msgs.style.display === 'none' ? 'block' : 'none';
+                    section.appendChild(header);
+                    section.appendChild(msgs);
+                    activityList.appendChild(section);
+                });
+            });
+        }
+
+        function closeUserActivityModal() {
+            document.getElementById('userActivityModal').classList.remove('show');
+        }
+
+        function openHelpModal() {
+            document.getElementById('helpModal').classList.add('show');
+        }
+
+        function closeHelpModal() {
+            document.getElementById('helpModal').classList.remove('show');
+        }
+
+        function reportBullying() {
+            const username = prompt('Who is bullying you? (Enter their username)');
+            if (username) {
+                const details = prompt('Please describe what happened (optional):');
+                const displayName = users[currentUser]?.username || currentUser.split('@')[0];
+                database.ref('reports').push({
+                    reporter: displayName,
+                    reporterEmail: currentUser,
+                    message: `Reported ${username} for bullying. ${details ? 'Details: ' + details : ''}`,
+                    timestamp: Date.now()
+                });
+                alert('Report submitted. An admin will review it.');
+                closeHelpModal();
+            }
+        }
+
+        function reportProblem() {
+            const problem = prompt('Please describe the problem:');
+            if (problem) {
+                const displayName = users[currentUser]?.username || currentUser.split('@')[0];
+                database.ref('reports').push({
+                    reporter: displayName,
+                    reporterEmail: currentUser,
+                    message: `Problem: ${problem}`,
+                    timestamp: Date.now()
+                });
+                alert('Problem reported. An admin will look into it.');
+                closeHelpModal();
+            }
+        }
+
+        function contactAdmin() {
+            const message = prompt('Message to admin:');
+            if (message) {
+                const displayName = users[currentUser]?.username || currentUser.split('@')[0];
+                database.ref('reports').push({
+                    reporter: displayName,
+                    reporterEmail: currentUser,
+                    message: `Message: ${message}`,
+                    timestamp: Date.now()
+                });
+                alert('Message sent to admin.');
+                closeHelpModal();
+            }
+        }
+
+        function resetAllMessages() {
+            if (!isOwner) return;
+            if (confirm('⚠️ WARNING: This will delete ALL messages from ALL channels. Are you sure?')) {
+                if (confirm('This action cannot be undone. Continue?')) {
+                    database.ref('messages').remove().then(() => {
+                        alert('All messages have been deleted.');
+                        loadMessages();
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>

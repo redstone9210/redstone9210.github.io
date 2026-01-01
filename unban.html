@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Owner Unban Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: #2f3136;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .status {
+            background: #40444b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #dcddde;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .status div {
+            margin: 5px 0;
+            padding: 5px;
+        }
+        
+        .success {
+            color: #3ba55d;
+            font-weight: bold;
+        }
+        
+        .error {
+            color: #ed4245;
+            font-weight: bold;
+        }
+        
+        .info {
+            color: #5865f2;
+        }
+        
+        .warning {
+            color: #faa61a;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ed4245 0%, #c03537 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(237, 66, 69, 0.4);
+        }
+        
+        button:disabled {
+            background: #72767d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #5865f2 0%, #4752c4 100%);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 5px 15px rgba(88, 101, 242, 0.4);
+        }
+        
+        .owners-list {
+            background: #40444b;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .owners-list h3 {
+            color: #faa61a;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .owners-list div {
+            color: #dcddde;
+            padding: 5px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 Emergency Owner Unban Tool</h1>
+        
+        <div class="owners-list">
+            <h3>👑 PROTECTED OWNER ACCOUNTS</h3>
+            <div>• redstoneb3@gmail.com</div>
+            <div>• haventeam3@gmail.com</div>
+        </div>
+        
+        <div class="status" id="status">
+            <div class="info">Ready to execute emergency unban...</div>
+        </div>
+        
+        <button onclick="emergencyUnban()" id="unbanBtn">
+            🔓 FORCE UNBAN ALL OWNERS
+        </button>
+        
+        <button onclick="viewDatabase()" class="btn-secondary">
+            📊 View Current Database Status
+        </button>
+        
+        <button onclick="clearAllBans()" class="btn-secondary">
+            🗑️ Clear ALL Bans (Nuclear Option)
+        </button>
+        
+        <button onclick="window.location.href='index.html'" class="btn-secondary">
+            🏠 Return to Chat
+        </button>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6uKGFMQEUCR9IQot1wdgjDmhAXioJOUo",
+            authDomain: "school-dis.firebaseapp.com",
+            databaseURL: "https://school-dis-default-rtdb.firebaseio.com",
+            projectId: "school-dis",
+            storageBucket: "school-dis.firebasestorage.app",
+            messagingSenderId: "53033292390",
+            appId: "1:53033292390:web:f9991ea57386a1ab5f13a7",
+            measurementId: "G-XLLRWR6KM4"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        const OWNER_ACCOUNTS = [
+            'redstoneb3@gmail.com',
+            'haventeam3@gmail.com'
+        ];
+        
+        function log(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const logDiv = document.createElement('div');
+            logDiv.className = type;
+            logDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            statusDiv.appendChild(logDiv);
+            statusDiv.scrollTop = statusDiv.scrollHeight;
+        }
+        
+        async function emergencyUnban() {
+            const btn = document.getElementById('unbanBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Processing...';
+            
+            log('========================================', 'warning');
+            log('EMERGENCY UNBAN INITIATED', 'warning');
+            log('========================================', 'warning');
+            
+            for (const email of OWNER_ACCOUNTS) {
+                const userKey = email.replace(/\./g, '_');
+                
+                log(`Processing: ${email}`, 'info');
+                
+                try {
+                    // Remove from banned list
+                    await database.ref('banned/' + userKey).remove();
+                    log(`✓ Removed ban entry for ${email}`, 'success');
+                    
+                    // Clear strikes from localStorage
+                    let strikes = JSON.parse(localStorage.getItem('userStrikes') || '{}');
+                    if (strikes[email]) {
+                        delete strikes[email];
+                        localStorage.setItem('userStrikes', JSON.stringify(strikes));
+                        log(`✓ Cleared strikes for ${email}`, 'success');
+                    }
+                    
+                    // Set as active user in database
+                    await database.ref('users/' + userKey).update({
+                        lastActive: Date.now(),
+                        isOwner: true
+                    });
+                    log(`✓ Updated database record for ${email}`, 'success');
+                    
+                } catch (error) {
+                    log(`✗ Error processing ${email}: ${error.message}`, 'error');
+                }
+            }
+            
+            log('========================================', 'warning');
+            log('UNBAN COMPLETE', 'success');
+            log('Both owner accounts are now UNBLOCKED', 'success');
+            log('You can now log in without restrictions', 'success');
+            log('========================================', 'warning');
+            
+            btn.disabled = false;
+            btn.textContent = '✅ UNBAN COMPLETE - Click to Re-run if Needed';
+        }
+        
+        async function viewDatabase() {
+            log('========================================', 'info');
+            log('FETCHING DATABASE STATUS...', 'info');
+            
+            try {
+                const bannedSnapshot = await database.ref('banned').once('value');
+                const bannedData = bannedSnapshot.val() || {};
+                
+                log('Current Banned Users:', 'warning');
+                if (Object.keys(bannedData).length === 0) {
+                    log('  No users are currently banned', 'success');
+                } else {
+                    Object.keys(bannedData).forEach(key => {
+                        const email = key.replace(/_/g, '.');
+                        const isOwner = OWNER_ACCOUNTS.includes(email);
+                        log(`  • ${email} ${isOwner ? '⚠️ OWNER ACCOUNT!' : ''}`, isOwner ? 'error' : 'info');
+                    });
+                }
+                
+                log('Owner Account Status:', 'info');
+                for (const email of OWNER_ACCOUNTS) {
+                    const userKey = email.replace(/\./g, '_');
+                    const isBanned = bannedData[userKey] === true;
+                    log(`  • ${email}: ${isBanned ? '🚫 BANNED' : '✅ NOT BANNED'}`, isBanned ? 'error' : 'success');
+                }
+                
+            } catch (error) {
+                log(`Error fetching database: ${error.message}`, 'error');
+            }
+            
+            log('========================================', 'info');
+        }
+        
+        async function clearAllBans() {
+            if (!confirm('⚠️ WARNING: This will unban ALL users in the database. Continue?')) {
+                return;
+            }
+            
+            log('========================================', 'warning');
+            log('CLEARING ALL BANS (NUCLEAR OPTION)', 'warning');
+            
+            try {
+                await database.ref('banned').remove();
+                log('✓ All bans cleared from database', 'success');
+                
+                localStorage.setItem('userStrikes', JSON.stringify({}));
+                log('✓ All strikes cleared from localStorage', 'success');
+                
+                log('Database is now clean - all users unbanned', 'success');
+            } catch (error) {
+                log(`✗ Error clearing bans: ${error.message}`, 'error');
+            }
+            
+            log('========================================', 'warning');
+        }
+        
+        // Auto-check status on load
+        window.onload = function() {
+            log('Emergency Unban Tool loaded', 'success');
+            log('Click "View Current Database Status" to check ban status', 'info');
+            log('Click "FORCE UNBAN ALL OWNERS" to remove any bans', 'warning');
+        };
+    </script>
+</body>
+</html>

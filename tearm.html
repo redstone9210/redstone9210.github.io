@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haven Chat - Terms of Service</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #dbdee1;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .terms-container {
+            background: #313338;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .terms-header {
+            background: #5865f2;
+            padding: 24px 32px;
+            text-align: center;
+        }
+        .terms-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+        .terms-header p {
+            font-size: 14px;
+            color: #e3e5e8;
+            opacity: 0.9;
+        }
+        .terms-content {
+            padding: 32px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .terms-content::-webkit-scrollbar { width: 8px; }
+        .terms-content::-webkit-scrollbar-track { background: #2b2d31; }
+        .terms-content::-webkit-scrollbar-thumb { background: #1a1b1e; border-radius: 4px; }
+        .terms-content::-webkit-scrollbar-thumb:hover { background: #141517; }
+        .terms-section {
+            margin-bottom: 28px;
+        }
+        .terms-section h2 {
+            color: #5865f2;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        .terms-section h2::before {
+            content: '▸';
+            margin-right: 8px;
+            font-size: 16px;
+        }
+        .terms-section p, .terms-section li {
+            color: #b5bac1;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        .terms-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .terms-section li {
+            padding-left: 24px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .terms-section li::before {
+            content: '•';
+            color: #5865f2;
+            font-weight: bold;
+            position: absolute;
+            left: 8px;
+        }
+        .warning-box {
+            background: rgba(237, 66, 69, 0.1);
+            border-left: 4px solid #ed4245;
+            padding: 16px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .warning-box h3 {
+            color: #ed4245;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .warning-box h3::before {
+            content: '⚠️';
+            margin-right: 8px;
+        }
+        .warning-box p {
+            color: #dbdee1;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .highlight {
+            color: #faa61a;
+            font-weight: 600;
+        }
+        .terms-footer {
+            background: #2b2d31;
+            padding: 24px 32px;
+            border-top: 1px solid #1e1f22;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .checkbox-container input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            margin-top: 2px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .checkbox-container label {
+            color: #dbdee1;
+            font-size: 14px;
+            line-height: 1.5;
+            cursor: pointer;
+            user-select: none;
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-accept {
+            background: #23a55a;
+            color: white;
+        }
+        .btn-accept:hover:not(:disabled) {
+            background: #1e8e4f;
+        }
+        .btn-accept:disabled {
+            background: #4e5058;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .btn-decline {
+            background: #ed4245;
+            color: white;
+        }
+        .btn-decline:hover {
+            background: #c03537;
+        }
+        .error-msg {
+            background: #ed4245;
+            color: white;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="terms-container">
+        <div class="terms-header">
+            <h1>Haven Chat Terms of Service</h1>
+            <p>Please read carefully before continuing</p>
+        </div>
+        
+        <div class="terms-content">
+            <div class="warning-box">
+                <h3>Important Notice</h3>
+                <p>By using Haven Chat, you agree to follow all rules and guidelines. Violations may result in warnings, strikes, or permanent account suspension without prior notice.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2>1. Acceptable Use Policy</h2>
+                <p>You agree to use Haven Chat in a respectful and lawful manner. The following behaviors are <span class="highlight">strictly prohibited</span>:</p>
+                <ul>
+                    <li><strong>Harassment and Bullying:</strong> Any form of harassment, threats, intimidation, or bullying towards other users will get you banned</li>
+                    <li><strong>Hate Speech:</strong> Discriminatory language, slurs, or content targeting individuals or groups based on race, ethnicity, religion, gender, sexual orientation, disability, or other protected characteristics will get you banned immediately</li>
+                    <li><strong>Profanity and Vulgar Content:</strong> Excessive profanity or sexually explicit content (Note: some channels may have different moderation levels)</li>
+                    <li><strong>Spam and Disruption:</strong> Flooding chat with repetitive messages, advertisements, or content intended to disrupt conversations</li>
+                    <li><strong>Illegal Content:</strong> Sharing or promoting illegal activities, including but not limited to piracy, drug use, or violence</li>
+                    <li><strong>Impersonation:</strong> Pretending to be another user, staff member, or public figure</li>
+                    <li><strong>Personal Information:</strong> Sharing your own or others' private information without consent (doxxing)</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h2>2. Enforcement and Consequences</h2>
+                <p>Haven Chat operates a <span class="highlight">three-strike warning system</span> for most violations:</p>
+                <ul>
+                    <li><strong>Strike 1:</strong> First warning - you'll receive a notice and your message will be blocked</li>
+                    <li><strong>Strike 2:</strong> Second warning - temporary suspension of messaging privileges</li>
+                    <li><strong>Strike 3:</strong> Permanent account ban from Haven Chat</li>
+                </ul>
+                <p><span class="highlight">Immediate Ban:</span> Certain severe violations, including but not limited to racist slurs, hate speech, threats of violence, or sharing illegal content, will result in an <strong>immediate and permanent ban</strong> without warning.</p>
+            </div>
+
+            <div class="terms-section">
+                <h2>3. User Responsibilities</h2>
+                <ul>
+                    <li>You are responsible for maintaining the security of your account credentials</li>
+                    <li>You must be at least 13 years of age to use this service</li>
+                    <li>You agree to report violations of these terms through the appropriate reporting channels</li>
+                    <li>You understand that all messages may be monitored by administrators for safety purposes</li>
+                    <li>You acknowledge that your account may be suspended or terminated for violations</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h2>4. Content and Privacy</h2>
+                <ul>
+                    <li>Messages sent on Haven Chat may be stored and reviewed by administrators</li>
+                    <li>You retain ownership of content you post, but grant Haven Chat the right to display and moderate it</li>
+                    <li>We reserve the right to remove any content that violates these terms</li>
+                    <li>Your username and activity may be visible to other users and administrators</li>
+                    <li>We do not sell your personal information to third parties</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h2>5. Limitation of Liability</h2>
+                <p>Haven Chat is provided "as is" without warranties of any kind. We are not responsible for:</p>
+                <ul>
+                    <li>User-generated content or interactions between users</li>
+                    <li>Service interruptions, data loss, or technical issues</li>
+                    <li>Actions taken by users that violate local, state, or federal laws</li>
+                    <li>Any damages resulting from your use of the service</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h2>6. Changes to Terms</h2>
+                <p>We reserve the right to modify these Terms of Service at any time. Continued use of Haven Chat after changes constitutes acceptance of the updated terms. Major changes will be announced through the platform.</p>
+            </div>
+
+            <div class="warning-box">
+                <h3>Final Reminder</h3>
+                <p>Haven Chat is a community space. Treat others with respect, follow the rules, and enjoy connecting with others. If you see someone breaking these rules, please report them to help keep our community safe.</p>
+            </div>
+        </div>
+
+        <div class="terms-footer">
+            <div class="error-msg" id="errorMsg">Please read and accept the terms to continue</div>
+            
+            <div class="checkbox-container" onclick="toggleCheckbox()">
+                <input type="checkbox" id="agreeCheckbox">
+                <label for="agreeCheckbox">
+                    I have read and agree to the Haven Chat Terms of Service. I understand that violations may result in warnings, strikes, or permanent account suspension. I agree to use Haven Chat responsibly and respectfully.
+                </label>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-decline" onclick="declineTerms()">Decline</button>
+                <button class="btn btn-accept" id="acceptBtn" disabled onclick="acceptTerms()">Accept & Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in when page loads
+        window.onload = function() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            if (!loggedInUser) {
+                // No user logged in, redirect to login
+                alert('Please log in first');
+                window.location.href = 'index.html';
+            }
+        };
+
+        function toggleCheckbox() {
+            const checkbox = document.getElementById('agreeCheckbox');
+            checkbox.checked = !checkbox.checked;
+            updateAcceptButton();
+        }
+
+        document.getElementById('agreeCheckbox').addEventListener('change', updateAcceptButton);
+
+        function updateAcceptButton() {
+            const checkbox = document.getElementById('agreeCheckbox');
+            const acceptBtn = document.getElementById('acceptBtn');
+            acceptBtn.disabled = !checkbox.checked;
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+
+        function acceptTerms() {
+            const checkbox = document.getElementById('agreeCheckbox');
+            if (!checkbox.checked) {
+                document.getElementById('errorMsg').style.display = 'block';
+                return;
+            }
+            
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            if (!loggedInUser) {
+                alert('Error: No user logged in');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Mark that user has accepted terms
+            localStorage.setItem('termsAccepted_' + loggedInUser, 'true');
+            localStorage.setItem('termsAcceptedDate_' + loggedInUser, new Date().toISOString());
+            
+            // Redirect back to main chat
+            window.location.href = 'index.html';
+        }
+
+        function declineTerms() {
+            if (confirm('If you decline the terms, you will be logged out and cannot use Haven Chat. Are you sure?')) {
+                // Remove the logged in user and terms acceptance
+                const loggedInUser = localStorage.getItem('loggedInUser');
+                if (loggedInUser) {
+                    localStorage.removeItem('termsAccepted_' + loggedInUser);
+                    localStorage.removeItem('termsAcceptedDate_' + loggedInUser);
+                }
+                localStorage.removeItem('loggedInUser');
+                localStorage.removeItem('lastLoginTime');
+                
+                // Redirect back to login
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
