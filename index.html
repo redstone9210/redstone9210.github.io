@@ -241,17 +241,17 @@
                     <span>Text Channels</span>
                     <button class="add-channel-btn" onclick="openCreateChannelModal()">+</button>
                 </div>
-                <div class="channel active" onclick="switchChannel('room 1', '')">
-                    <span class="channel-name">room tester</span>
+                <div class="channel active" onclick="switchChannel('Homework Help', '')">
+                    <span class="channel-name">Homework Help</span>
                 </div>
-                <div class="channel" onclick="switchChannel('room 2', '')">
-                    <span class="channel-name">homework</span>
+                <div class="channel" onclick="switchChannel('Study Hall', '')">
+                    <span class="channel-name">Study Hall</span>
                 </div>
-                <div class="channel" onclick="switchChannel('room 3', '')">
-                    <span class="channel-name">random</span>
+                <div class="channel" onclick="switchChannel('Class Talk', '')">
+                    <span class="channel-name">Class Talk</span>
                 </div>
-                <div class="channel" onclick="switchChannel('room 4', '')">
-                    <span class="channel-name">room 4</span>
+                <div class="channel" onclick="switchChannel('Exam Stress', '')">
+                    <span class="channel-name">Exam Stress</span>
                 </div>
                 <div id="customChannelsSection" class="hidden">
                     <div class="channel-category">Custom Channels</div>
@@ -266,21 +266,21 @@
 
         <div class="chat-area">
             <div id="maintenanceActiveBanner" class="maintenance-active-banner">
-                🔧 Maintenance Mode Active - Only owners can access the chat
+                🔧 Maintenance Mode Active - Only owners and admin can access the chat
             </div>
             <div id="warningBanner" class="warning-banner hidden">
                 ⚠️ Strike <span id="strikeCount">0</span>/3 - Watch your language!
             </div>
             <div class="chat-header">
                 <div class="chat-header-left">
-                    <div class="chat-header-title" id="chatHeader">room 1</div>
+                    <div class="chat-header-title" id="chatHeader">Homework Help</div>
                     <div class="chat-topic" id="chatTopic"></div>
                 </div>
                 <button class="help-button hidden" id="helpButton" onclick="openHelpModal()">report</button>
             </div>
             <div class="messages" id="messages"></div>
             <div class="message-input-area">
-                <input type="text" class="message-input" id="messageInput" placeholder="Message #room-1" onkeypress="handleKeyPress(event)" />
+                <input type="text" class="message-input" id="messageInput" placeholder="Message #Homework Help" onkeypress="handleKeyPress(event)" />
             </div>
         </div>
 
@@ -425,7 +425,7 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        let currentUser = null, currentChannel = 'room 1', currentChannelTopic = '';
+        let currentUser = null, currentChannel = 'Homework Help', currentChannelTopic = '';
         let isOwner = false, isAdmin = false, isModerator = false, isBanned = false;
         let isSignupMode = true, banListener = null, maintenanceListener = null;
         let blockedUsers = [], customChannels = {}, reports = {};
@@ -606,7 +606,7 @@
                 return;
             }
             
-            const defaults = ['room 1', 'room 2', 'room 3', 'room 4'];
+            const defaults = ['homework-help', 'study-hall', 'class-talk', 'exam-stress'];
             if (defaults.includes(name) || customChannels[name]) {
                 errorEl.textContent = 'Channel already exists';
                 errorEl.classList.remove('hidden');
@@ -624,7 +624,7 @@
             if (confirm(`Delete #${name}? All messages will be lost.`)) {
                 database.ref('customChannels/' + name).remove();
                 database.ref('messages/' + name).remove();
-                if (currentChannel === name) switchChannel('room 1', '');
+                if (currentChannel === name) switchChannel('Homework Help', '');
             }
         }
 
@@ -1244,7 +1244,7 @@
                 database.ref('banned/' + userKey).remove();
                 
                 // Delete all messages from this user in all channels
-                const allChannels = ['room 1', 'room 2', 'room 3', 'room 4'];
+                const allChannels = ['homework-help', 'study-hall', 'class-talk', 'exam-stress'];
                 Object.keys(customChannels).forEach(ch => allChannels.push(ch));
                 
                 allChannels.forEach(channel => {
@@ -1284,7 +1284,7 @@
             document.getElementById('activityUserName').textContent = username;
             document.getElementById('activityUserEmail').textContent = email;
             
-            const allChannels = ['room 1', 'room 2', 'room 3', 'room 4'];
+            const allChannels = ['homework-help', 'study-hall', 'class-talk', 'exam-stress'];
             Object.keys(customChannels).forEach(ch => allChannels.push(ch));
             
             const activityList = document.getElementById('activityChannelsList');
