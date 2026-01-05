@@ -56,14 +56,19 @@
         .messages { flex: 1; overflow-y: auto; padding: 16px; }
         .message { margin-bottom: 16px; display: flex; padding: 4px 16px 4px 72px; position: relative; transition: background 0.1s; }
         .message:hover { background: #2e3035; }
+        .message.broadcast-message { background: rgba(250, 166, 26, 0.1); border-left: 4px solid #faa61a; padding-left: 68px; }
+        .message.broadcast-message:hover { background: rgba(250, 166, 26, 0.15); }
         .message-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #5865f2 0%, #7289da 100%); position: absolute; left: 16px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 18px; color: white; cursor: pointer; transition: border-radius 0.2s; }
+        .message.broadcast-message .message-avatar { background: linear-gradient(135deg, #faa61a 0%, #f57c00 100%); }
         .message-avatar:hover { border-radius: 35%; }
         .message-content { flex: 1; min-width: 0; }
         .message-header { display: flex; align-items: baseline; margin-bottom: 2px; }
         .message-username { font-weight: 600; margin-right: 8px; font-size: 15px; color: #f2f3f5; cursor: pointer; transition: text-decoration 0.1s; }
+        .message.broadcast-message .message-username { color: #faa61a; }
         .message-username:hover { text-decoration: underline; }
         .message-time { font-size: 12px; color: #949ba4; font-weight: 500; }
         .message-text { color: #dbdee1; line-height: 1.375; font-size: 16px; word-wrap: break-word; }
+        .broadcast-badge { background: #faa61a; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 700; margin-left: 6px; text-transform: uppercase; }
         .message-buttons { position: absolute; top: -16px; right: 16px; background: #313338; border: 1px solid #1e1f22; border-radius: 4px; padding: 4px; display: none; box-shadow: 0 2px 10px 0 rgba(0,0,0,0.2); }
         .message:hover .message-buttons { display: flex; gap: 4px; }
         .message-btn { background: none; border: none; padding: 4px 8px; cursor: pointer; font-size: 20px; color: #b5bac1; transition: color 0.2s; }
@@ -108,6 +113,8 @@
         .maintenance-btn.active:hover { background: #1e8e4f; }
         .unban-tool-btn { background: #5865f2; color: white; }
         .unban-tool-btn:hover { background: #4752c4; }
+        .broadcast-btn { background: linear-gradient(135deg, #faa61a 0%, #f57c00 100%); color: white; }
+        .broadcast-btn:hover { filter: brightness(1.1); }
         .banned-word-input-area { display: flex; gap: 8px; margin-bottom: 12px; }
         .banned-word-input-area input { flex: 1; padding: 8px; background: #1e1f22; border: 1px solid #1e1f22; border-radius: 3px; color: #dbdee1; font-size: 14px; }
         .banned-word-input-area input:focus { outline: none; border-color: #5865f2; }
@@ -135,6 +142,8 @@
         .modal-content button { width: 48%; padding: 10px; border: none; border-radius: 3px; cursor: pointer; font-size: 14px; font-weight: 500; }
         .modal-content .primary-btn { background: #5865f2; color: white; margin-right: 4%; }
         .modal-content .primary-btn:hover { background: #4752c4; }
+        .modal-content .broadcast-primary-btn { background: linear-gradient(135deg, #faa61a 0%, #f57c00 100%); color: white; margin-right: 4%; }
+        .modal-content .broadcast-primary-btn:hover { filter: brightness(1.1); }
         .modal-content .secondary-btn { background: #4e5058; color: white; }
         .modal-content .secondary-btn:hover { background: #5d6269; }
         .user-activity-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); justify-content: center; align-items: center; z-index: 1000; }
@@ -163,6 +172,10 @@
         ::-webkit-scrollbar-thumb { background: #1a1b1e; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #141517; }
         .hidden { display: none !important; }
+        .vip-channel { border-left: 3px solid #faa61a; }
+        .vip-user-checkbox { padding: 8px; background: #383a40; margin-bottom: 6px; border-radius: 3px; }
+        .vip-user-checkbox label { display: flex; align-items: center; cursor: pointer; color: #dbdee1; }
+        .vip-user-checkbox input { margin-right: 8px; }
         .banned-screen { display: none; height: 100vh; background: #da373c; justify-content: center; align-items: center; flex-direction: column; color: white; }
         .banned-screen.show { display: flex; }
         .banned-box { background: rgba(0, 0, 0, 0.3); padding: 60px; border-radius: 8px; text-align: center; max-width: 500px; }
@@ -241,6 +254,21 @@
                     <span>Text Channels</span>
                     <button class="add-channel-btn" onclick="openCreateChannelModal()">+</button>
                 </div>
+                <!-- VIP Room Modal -->
+                <div class="modal" id="createVipRoomModal">
+                    <div class="modal-content">
+                        <h3>👑 Create VIP Room</h3>
+                        <input type="text" id="vipRoomName" placeholder="VIP room name" maxlength="30" />
+                        <textarea id="vipRoomTopic" placeholder="Room topic (optional)" maxlength="200"></textarea>
+                        <h4 style="color: #f2f3f5; margin: 16px 0 8px 0;">Select Users:</h4>
+                        <div id="vipUsersList" style="max-height: 200px; overflow-y: auto; margin-bottom: 16px; background: #2b2d31; padding: 8px; border-radius: 4px;"></div>
+                        <div class="error-msg hidden" id="vipRoomError"></div>
+                        <div>
+                            <button class="primary-btn" onclick="createVipRoom()">Create</button>
+                            <button class="secondary-btn" onclick="closeCreateVipRoomModal()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
                 <div class="channel active" onclick="switchChannel('Homework Help', '')">
                     <span class="channel-name">Homework Help</span>
                 </div>
@@ -257,6 +285,13 @@
                     <div class="channel-category">Custom Channels</div>
                     <div id="customChannelsList"></div>
                 </div>
+            </div>
+            <div id="vipChannelsSection" class="hidden">
+                <div class="channel-category">
+                    <span>👑 VIP Rooms</span>
+                    <button class="add-channel-btn" onclick="openCreateVipRoomModal()" style="display: none;" id="addVipRoomBtn">+</button>
+                </div>
+                <div id="vipChannelsList"></div>
             </div>
             <div class="user-info">
                 <span id="currentUser"></span>
@@ -291,34 +326,6 @@
                 <div class="collapsible-header" onclick="toggleCollapsible('reportsContent')" id="reportsHeader">
                     <span>Reports<span class="reports-badge hidden" id="reportsBadge">0</span></span>
                 </div>
-                <!-- Admin Panel (for admins only) -->
-                <div class="admin-panel" id="adminPanel">
-            <div class="admin-header">🛡️ ADMIN PANEL</div>
-        <div class="admin-section">
-        <div class="collapsible-header" onclick="toggleCollapsible('adminReportsContent')">
-            <span>Reports<span class="reports-badge hidden" id="adminReportsBadge">0</span></span>
-        </div>
-        <div class="collapsible-content collapsed" id="adminReportsContent">
-            <div id="adminReportsList"></div>
-        </div>
-    </div>
-    <div class="admin-section">
-        <h4>Users</h4>
-        <div class="admin-users" id="adminAdminUsers"></div>
-    </div>
-    <div class="admin-section">
-        <div class="collapsible-header collapsed" onclick="toggleCollapsible('adminBannedWordsContent')">
-            <span>Banned Words</span>
-        </div>
-        <div class="collapsible-content collapsed" id="adminBannedWordsContent">
-            <div class="banned-word-input-area">
-                <input type="text" id="adminNewBannedWord" placeholder="Add word..." />
-                <button onclick="addBannedWordAdmin()">Add</button>
-            </div>
-            <div class="banned-words-list" id="adminBannedWordsList"></div>
-        </div>
-    </div>
-</div>
                 <div class="collapsible-content collapsed" id="reportsContent">
                     <div id="reportsList"></div>
                 </div>
@@ -341,9 +348,24 @@
             </div>
             <div class="owner-controls hidden" id="ownerControls">
                 <h4>👑 Owner Controls</h4>
+                <button class="owner-control-btn broadcast-btn" onclick="openBroadcastModal()">📢 Broadcast Message</button>
                 <button class="owner-control-btn reset-messages-btn" onclick="resetAllMessages()">🗑️ Reset All Messages</button>
                 <button class="owner-control-btn maintenance-btn" id="maintenanceToggleBtn" onclick="toggleMaintenanceMode()">🔧 Enable Maintenance</button>
                 <button class="owner-control-btn unban-tool-btn" onclick="openUnbanTool()">🔓 Emergency Unban Tool</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Broadcast Message Modal -->
+    <div class="modal" id="broadcastModal">
+        <div class="modal-content">
+            <h3>📢 Broadcast Message</h3>
+            <p style="color: #b5bac1; font-size: 14px; margin-bottom: 16px; text-align: center;">This message will be sent to ALL channels with an orange highlight</p>
+            <textarea id="broadcastMessage" placeholder="Enter your broadcast message..." style="min-height: 120px;"></textarea>
+            <div class="error-msg hidden" id="broadcastError"></div>
+            <div>
+                <button class="broadcast-primary-btn" onclick="sendBroadcastMessage()">Send Broadcast</button>
+                <button class="secondary-btn" onclick="closeBroadcastModal()">Cancel</button>
             </div>
         </div>
     </div>
@@ -445,6 +467,30 @@
         let bannedWords = ['fuck', 'shit', 'damn', 'hell', 'ass', 'bitch', 'bastard', 'crap'];
         const racistSlurs = ['nigger', 'nigga', 'chink', 'spic', 'kike', 'wetback', 'raghead'];
 
+        // Helper function to get username for an email
+        function getUsername(email, callback) {
+            // First check local storage
+            if (users[email] && users[email].username) {
+                callback(users[email].username);
+                return;
+            }
+            
+            // If not in local storage, fetch from Firebase
+            database.ref('users/' + email.replace(/\./g, '_')).once('value', (snapshot) => {
+                if (snapshot.exists() && snapshot.val().username) {
+                    const username = snapshot.val().username;
+                    // Update local storage
+                    if (!users[email]) users[email] = {};
+                    users[email].username = username;
+                    localStorage.setItem('users', JSON.stringify(users));
+                    callback(username);
+                } else {
+                    // Fallback to email prefix
+                    callback(email.split('@')[0]);
+                }
+            });
+        }
+
         function isProtectedAccount(email) {
             return OWNER_EMAILS.includes(email);
         }
@@ -481,6 +527,59 @@
                 return 'admin';
             }
             return 'user';
+        }
+
+        // BROADCAST MESSAGE FUNCTIONS
+        function openBroadcastModal() {
+            if (!isOwner) return;
+            document.getElementById('broadcastModal').classList.add('show');
+            document.getElementById('broadcastMessage').value = '';
+            document.getElementById('broadcastError').classList.add('hidden');
+        }
+
+        function closeBroadcastModal() {
+            document.getElementById('broadcastModal').classList.remove('show');
+        }
+
+        function sendBroadcastMessage() {
+            if (!isOwner) return;
+            
+            const message = document.getElementById('broadcastMessage').value.trim();
+            const errorEl = document.getElementById('broadcastError');
+            
+            if (!message) {
+                errorEl.textContent = 'Please enter a message';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            
+            getUsername(currentUser, (displayName) => {
+                const timestamp = new Date().toISOString();
+                
+                // Get all channels
+                const allChannels = ['Homework Help', 'Study Hall', 'Class Talk', 'Exam Stress'];
+                Object.keys(customChannels).forEach(ch => allChannels.push(ch));
+                
+                // Send message to all channels with broadcast flag
+                const promises = allChannels.map(channel => {
+                    return database.ref('messages/' + channel).push({
+                        user: displayName,
+                        email: currentUser,
+                        text: message,
+                        timestamp: timestamp,
+                        isBroadcast: true  // Special flag for broadcast messages
+                    });
+                });
+                
+                Promise.all(promises).then(() => {
+                    closeBroadcastModal();
+                    alert('✅ Broadcast message sent to all channels!');
+                }).catch(err => {
+                    errorEl.textContent = 'Failed to send broadcast message';
+                    errorEl.classList.remove('hidden');
+                    console.error(err);
+                });
+            });
         }
 
         function toggleCollapsible(contentId) {
@@ -864,8 +963,12 @@
             
             users[email] = { username, password, createdAt: new Date().toISOString() };
             localStorage.setItem('users', JSON.stringify(users));
+            
+            // Store username in Firebase with email as key
             database.ref('users/' + email.replace(/\./g, '_')).set({
-                username, createdAt: new Date().toISOString()
+                username, 
+                email,
+                createdAt: new Date().toISOString()
             });
             
             showSuccess('Account created!');
@@ -941,17 +1044,18 @@
             document.getElementById('bannedScreen').classList.remove('show');
             document.getElementById('maintenanceScreen').classList.remove('show');
             
-            const displayName = users[currentUser]?.username || currentUser.split('@')[0];
-            let badge = '';
-            if (isOwner) {
-                badge = '<span class="badge owner-badge">Owner</span>';
-                document.getElementById('adminPanelHeader').textContent = 'OWNER PANEL';
-                document.getElementById('adminPanelHeader').classList.add('owner-header');
-            } else if (isAdmin) {
-                badge = '<span class="badge admin-badge">Admin</span>';
-                document.getElementById('adminPanelHeader').textContent = 'ADMIN PANEL';
-            }
-            document.getElementById('currentUser').innerHTML = displayName + badge;
+            getUsername(currentUser, (displayName) => {
+                let badge = '';
+                if (isOwner) {
+                    badge = '<span class="badge owner-badge">Owner</span>';
+                    document.getElementById('adminPanelHeader').textContent = 'OWNER PANEL';
+                    document.getElementById('adminPanelHeader').classList.add('owner-header');
+                } else if (isAdmin) {
+                    badge = '<span class="badge admin-badge">Admin</span>';
+                    document.getElementById('adminPanelHeader').textContent = 'ADMIN PANEL';
+                }
+                document.getElementById('currentUser').innerHTML = displayName + badge;
+            });
             
             if (!isProtectedAccount(currentUser) && !isAdmin && !isModerator) {
                 banListener = database.ref('banned/' + currentUser.replace(/\./g, '_'));
@@ -1065,17 +1169,29 @@
             const messagesDiv = document.getElementById('messages');
             const messageEl = document.createElement('div');
             messageEl.className = 'message';
+            
+            // Add broadcast styling if this is a broadcast message
+            if (msg.isBroadcast) {
+                messageEl.classList.add('broadcast-message');
+            }
+            
             messageEl.setAttribute('data-message-id', messageId);
             
-            const initial = msg.user.charAt(0).toUpperCase();
+            // Get username - use the stored username from message
+            const displayName = msg.user;
+            const initial = displayName.charAt(0).toUpperCase();
             const time = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             const canDelete = isAdmin || isOwner || isModerator;
+            
+            // Add broadcast badge if it's a broadcast message
+            const broadcastBadge = msg.isBroadcast ? '<span class="broadcast-badge">📢 Broadcast</span>' : '';
             
             messageEl.innerHTML = `
                 <div class="message-avatar" onclick="viewUserActivity('${msg.email}')" title="Click to view activity">${initial}</div>
                 <div class="message-content">
                     <div class="message-header">
-                        <span class="message-username" onclick="viewUserActivity('${msg.email}')">${msg.user}</span>
+                        <span class="message-username" onclick="viewUserActivity('${msg.email}')">${displayName}</span>
+                        ${broadcastBadge}
                         <span class="message-time">${time}</span>
                     </div>
                     <div class="message-text">${msg.text}</div>
@@ -1103,54 +1219,54 @@
             const text = input.value.trim();
             if (!text) return;
             
-            if (isProtectedAccount(currentUser)) {
-                const displayName = users[currentUser]?.username || currentUser.split('@')[0];
-                database.ref('messages/' + currentChannel).push({
-                    user: displayName, email: currentUser, text, timestamp: new Date().toISOString()
-                });
-                input.value = '';
-                return;
-            }
-            
-            if (isBanned) {
-                alert('You are banned');
-                input.value = '';
-                return;
-            }
-            
-            const lowerText = text.toLowerCase();
-            if (racistSlurs.some(slur => lowerText.includes(slur))) {
-                database.ref('banned/' + currentUser.replace(/\./g, '_')).set(true);
-                alert('Banned for using racist language');
-                isBanned = true;
-                showBannedScreen();
-                return;
-            }
-            
-            if (bannedWords.some(word => lowerText.includes(word))) {
-                if (!userStrikes[currentUser]) userStrikes[currentUser] = 0;
-                userStrikes[currentUser]++;
-                localStorage.setItem('userStrikes', JSON.stringify(userStrikes));
-                document.getElementById('strikeCount').textContent = userStrikes[currentUser];
-                document.getElementById('warningBanner').classList.remove('hidden');
+            getUsername(currentUser, (displayName) => {
+                if (isProtectedAccount(currentUser)) {
+                    database.ref('messages/' + currentChannel).push({
+                        user: displayName, email: currentUser, text, timestamp: new Date().toISOString()
+                    });
+                    input.value = '';
+                    return;
+                }
                 
-                if (userStrikes[currentUser] >= 3) {
+                if (isBanned) {
+                    alert('You are banned');
+                    input.value = '';
+                    return;
+                }
+                
+                const lowerText = text.toLowerCase();
+                if (racistSlurs.some(slur => lowerText.includes(slur))) {
                     database.ref('banned/' + currentUser.replace(/\./g, '_')).set(true);
-                    alert('Banned for excessive profanity (3 strikes)');
+                    alert('Banned for using racist language');
                     isBanned = true;
                     showBannedScreen();
                     return;
                 }
-                setTimeout(() => document.getElementById('warningBanner').classList.add('hidden'), 3000);
+                
+                if (bannedWords.some(word => lowerText.includes(word))) {
+                    if (!userStrikes[currentUser]) userStrikes[currentUser] = 0;
+                    userStrikes[currentUser]++;
+                    localStorage.setItem('userStrikes', JSON.stringify(userStrikes));
+                    document.getElementById('strikeCount').textContent = userStrikes[currentUser];
+                    document.getElementById('warningBanner').classList.remove('hidden');
+                    
+                    if (userStrikes[currentUser] >= 3) {
+                        database.ref('banned/' + currentUser.replace(/\./g, '_')).set(true);
+                        alert('Banned for excessive profanity (3 strikes)');
+                        isBanned = true;
+                        showBannedScreen();
+                        return;
+                    }
+                    setTimeout(() => document.getElementById('warningBanner').classList.add('hidden'), 3000);
+                    input.value = '';
+                    return;
+                }
+                
+                database.ref('messages/' + currentChannel).push({
+                    user: displayName, email: currentUser, text, timestamp: new Date().toISOString()
+                });
                 input.value = '';
-                return;
-            }
-            
-            const displayName = users[currentUser]?.username || currentUser.split('@')[0];
-            database.ref('messages/' + currentChannel).push({
-                user: displayName, email: currentUser, text, timestamp: new Date().toISOString()
             });
-            input.value = '';
         }
 
         function loadAdminPanel() {
@@ -1181,18 +1297,21 @@
                         const isBannedUser = bannedEmails.includes(email);
                         const userDiv = document.createElement('div');
                         userDiv.className = 'admin-user' + (isBannedUser ? ' banned' : '');
-                        const displayName = users[email]?.username || email.split('@')[0];
                         
-                        userDiv.innerHTML = `
-                            <div class="admin-user-name" onclick="viewUserActivity('${email}')">${displayName}${isBannedUser ? ' <small>(BANNED)</small>' : ''}</div>
-                            <div class="admin-user-buttons">
-                                <button class="view-activity-btn" onclick="viewUserActivity('${email}')">View Activity</button>
-                                <button class="${isBannedUser ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${email}')">
-                                    ${isBannedUser ? 'Unban' : 'Ban'}
-                                </button>
-                                ${isOwner ? `<button class="delete-account-btn" onclick="deleteAccount('${email}')">Delete Account</button>` : ''}
-                            </div>
-                        `;
+                        // Get username from Firebase or local storage
+                        getUsername(email, (displayName) => {
+                            userDiv.innerHTML = `
+                                <div class="admin-user-name" onclick="viewUserActivity('${email}')">${displayName}${isBannedUser ? ' <small>(BANNED)</small>' : ''}</div>
+                                <div class="admin-user-buttons">
+                                    <button class="view-activity-btn" onclick="viewUserActivity('${email}')">View Activity</button>
+                                    <button class="${isBannedUser ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${email}')">
+                                        ${isBannedUser ? 'Unban' : 'Ban'}
+                                    </button>
+                                    ${isOwner ? `<button class="delete-account-btn" onclick="deleteAccount('${email}')">Delete Account</button>` : ''}
+                                </div>
+                            `;
+                        });
+                        
                         adminUsersDiv.appendChild(userDiv);
                     });
                 });
@@ -1232,7 +1351,6 @@
             
             if (confirm(`Are you sure you want to permanently delete the account for ${email}?\n\nThis will:\n- Delete their user data\n- Delete all their messages\n- Remove them from the system\n\nThis action CANNOT be undone!`)) {
                 const userKey = email.replace(/\./g, '_');
-                const displayName = users[email]?.username || email.split('@')[0];
                 
                 // Delete from local storage
                 if (users[email]) {
@@ -1244,7 +1362,7 @@
                 database.ref('users/' + userKey).remove();
                 database.ref('banned/' + userKey).remove();
                 
-                // Delete all messages from this user in all channels
+                // Delete all messages from this user in all channels based on email
                 const allChannels = ['homework-help', 'study-hall', 'class-talk', 'exam-stress'];
                 Object.keys(customChannels).forEach(ch => allChannels.push(ch));
                 
@@ -1252,7 +1370,7 @@
                     database.ref('messages/' + channel).once('value', (snapshot) => {
                         snapshot.forEach(child => {
                             const msg = child.val();
-                            if (msg.email === email || msg.user === displayName) {
+                            if (msg.email === email) {
                                 database.ref('messages/' + channel + '/' + child.key).remove();
                             }
                         });
@@ -1281,7 +1399,27 @@
 
         function viewUserActivity(email) {
             if (!isOwner && !isAdmin) return;
-            const username = users[email]?.username || email.split('@')[0];
+            
+            // Get username from local storage or Firebase
+            let username = users[email]?.username;
+            
+            // If not in local storage, fetch from Firebase
+            if (!username) {
+                database.ref('users/' + email.replace(/\./g, '_')).once('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        username = snapshot.val().username || email.split('@')[0];
+                        continueViewUserActivity(email, username);
+                    } else {
+                        username = email.split('@')[0];
+                        continueViewUserActivity(email, username);
+                    }
+                });
+            } else {
+                continueViewUserActivity(email, username);
+            }
+        }
+        
+        function continueViewUserActivity(email, username) {
             document.getElementById('activityUserName').textContent = username;
             document.getElementById('activityUserEmail').textContent = email;
             
@@ -1297,7 +1435,7 @@
                     const messages = [];
                     snapshot.forEach(child => {
                         const msg = child.val();
-                        if (msg.user === username || msg.email === email) {
+                        if (msg.email === email) {
                             messages.push({ ...msg, id: child.key });
                         }
                     });
@@ -1359,45 +1497,48 @@
             const username = prompt('Who is bullying you? (Enter their username)');
             if (username) {
                 const details = prompt('Please describe what happened (optional):');
-                const displayName = users[currentUser]?.username || currentUser.split('@')[0];
-                database.ref('reports').push({
-                    reporter: displayName,
-                    reporterEmail: currentUser,
-                    message: `Reported ${username} for bullying. ${details ? 'Details: ' + details : ''}`,
-                    timestamp: Date.now()
+                getUsername(currentUser, (displayName) => {
+                    database.ref('reports').push({
+                        reporter: displayName,
+                        reporterEmail: currentUser,
+                        message: `Reported ${username} for bullying. ${details ? 'Details: ' + details : ''}`,
+                        timestamp: Date.now()
+                    });
+                    alert('Report submitted. An admin will review it.');
+                    closeHelpModal();
                 });
-                alert('Report submitted. An admin will review it.');
-                closeHelpModal();
             }
         }
 
         function reportProblem() {
             const problem = prompt('Please describe the problem:');
             if (problem) {
-                const displayName = users[currentUser]?.username || currentUser.split('@')[0];
-                database.ref('reports').push({
-                    reporter: displayName,
-                    reporterEmail: currentUser,
-                    message: `Problem: ${problem}`,
-                    timestamp: Date.now()
+                getUsername(currentUser, (displayName) => {
+                    database.ref('reports').push({
+                        reporter: displayName,
+                        reporterEmail: currentUser,
+                        message: `Problem: ${problem}`,
+                        timestamp: Date.now()
+                    });
+                    alert('Problem reported. An admin will look into it.');
+                    closeHelpModal();
                 });
-                alert('Problem reported. An admin will look into it.');
-                closeHelpModal();
             }
         }
 
         function contactAdmin() {
             const message = prompt('Message to admin:');
             if (message) {
-                const displayName = users[currentUser]?.username || currentUser.split('@')[0];
-                database.ref('reports').push({
-                    reporter: displayName,
-                    reporterEmail: currentUser,
-                    message: `Message: ${message}`,
-                    timestamp: Date.now()
+                getUsername(currentUser, (displayName) => {
+                    database.ref('reports').push({
+                        reporter: displayName,
+                        reporterEmail: currentUser,
+                        message: `Message: ${message}`,
+                        timestamp: Date.now()
+                    });
+                    alert('Message sent to admin.');
+                    closeHelpModal();
                 });
-                alert('Message sent to admin.');
-                closeHelpModal();
             }
         }
 
