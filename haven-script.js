@@ -1029,6 +1029,7 @@ function showChat() {
     loadCustomSettings();
     loadMessages();
     loadVipRooms();
+    loadAnnouncement();
     setInterval(updateLastActivity, 60000);
 }
 
@@ -1545,4 +1546,59 @@ function resetAllMessages() {
             });
         }
     }
+}
+
+// Announcement functions
+function postAnnouncement() {
+    if (!isOwner) return;
+    const text = document.getElementById('newAnnouncement').value.trim();
+    if (!text) {
+        alert('Please enter an announcement text');
+        return;
+    }
+    
+    database.ref('announcement').set({
+        text: text,
+        timestamp: Date.now(),
+        postedBy: currentUser
+    }).then(() => {
+        document.getElementById('newAnnouncement').value = '';
+        alert('Announcement posted!');
+        showAnnouncementBanner(text);
+    });
+}
+
+function clearAnnouncement() {
+    if (!isOwner) return;
+    if (confirm('Clear the current announcement?')) {
+        database.ref('announcement').remove().then(() => {
+            document.getElementById('announcementsBanner').classList.remove('show');
+            document.getElementById('currentAnnouncementText').textContent = 'None';
+            alert('Announcement cleared');
+        });
+    }
+}
+
+function dismissAnnouncement() {
+    document.getElementById('announcementsBanner').classList.remove('show');
+}
+
+function showAnnouncementBanner(text) {
+    document.getElementById('announcementText').textContent = text;
+    document.getElementById('announcementsBanner').classList.add('show');
+    document.getElementById('currentAnnouncementText').textContent = text;
+}
+
+function loadAnnouncement() {
+    database.ref('announcement').on('value', (snapshot) => {
+        if (snapshot.exists()) {
+            const announcement = snapshot.val();
+            showAnnouncementBanner(announcement.text);
+        } else {
+            document.getElementById('announcementsBanner').classList.remove('show');
+            if (isOwner) {
+                document.getElementById('currentAnnouncementText').textContent = 'None';
+            }
+        }
+    });
 }
