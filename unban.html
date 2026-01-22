@@ -3,165 +3,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Owner Unban Tool</title>
+    <title>Owner Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg-primary: #0f0f14;
+            --bg-secondary: #16161d;
+            --bg-tertiary: #1d1d26;
+            --accent-danger: #ef4444;
+            --accent-warning: #f59e0b;
+            --accent-primary: #6366f1;
+            --accent-success: #10b981;
+            --text-primary: #e4e4e7;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
         }
         
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
         }
         
         .container {
-            background: #2f3136;
+            background: var(--bg-secondary);
             padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            max-width: 600px;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-width: 900px;
             width: 100%;
+            margin: 0 auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         h1 {
-            color: #fff;
+            color: var(--text-primary);
             text-align: center;
-            margin-bottom: 30px;
-            font-size: 28px;
+            margin-bottom: 12px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+        
+        .auth-section {
+            background: var(--bg-tertiary);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 2px solid var(--accent-warning);
+        }
+        
+        .auth-section h2 {
+            color: var(--accent-warning);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+        
+        .auth-section input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-primary);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+        
+        .auth-section input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        .locked-section {
+            filter: blur(4px);
+            pointer-events: none;
+            opacity: 0.5;
         }
         
         .status {
-            background: #40444b;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-family: monospace;
+            background: var(--bg-primary);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
-            color: #dcddde;
+            color: var(--text-secondary);
             max-height: 400px;
             overflow-y: auto;
+            border: 1px solid var(--bg-tertiary);
         }
         
         .status div {
-            margin: 5px 0;
-            padding: 5px;
+            margin: 6px 0;
+            padding: 6px 0;
         }
         
-        .success {
-            color: #3ba55d;
-            font-weight: bold;
-        }
+        .success { color: var(--accent-success); font-weight: 600; }
+        .error { color: var(--accent-danger); font-weight: 600; }
+        .info { color: var(--accent-primary); }
+        .warning { color: var(--accent-warning); font-weight: 600; }
         
-        .error {
-            color: #ed4245;
-            font-weight: bold;
-        }
-        
-        .info {
-            color: #5865f2;
-        }
-        
-        .warning {
-            color: #faa61a;
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
         }
         
         button {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #ed4245 0%, #c03537 100%);
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-primary), #4f46e5);
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             color: white;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
-            margin-bottom: 10px;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
         }
         
-        button:hover {
+        button:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(237, 66, 69, 0.4);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
         }
         
         button:disabled {
-            background: #72767d;
+            background: var(--bg-tertiary);
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
+            opacity: 0.5;
         }
         
-        .btn-secondary {
-            background: linear-gradient(135deg, #5865f2 0%, #4752c4 100%);
+        .btn-danger {
+            background: linear-gradient(135deg, var(--accent-danger), #dc2626);
         }
         
-        .btn-secondary:hover {
-            box-shadow: 0 5px 15px rgba(88, 101, 242, 0.4);
+        .btn-danger:hover:not(:disabled) {
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--accent-warning), #d97706);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent-success), #059669);
         }
         
         .owners-list {
-            background: #40444b;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
+            background: var(--bg-tertiary);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 24px 0;
+            border-left: 4px solid var(--accent-warning);
         }
         
         .owners-list h3 {
-            color: #faa61a;
-            margin-bottom: 10px;
+            color: var(--accent-warning);
+            margin-bottom: 12px;
             font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .owners-list div {
-            color: #dcddde;
-            padding: 5px 0;
-            font-size: 14px;
+            color: var(--text-primary);
+            padding: 8px 0;
+            font-size: 15px;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 4px; }
+        
+        .section-title {
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 700;
+            margin: 32px 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--bg-tertiary);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚨 Emergency Owner Unban Tool</h1>
+        <h1>👑 Owner Control Panel</h1>
+        <p class="subtitle">Advanced management and emergency tools</p>
         
-        <div class="owners-list">
-            <h3>👑 PROTECTED OWNER ACCOUNTS</h3>
-            <div>• redstoneb3@gmail.com</div>
-            <div>• haventeam3@gmail.com</div>
+        <div class="auth-section">
+            <h2>🔐 Authentication Required</h2>
+            <input type="password" id="accessCode" placeholder="Enter owner access code..." />
+            <button onclick="authenticate()" class="btn-success">Unlock Panel</button>
         </div>
         
-        <div class="status" id="status">
-            <div class="info">Ready to execute emergency unban...</div>
+        <div id="mainPanel" class="locked-section">
+            <div class="owners-list">
+                <h3>👑 PROTECTED OWNER ACCOUNTS</h3>
+                <div>• redstoneb3@gmail.com</div>
+                <div>• haventeam3@gmail.com</div>
+            </div>
+            
+            <div class="status" id="status">
+                <div class="info">Waiting for authentication...</div>
+            </div>
+            
+            <div class="section-title">🚨 Emergency Controls</div>
+            <div class="button-grid">
+                <button onclick="emergencyUnban()" class="btn-danger">
+                    🔓 Force Unban All Owners
+                </button>
+                
+                <button onclick="clearAllBans()" class="btn-danger">
+                    🗑️ Clear ALL Bans
+                </button>
+                
+                <button onclick="unbanSpecificUser()" class="btn-warning">
+                    👤 Unban Specific User
+                </button>
+                
+                <button onclick="banSpecificUser()" class="btn-warning">
+                    🚫 Ban Specific User
+                </button>
+            </div>
+            
+            <div class="section-title">📊 Database Management</div>
+            <div class="button-grid">
+                <button onclick="viewDatabase()">
+                    📊 View Database Status
+                </button>
+                
+                <button onclick="viewAllUsers()">
+                    👥 View All Users
+                </button>
+                
+                <button onclick="deleteInactiveAccounts()" class="btn-warning">
+                    🧹 Delete Inactive Accounts (30+ days)
+                </button>
+                
+                <button onclick="resetUserStrikes()">
+                    ⚡ Reset All User Strikes
+                </button>
+            </div>
+            
+            <div class="section-title">🔧 System Tools</div>
+            <div class="button-grid">
+                <button onclick="exportBackup()" class="btn-success">
+                    💾 Export Database Backup
+                </button>
+                
+                <button onclick="clearReports()">
+                    📝 Clear All Reports
+                </button>
+                
+                <button onclick="resetBannedWords()">
+                    🔤 Reset Banned Words List
+                </button>
+                
+                <button onclick="window.location.href='index.html'" class="btn-primary">
+                    🏠 Return to Chat
+                </button>
+            </div>
         </div>
-        
-        <button onclick="emergencyUnban()" id="unbanBtn">
-            🔓 FORCE UNBAN ALL OWNERS
-        </button>
-        
-        <button onclick="viewDatabase()" class="btn-secondary">
-            📊 View Current Database Status
-        </button>
-        
-        <button onclick="clearAllBans()" class="btn-secondary">
-            🗑️ Clear ALL Bans (Nuclear Option)
-        </button>
-        
-        <button onclick="window.location.href='index.html'" class="btn-secondary">
-            🏠 Return to Chat
-        </button>
     </div>
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyB6uKGFMQEUCR9IQot1wdgjDmhAXioJOUo",
             authDomain: "school-dis.firebaseapp.com",
@@ -181,6 +319,11 @@
             'haventeam3@gmail.com'
         ];
         
+        const ACCESS_CODE = 'owner123';
+        const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
+        
+        let isAuthenticated = false;
+        
         function log(message, type = 'info') {
             const statusDiv = document.getElementById('status');
             const logDiv = document.createElement('div');
@@ -190,10 +333,22 @@
             statusDiv.scrollTop = statusDiv.scrollHeight;
         }
         
+        function authenticate() {
+            const code = document.getElementById('accessCode').value.trim();
+            if (code === ACCESS_CODE) {
+                isAuthenticated = true;
+                document.getElementById('mainPanel').classList.remove('locked-section');
+                document.querySelector('.auth-section').style.display = 'none';
+                log('✓ Authentication successful - Full access granted', 'success');
+                log('Owner Control Panel ready', 'info');
+            } else {
+                alert('❌ Incorrect access code!');
+                log('✗ Authentication failed', 'error');
+            }
+        }
+        
         async function emergencyUnban() {
-            const btn = document.getElementById('unbanBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Processing...';
+            if (!isAuthenticated) return;
             
             log('========================================', 'warning');
             log('EMERGENCY UNBAN INITIATED', 'warning');
@@ -205,11 +360,9 @@
                 log(`Processing: ${email}`, 'info');
                 
                 try {
-                    // Remove from banned list
                     await database.ref('banned/' + userKey).remove();
                     log(`✓ Removed ban entry for ${email}`, 'success');
                     
-                    // Clear strikes from localStorage
                     let strikes = JSON.parse(localStorage.getItem('userStrikes') || '{}');
                     if (strikes[email]) {
                         delete strikes[email];
@@ -217,7 +370,6 @@
                         log(`✓ Cleared strikes for ${email}`, 'success');
                     }
                     
-                    // Set as active user in database
                     await database.ref('users/' + userKey).update({
                         lastActive: Date.now(),
                         isOwner: true
@@ -230,16 +382,81 @@
             }
             
             log('========================================', 'warning');
-            log('UNBAN COMPLETE', 'success');
-            log('Both owner accounts are now UNBLOCKED', 'success');
-            log('You can now log in without restrictions', 'success');
+            log('UNBAN COMPLETE - All owner accounts unbanned', 'success');
             log('========================================', 'warning');
+        }
+        
+        async function clearAllBans() {
+            if (!isAuthenticated) return;
+            if (!confirm('⚠️ WARNING: This will unban ALL users in the database. Continue?')) {
+                return;
+            }
             
-            btn.disabled = false;
-            btn.textContent = '✅ UNBAN COMPLETE - Click to Re-run if Needed';
+            log('========================================', 'warning');
+            log('CLEARING ALL BANS', 'warning');
+            
+            try {
+                await database.ref('banned').remove();
+                log('✓ All bans cleared from database', 'success');
+                
+                localStorage.setItem('userStrikes', JSON.stringify({}));
+                log('✓ All strikes cleared from localStorage', 'success');
+                
+                log('Database is now clean - all users unbanned', 'success');
+            } catch (error) {
+                log(`✗ Error clearing bans: ${error.message}`, 'error');
+            }
+            
+            log('========================================', 'warning');
+        }
+        
+        async function unbanSpecificUser() {
+            if (!isAuthenticated) return;
+            
+            const email = prompt('Enter email address to unban:');
+            if (!email) return;
+            
+            const userKey = email.replace(/\./g, '_');
+            
+            try {
+                await database.ref('banned/' + userKey).remove();
+                log(`✓ Unbanned ${email}`, 'success');
+                
+                let strikes = JSON.parse(localStorage.getItem('userStrikes') || '{}');
+                if (strikes[email]) {
+                    delete strikes[email];
+                    localStorage.setItem('userStrikes', JSON.stringify(strikes));
+                    log(`✓ Cleared strikes for ${email}`, 'success');
+                }
+            } catch (error) {
+                log(`✗ Error unbanning ${email}: ${error.message}`, 'error');
+            }
+        }
+        
+        async function banSpecificUser() {
+            if (!isAuthenticated) return;
+            
+            const email = prompt('Enter email address to ban:');
+            if (!email) return;
+            
+            if (OWNER_ACCOUNTS.includes(email)) {
+                alert('❌ Cannot ban owner accounts!');
+                return;
+            }
+            
+            const userKey = email.replace(/\./g, '_');
+            
+            try {
+                await database.ref('banned/' + userKey).set(true);
+                log(`✓ Banned ${email}`, 'success');
+            } catch (error) {
+                log(`✗ Error banning ${email}: ${error.message}`, 'error');
+            }
         }
         
         async function viewDatabase() {
+            if (!isAuthenticated) return;
+            
             log('========================================', 'info');
             log('FETCHING DATABASE STATUS...', 'info');
             
@@ -272,34 +489,168 @@
             log('========================================', 'info');
         }
         
-        async function clearAllBans() {
-            if (!confirm('⚠️ WARNING: This will unban ALL users in the database. Continue?')) {
+        async function viewAllUsers() {
+            if (!isAuthenticated) return;
+            
+            log('========================================', 'info');
+            log('FETCHING ALL USERS...', 'info');
+            
+            try {
+                const usersSnapshot = await database.ref('users').once('value');
+                const firebaseUsers = usersSnapshot.val() || {};
+                const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
+                
+                const allEmails = new Set([...Object.keys(localUsers)]);
+                Object.keys(firebaseUsers).forEach(key => allEmails.add(key.replace(/_/g, '.')));
+                
+                const now = Date.now();
+                
+                log(`Total Users: ${allEmails.size}`, 'info');
+                log('', 'info');
+                
+                allEmails.forEach(email => {
+                    const userKey = email.replace(/\./g, '_');
+                    const username = localUsers[email]?.username || email.split('@')[0];
+                    const lastActive = firebaseUsers[userKey]?.lastActive || 0;
+                    const daysSinceActive = lastActive > 0 ? Math.floor((now - lastActive) / (24 * 60 * 60 * 1000)) : 'Never';
+                    
+                    let role = '';
+                    if (OWNER_ACCOUNTS.includes(email)) role = '👑 OWNER';
+                    
+                    log(`${username} (${email}) ${role}`, 'info');
+                    log(`  Last active: ${daysSinceActive} days ago`, 'info');
+                });
+                
+            } catch (error) {
+                log(`Error fetching users: ${error.message}`, 'error');
+            }
+            
+            log('========================================', 'info');
+        }
+        
+        async function deleteInactiveAccounts() {
+            if (!isAuthenticated) return;
+            
+            if (!confirm('⚠️ This will delete all accounts inactive for 30+ days. Continue?')) {
                 return;
             }
             
             log('========================================', 'warning');
-            log('CLEARING ALL BANS (NUCLEAR OPTION)', 'warning');
+            log('SCANNING FOR INACTIVE ACCOUNTS...', 'info');
             
             try {
-                await database.ref('banned').remove();
-                log('✓ All bans cleared from database', 'success');
+                const now = Date.now();
+                const usersSnapshot = await database.ref('users').once('value');
+                const firebaseUsers = usersSnapshot.val() || {};
+                const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
                 
-                localStorage.setItem('userStrikes', JSON.stringify({}));
-                log('✓ All strikes cleared from localStorage', 'success');
+                let deletedCount = 0;
                 
-                log('Database is now clean - all users unbanned', 'success');
+                for (const userKey in firebaseUsers) {
+                    const email = userKey.replace(/_/g, '.');
+                    
+                    if (OWNER_ACCOUNTS.includes(email)) continue;
+                    
+                    const lastActive = firebaseUsers[userKey].lastActive || 0;
+                    
+                    if (lastActive > 0 && (now - lastActive) > ONE_MONTH_MS) {
+                        const daysSinceActive = Math.floor((now - lastActive) / (24 * 60 * 60 * 1000));
+                        log(`Deleting ${email} (inactive for ${daysSinceActive} days)`, 'warning');
+                        
+                        await database.ref('users/' + userKey).remove();
+                        await database.ref('banned/' + userKey).remove();
+                        
+                        if (localUsers[email]) {
+                            delete localUsers[email];
+                        }
+                        
+                        deletedCount++;
+                    }
+                }
+                
+                localStorage.setItem('users', JSON.stringify(localUsers));
+                
+                log(`✓ Deleted ${deletedCount} inactive accounts`, 'success');
+                
             } catch (error) {
-                log(`✗ Error clearing bans: ${error.message}`, 'error');
+                log(`✗ Error: ${error.message}`, 'error');
             }
             
             log('========================================', 'warning');
         }
         
-        // Auto-check status on load
+        async function resetUserStrikes() {
+            if (!isAuthenticated) return;
+            
+            if (!confirm('Reset all user strikes?')) return;
+            
+            localStorage.setItem('userStrikes', JSON.stringify({}));
+            log('✓ All user strikes have been reset', 'success');
+        }
+        
+        async function exportBackup() {
+            if (!isAuthenticated) return;
+            
+            log('Creating backup...', 'info');
+            
+            try {
+                const snapshot = await database.ref().once('value');
+                const data = snapshot.val();
+                
+                const backup = {
+                    timestamp: new Date().toISOString(),
+                    database: data,
+                    localStorage: {
+                        users: JSON.parse(localStorage.getItem('users') || '{}'),
+                        userStrikes: JSON.parse(localStorage.getItem('userStrikes') || '{}')
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `haven-backup-${Date.now()}.json`;
+                a.click();
+                
+                log('✓ Backup exported successfully', 'success');
+            } catch (error) {
+                log(`✗ Export failed: ${error.message}`, 'error');
+            }
+        }
+        
+        async function clearReports() {
+            if (!isAuthenticated) return;
+            
+            if (!confirm('Clear all reports?')) return;
+            
+            try {
+                await database.ref('reports').remove();
+                log('✓ All reports cleared', 'success');
+            } catch (error) {
+                log(`✗ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function resetBannedWords() {
+            if (!isAuthenticated) return;
+            
+            if (!confirm('Reset banned words list to default?')) return;
+            
+            const defaultWords = ['fuck', 'shit', 'damn', 'hell', 'ass', 'bitch', 'bastard', 'crap'];
+            
+            try {
+                await database.ref('settings/bannedWords').set(defaultWords);
+                log('✓ Banned words list reset to default', 'success');
+            } catch (error) {
+                log(`✗ Error: ${error.message}`, 'error');
+            }
+        }
+        
         window.onload = function() {
-            log('Emergency Unban Tool loaded', 'success');
-            log('Click "View Current Database Status" to check ban status', 'info');
-            log('Click "FORCE UNBAN ALL OWNERS" to remove any bans', 'warning');
+            log('Owner Control Panel loaded', 'info');
+            log('Enter access code to unlock features', 'warning');
+            log(`Access Code: ${ACCESS_CODE}`, 'info');
         };
     </script>
 </body>
