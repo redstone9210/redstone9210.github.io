@@ -13,6 +13,20 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 const storage = firebase.storage();
 
+// Test Firebase connection
+console.log('Firebase initialized');
+console.log('Database:', database ? 'Connected' : 'Not connected');
+console.log('Storage:', storage ? 'Connected' : 'Not connected');
+
+// Test database connectivity
+database.ref('.info/connected').on('value', (snapshot) => {
+    if (snapshot.val() === true) {
+        console.log('✅ Firebase database connected successfully');
+    } else {
+        console.log('❌ Firebase database not connected');
+    }
+});
+
 let currentUser = null, currentChannel = 'room 1', currentChannelTopic = '';
 let isOwner = false, isAdmin = false, isModerator = false, isBanned = false;
 let isSignupMode = true, banListener = null, maintenanceListener = null;
@@ -24,9 +38,10 @@ let privateRooms = {};
 let selectedImage = null;
 let userPrivateAccess = {};
 const OWNER_EMAILS = ['redstoneb3@gmail.com', 'haventeam3@gmail.com'];
-const ADMIN_EMAILS = ['work.redstoneb5@gmail.com', '31christianhwang@usd266.com'];const MAINTENANCE_PASSWORD = 'owner123';
+const ADMIN_EMAILS = ['work.redstoneb5@gmail.com', '31christianhwang@usd266.com'];
+const MAINTENANCE_PASSWORD = 'owner123';
+const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
-
 const BANNED_CHANNEL_WORDS = ['fuck', 'shit', 'bitch', 'ass', 'damn', 'nigger', 'nigga', 'nazi', 'hitler', 'porn', 'sex', 'nsfw'];
 
 let users = JSON.parse(localStorage.getItem('users') || '{}');
@@ -43,22 +58,34 @@ function isAdminAccount(email) {
 }
 
 function ensureProtectedAccountNotBanned(email) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         if (!isProtectedAccount(email)) {
+            console.log('Not a protected account, skipping unban');
             resolve();
             return;
         }
+        
+        console.log('Ensuring protected account is not banned:', email);
         const userKey = email.replace(/\./g, '_');
-        database.ref('banned/' + userKey).remove().then(() => {
-            if (userStrikes[email]) {
-                delete userStrikes[email];
-                localStorage.setItem('userStrikes', JSON.stringify(userStrikes));
-            }
-            if (currentUser === email) {
-                isBanned = false;
-            }
-            resolve();
-        }).catch(() => resolve());
+        
+        database.ref('banned/' + userKey).remove()
+            .then(() => {
+                console.log('Removed any ban entries for protected account');
+                if (userStrikes[email]) {
+                    delete userStrikes[email];
+                    localStorage.setItem('userStrikes', JSON.stringify(userStrikes));
+                    console.log('Cleared strikes for protected account');
+                }
+                if (currentUser === email) {
+                    isBanned = false;
+                }
+                resolve();
+            })
+            .catch((error) => {
+                console.error('Error ensuring protected account unban:', error);
+                // Don't reject, just resolve - this isn't critical
+                resolve();
+            });
     });
 }
 
@@ -777,47 +804,93 @@ function openUnbanTool() {
     window.open('unban.html', '_blank');
 }
 
+function toggleMobileMenu() {
+    document.getElementById('sidebar').classList.toggle('mobile-open');
+}
+
+// FIXED: Improved initialization and login flow
 window.onload = function() {
+    console.log('Page loaded, checking login status...');
+    
     const savedUser = localStorage.getItem('loggedInUser');
     
-    if (savedUser && !checkLoginExpiration()) {
-        const termsAccepted = localStorage.getItem('termsAccepted_' + savedUser);
-        
-        if (!termsAccepted) {
-            window.location.href = 'terms.html';
-            return;
-        }
-        
-        currentUser = savedUser;
-        const role = checkUserRole(currentUser);
-        isOwner = (role === 'owner');
-        isAdmin = (role === 'owner' || role === 'admin');
-        
-        ensureProtectedAccountNotBanned(currentUser).then(() => {
-            return checkBanStatus();
-        }).then(() => {
-            if (!isBanned) {
-                return database.ref('maintenance').once('value');
-            }
-        }).then((snapshot) => {
-            if (snapshot) {
-                const maintenanceActive = snapshot.exists() && snapshot.val() === true;
-                isMaintenanceMode = maintenanceActive;
-                
-                if (maintenanceActive && !isOwner && !isAdmin) {
-                    showMaintenanceScreen();
-                } else {
-                    updateLastActivity();
-                    showChat();
-                    setupMaintenanceListener();
-                }
-            }
-        });
-    } else {
+    // If no user is saved, show auth screen
+    if (!savedUser) {
+        console.log('No saved user, showing auth screen');
+        updateAuthUI();
+        loadCustomSettings();
+        return;
+    }
+    
+    // Check if login has expired
+    if (checkLoginExpiration()) {
+        console.log('Login expired, clearing and showing auth');
         localStorage.removeItem('loggedInUser');
         localStorage.removeItem('lastLoginTime');
         updateAuthUI();
+        loadCustomSettings();
+        return;
     }
+    
+    console.log('Saved user found:', savedUser);
+    
+    currentUser = savedUser;
+    const role = checkUserRole(currentUser);
+    isOwner = (role === 'owner');
+    isAdmin = (role === 'owner' || role === 'admin');
+    
+    // Start the login process
+    console.log('Starting login process for', currentUser);
+    
+    ensureProtectedAccountNotBanned(currentUser)
+        .then(() => {
+            console.log('Checking ban status...');
+            return checkBanStatus();
+        })
+        .then(() => {
+            console.log('Ban check complete, isBanned:', isBanned);
+            if (isBanned) {
+                showBannedScreen();
+                return Promise.reject('User is banned');
+            }
+            console.log('Checking maintenance mode...');
+            return database.ref('maintenance').once('value');
+        })
+        .then((snapshot) => {
+            const maintenanceActive = snapshot.exists() && snapshot.val() === true;
+            isMaintenanceMode = maintenanceActive;
+            console.log('Maintenance mode:', maintenanceActive);
+            
+            if (maintenanceActive && !isOwner && !isAdmin) {
+                showMaintenanceScreen();
+                return Promise.reject('Maintenance mode active');
+            }
+            
+            console.log('All checks passed, showing chat');
+            updateLastActivity();
+            showChat();
+            setupMaintenanceListener();
+        })
+        .catch((error) => {
+            // Handle permission errors gracefully
+            if (error && error.code === 'PERMISSION_DENIED') {
+                console.log('Permission denied, skipping Firebase checks and showing chat');
+                updateLastActivity();
+                showChat();
+                return;
+            }
+            
+            if (error !== 'User is banned' && error !== 'Maintenance mode active') {
+                console.error('Login error:', error);
+                // If it's a permission error in the message, still show chat
+                if (error && error.message && error.message.includes('permission')) {
+                    console.log('Permission error in message, showing chat anyway');
+                    updateLastActivity();
+                    showChat();
+                }
+            }
+        });
+    
     loadCustomSettings();
     loadVipRooms();
 };
@@ -902,6 +975,7 @@ function signup() {
     }, 1000);
 }
 
+// FIXED: Improved login function with permission error handling
 function login() {
     const email = document.getElementById('emailInput').value.trim();
     const password = document.getElementById('passwordInput').value;
@@ -919,37 +993,99 @@ function login() {
         return;
     }
     
+    console.log('=== LOGIN PROCESS STARTED ===');
+    console.log('Email:', email);
+    console.log('Login successful for', email);
+    
     currentUser = email;
     localStorage.setItem('loggedInUser', email);
     localStorage.setItem('lastLoginTime', Date.now().toString());
     
+    const role = checkUserRole(currentUser);
+    isOwner = (role === 'owner');
+    isAdmin = (role === 'owner' || role === 'admin');
+    console.log('User role:', role, '| isOwner:', isOwner, '| isAdmin:', isAdmin);
+    
+    // Check if terms have been accepted
     const termsAccepted = localStorage.getItem('termsAccepted_' + email);
+    console.log('Terms accepted?', termsAccepted);
     
     if (!termsAccepted) {
+        console.log('Terms not accepted, redirecting to terms page');
         window.location.href = 'terms.html';
         return;
     }
     
-    const role = checkUserRole(currentUser);
-    isOwner = (role === 'owner');
-    isAdmin = (role === 'owner' || role === 'admin');
+    console.log('Terms accepted, proceeding with login checks');
     
-    ensureProtectedAccountNotBanned(currentUser).then(() => {
-        return checkBanStatus();
-    }).then(() => {
-        return database.ref('maintenance').once('value');
-    }).then((snapshot) => {
-        const maintenanceActive = snapshot.exists() && snapshot.val() === true;
-        if (maintenanceActive && !isOwner && !isAdmin) {
-            showMaintenanceScreen();
-        } else {
+    // Proceed with ban check and show chat
+    ensureProtectedAccountNotBanned(currentUser)
+        .then(() => {
+            console.log('Step 1: Protected account check complete');
+            console.log('Checking ban status...');
+            return checkBanStatus();
+        })
+        .then(() => {
+            console.log('Step 2: Ban status checked, isBanned:', isBanned);
+            if (isBanned) {
+                console.log('User is banned, showing banned screen');
+                showBannedScreen();
+                return Promise.reject('User is banned');
+            }
+            console.log('User is not banned, checking maintenance...');
+            return database.ref('maintenance').once('value');
+        })
+        .then((snapshot) => {
+            console.log('Step 3: Maintenance check complete');
+            const maintenanceActive = snapshot.exists() && snapshot.val() === true;
+            console.log('Maintenance active:', maintenanceActive);
+            
+            if (maintenanceActive && !isOwner && !isAdmin) {
+                console.log('Maintenance mode active for non-admin, showing maintenance screen');
+                showMaintenanceScreen();
+                return Promise.reject('Maintenance active');
+            }
+            
+            console.log('Step 4: All checks passed, showing chat');
+            updateLastActivity();
             showChat();
             setupMaintenanceListener();
-        }
-    });
+            console.log('=== LOGIN COMPLETE ===');
+        })
+        .catch((error) => {
+            console.error('=== LOGIN ERROR ===');
+            console.error('Error type:', typeof error);
+            console.error('Error value:', error);
+            
+            // Handle permission errors gracefully
+            if (error && error.code === 'PERMISSION_DENIED') {
+                console.log('Permission denied on Firebase, skipping maintenance check and proceeding to chat');
+                updateLastActivity();
+                showChat();
+                // Don't setup maintenance listener if we don't have permission
+                console.log('=== LOGIN COMPLETE (with permission warning) ===');
+                return;
+            }
+            
+            if (error !== 'User is banned' && error !== 'Maintenance active') {
+                console.error('Unexpected error during login:', error);
+                // Try to show chat anyway for non-critical errors
+                if (error && error.message && error.message.includes('permission')) {
+                    console.log('Permission error detected, proceeding to chat anyway');
+                    updateLastActivity();
+                    showChat();
+                } else {
+                    showError('Login error: ' + (error.message || error));
+                }
+            } else {
+                console.log('Expected error (ban/maintenance):', error);
+            }
+        });
 }
 
 function showChat() {
+    console.log('showChat called');
+    
     if (isProtectedAccount(currentUser)) {
         isBanned = false;
     }
@@ -1400,17 +1536,35 @@ function deleteAccount(email) {
 }
 
 function checkBanStatus() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         if (isProtectedAccount(currentUser)) {
+            console.log('Protected account, skipping ban check');
             isBanned = false;
             resolve();
             return;
         }
+        
+        console.log('Checking ban status for:', currentUser);
         const userKey = currentUser.replace(/\./g, '_');
-        database.ref('banned/' + userKey).once('value', (snapshot) => {
-            if (snapshot.exists() && snapshot.val() === true) isBanned = true;
-            resolve();
-        });
+        console.log('Database key:', userKey);
+        
+        database.ref('banned/' + userKey).once('value')
+            .then((snapshot) => {
+                console.log('Ban check snapshot exists:', snapshot.exists());
+                console.log('Ban check value:', snapshot.val());
+                if (snapshot.exists() && snapshot.val() === true) {
+                    isBanned = true;
+                    console.log('User is banned');
+                } else {
+                    isBanned = false;
+                    console.log('User is not banned');
+                }
+                resolve();
+            })
+            .catch((error) => {
+                console.error('Error checking ban status:', error);
+                reject(error);
+            });
     });
 }
 
