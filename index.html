@@ -988,10 +988,32 @@
             font-size: 14px;
             margin-bottom: 12px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .admin-user-name:hover {
             text-decoration: underline;
+        }
+
+        /* Online status dot styling */
+        .online-status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .online-status-dot.online {
+            background-color: #43b581;
+            box-shadow: 0 0 8px rgba(67, 181, 129, 0.6);
+        }
+
+        .online-status-dot.offline {
+            background-color: #747f8d;
         }
 
         .admin-user-buttons {
@@ -1756,17 +1778,17 @@
                     <span>Text Channels</span>
                     <button class="add-channel-btn" onclick="openCreateChannelModal()">+</button>
                 </div>
-                <div class="channel active" onclick="switchChannel('room 1', '')">
-                    <span class="channel-name">room 1</span>
+                <div class="channel active" onclick="switchChannel('homework help', '')">
+                    <span class="channel-name">homework help</span>
                 </div>
-                <div class="channel" onclick="switchChannel('room 2', '')">
-                    <span class="channel-name">room 2</span>
+                <div class="channel" onclick="switchChannel('teacher complaints', '')">
+                    <span class="channel-name">teacher complaints</span>
                 </div>
-                <div class="channel" onclick="switchChannel('room 3', '')">
-                    <span class="channel-name">room 3</span>
+                <div class="channel" onclick="switchChannel('study hall', '')">
+                    <span class="channel-name">study hall</span>
                 </div>
-                <div class="channel" onclick="switchChannel('room 4', '')">
-                    <span class="channel-name">room 4</span>
+                <div class="channel" onclick="switchChannel('science lab', '')">
+                    <span class="channel-name">science lab</span>
                 </div>
                 <div id="customChannelsSection" class="hidden">
                     <div class="channel-category">Custom Channels</div>
@@ -1782,7 +1804,7 @@
             </div>
             <div id="privateChannelsSection" class="hidden">
                 <div class="channel-category">
-                    <span>🔒 Dev room</span>
+                    <span>🔒 Staff room</span>
                     <button class="add-channel-btn" onclick="openCreatePrivateRoomModal()" style="display: none;" id="addPrivateRoomBtn">+</button>
                     <button class="add-channel-btn" onclick="openJoinPrivateRoomModal()" title="Join with code">🔑</button>
                 </div>
@@ -1922,7 +1944,7 @@
         <div class="modal-content">
             <h3>🔒 Create Private Room</h3>
             <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">Create a code-protected room. Anyone with the code can join!</p>
-            <input type="text" id="privateRoomName" placeholder="Room name (e.g., Dev Room)" maxlength="30" />
+            <input type="text" id="privateRoomName" placeholder="Room name (e.g., Staff Room)" maxlength="30" />
             <textarea id="privateRoomTopic" placeholder="Room description (optional)" maxlength="200"></textarea>
             <input type="text" id="privateRoomCode" placeholder="Access code (min 4 characters)" />
             <div class="error-msg hidden" id="privateRoomError"></div>
@@ -1998,7 +2020,7 @@
         <img id="modalImage" src="" alt="Full size image" />
     </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <script src="haven-script.js"></script>
