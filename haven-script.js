@@ -1405,6 +1405,7 @@ function loadAdminPanel() {
     const adminUsersDiv = document.getElementById('adminUsers');
     adminUsersDiv.innerHTML = '';
     const now = Date.now();
+    const FIVE_MINUTES = 5 * 60 * 1000; // 5 minutes in milliseconds
     
     OWNER_EMAILS.forEach(email => ensureProtectedAccountNotBanned(email));
     
@@ -1418,43 +1419,80 @@ function loadAdminPanel() {
             Object.keys(firebaseUsers).forEach(key => allEmails.add(key.replace(/_/g, '.')));
             bannedEmails.forEach(email => allEmails.add(email));
             
-            allEmails.forEach(email => {
-                if (isProtectedAccount(email)) return;
-                
+            // Convert to array and sort by online status and name
+            const usersList = Array.from(allEmails).map(email => {
                 const userKey = email.replace(/\./g, '_');
                 const lastActive = firebaseUsers[userKey]?.lastActive || 0;
-                const isInactive = (now - lastActive) > THREE_DAYS_MS;
-                if (isInactive && lastActive !== 0 && !bannedEmails.includes(email)) return;
-                
+                const isOnline = lastActive > 0 && (now - lastActive) < FIVE_MINUTES;
                 const isBannedUser = bannedEmails.includes(email);
-                const userDiv = document.createElement('div');
-                userDiv.className = 'admin-user' + (isBannedUser ? ' banned' : '');
                 const displayName = users[email]?.username || email.split('@')[0];
                 
-                const userIsAdmin = isAdminAccount(email);
-                const adminBadge = userIsAdmin ? ' <span class="badge admin-badge">Admin</span>' : '';
+                return {
+                    email,
+                    displayName,
+                    lastActive,
+                    isOnline,
+                    isBannedUser,
+                    isProtected: isProtectedAccount(email),
+                    isAdminUser: isAdminAccount(email)
+                };
+            });
+            
+            // Sort: Protected accounts first, then online users, then by name
+            usersList.sort((a, b) => {
+                if (a.isProtected !== b.isProtected) return a.isProtected ? -1 : 1;
+                if (a.isOnline !== b.isOnline) return a.isOnline ? -1 : 1;
+                return a.displayName.localeCompare(b.displayName);
+            });
+            
+            // Display all users
+            usersList.forEach(user => {
+                const userDiv = document.createElement('div');
+                userDiv.className = 'admin-user' + (user.isBannedUser ? ' banned' : '');
+                
+                const onlineIndicator = user.isOnline ? '<span style="color: #43b581; font-size: 20px; margin-right: 5px;">●</span>' : '<span style="color: #747f8d; font-size: 20px; margin-right: 5px;">●</span>';
+                
+                let badges = '';
+                if (user.isProtected) {
+                    badges = ' <span class="badge owner-badge">Owner</span>';
+                } else if (user.isAdminUser) {
+                    badges = ' <span class="badge admin-badge">Admin</span>';
+                }
                 
                 let banButtonHtml = '';
-                if (isOwner) {
-                    banButtonHtml = `<button class="${isBannedUser ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${email}')">
-                        ${isBannedUser ? 'Unban' : 'Ban'}
-                    </button>`;
-                } else if (isAdmin && !userIsAdmin) {
-                    banButtonHtml = `<button class="${isBannedUser ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${email}')">
-                        ${isBannedUser ? 'Unban' : 'Ban'}
-                    </button>`;
+                // Don't show ban button for protected accounts
+                if (!user.isProtected) {
+                    if (isOwner) {
+                        banButtonHtml = `<button class="${user.isBannedUser ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${user.email}')">
+                            ${user.isBannedUser ? 'Unban' : 'Ban'}
+                        </button>`;
+                    } else if (isAdmin && !user.isAdminUser) {
+                        banButtonHtml = `<button class="${user.isBannedUser ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${user.email}')">
+                            ${user.isBannedUser ? 'Unban' : 'Ban'}
+                        </button>`;
+                    }
                 }
                 
                 userDiv.innerHTML = `
-                    <div class="admin-user-name" onclick="viewUserActivity('${email}')">${displayName}${adminBadge}${isBannedUser ? ' <small>(BANNED)</small>' : ''}</div>
+                    <div class="admin-user-name" onclick="viewUserActivity('${user.email}')">
+                        ${onlineIndicator}${user.displayName}${badges}${user.isBannedUser ? ' <small>(BANNED)</small>' : ''}
+                    </div>
                     <div class="admin-user-buttons">
-                        <button class="view-activity-btn" onclick="viewUserActivity('${email}')">View Activity</button>
+                        <button class="view-activity-btn" onclick="viewUserActivity('${user.email}')">View Activity</button>
                         ${banButtonHtml}
-                        ${isOwner ? `<button class="delete-account-btn" onclick="deleteAccount('${email}')">Delete Account</button>` : ''}
+                        ${isOwner && !user.isProtected ? `<button class="delete-account-btn" onclick="deleteAccount('${user.email}')">Delete Account</button>` : ''}
                     </div>
                 `;
                 adminUsersDiv.appendChild(userDiv);
             });
+            
+            // Add count summary
+            const onlineCount = usersList.filter(u => u.isOnline).length;
+            const totalCount = usersList.length;
+            const summaryDiv = document.createElement('div');
+            summaryDiv.style.cssText = 'padding: 10px; text-align: center; color: var(--text-muted); font-size: 13px; border-top: 1px solid var(--background-tertiary); margin-top: 10px;';
+            summaryDiv.textContent = `${onlineCount} online • ${totalCount} total users`;
+            adminUsersDiv.appendChild(summaryDiv);
         });
     });
 }
