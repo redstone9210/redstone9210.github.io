@@ -912,7 +912,7 @@ function logout() {
 function checkLoginExpiration() {
     const lastLogin = localStorage.getItem('lastLoginTime');
     if (!lastLogin) return true;
-    return (Date.now() - parseInt(lastLogin)) > THREE_DAYS_MS;
+    return (Date.now() - parseInt(lastLogin)) > ONE_MONTH_MS;
 }
 
 function updateLastActivity() {
