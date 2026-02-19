@@ -44,6 +44,34 @@ let userStrikes = JSON.parse(localStorage.getItem('userStrikes') || '{}');
 let bannedWords = ['fuck', 'shit', 'damn', 'hell', 'ass', 'bitch', 'bastard', 'crap'];
 const racistSlurs = ['nigger', 'nigga', 'chink', 'spic', 'kike', 'wetback', 'raghead'];
 
+// Validates email format and checks domain is real — no email is sent
+async function validateEmail(email) {
+    // Step 1: strict format check
+    const formatRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+    if (!formatRegex.test(email)) return { valid: false, reason: 'Invalid email format' };
+
+    const domain = email.split('@')[1].toLowerCase();
+
+    // Step 2: block obviously fake domains
+    const fakeDomains = ['test.com', 'example.com', 'fake.com', 'nomail.com', 'noemail.com', 'mailinator.com', 'guerrillamail.com', 'throwam.com', 'yopmail.com', 'sharklasers.com', 'trashmail.com', 'dispostable.com', 'tempr.email', 'temp-mail.org', 'getnada.com', 'maildrop.cc', 'spamgourmet.com'];
+    if (fakeDomains.includes(domain)) return { valid: false, reason: 'Please use a real email address' };
+
+    // Step 3: check domain via Disify API (free, no key, sends nothing)
+    try {
+        const res = await fetch(`https://api.disify.com/api/email/${encodeURIComponent(email)}`);
+        if (res.ok) {
+            const data = await res.json();
+            if (data.disposable) return { valid: false, reason: 'Disposable email addresses are not allowed' };
+            if (!data.dns) return { valid: false, reason: 'Email domain does not exist' };
+        }
+    } catch (e) {
+        // If API is unreachable, allow through (don't block users due to API downtime)
+        console.warn('Email validation API unreachable, skipping domain check');
+    }
+
+    return { valid: true };
+}
+
 function isProtectedAccount(email) {
     return OWNER_EMAILS.includes(email);
 }
@@ -68,7 +96,7 @@ function loadPrimeMembers() {
 }
 
 function togglePrimeMember(email) {
-    if (!isOwner && !isAdmin) return;
+    if (!isOwner) { alert('Only owners can manage Prime Members!'); return; }
     if (isProtectedAccount(email)) { alert('Cannot assign Prime to owner accounts!'); return; }
     const key = email.replace(/\./g, '_');
     if (primeMembers[key]) {
@@ -755,7 +783,7 @@ function handleAuth() {
     isSignupMode ? signup() : login();
 }
 
-function signup() {
+async function signup() {
     const username = document.getElementById('usernameInput').value.trim();
     const email = document.getElementById('emailInput').value.trim();
     const password = document.getElementById('passwordInput').value;
@@ -766,6 +794,15 @@ function signup() {
     if (password.length < 6) { showError('Password must be at least 6 characters'); return; }
     if (users[email]) { showError('Email already registered'); return; }
     if (Object.values(users).some(u => u.username.toLowerCase() === username.toLowerCase())) { showError('Username taken'); return; }
+
+    // Validate email is real (no email sent)
+    const authButton = document.getElementById('authButton');
+    authButton.textContent = 'Checking email...';
+    authButton.disabled = true;
+    const emailCheck = await validateEmail(email);
+    authButton.textContent = 'Continue';
+    authButton.disabled = false;
+    if (!emailCheck.valid) { showError(emailCheck.reason); return; }
 
     users[email] = { username, password, createdAt: new Date().toISOString() };
     localStorage.setItem('users', JSON.stringify(users));
@@ -1157,7 +1194,7 @@ async function loadAdminPanel() {
         }
 
         let primeButtonHtml = '';
-        if ((isOwner || isAdmin) && !user.isProtected && !user.isAdminUser) {
+        if (isOwner && !user.isProtected && !user.isAdminUser) {
             primeButtonHtml = `<button style="background:${user.isPrime ? '#f59e0b' : '#6366f1'}; color:white; padding:8px 12px; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; transition:all 0.2s;" onclick="togglePrimeMember('${user.email}')">${user.isPrime ? '⭐ Remove Prime' : '⭐ Grant Prime'}</button>`;
         }
 
