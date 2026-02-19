@@ -24,7 +24,7 @@ database.ref('.info/connected').on('value', (snapshot) => {
 });
 
 let currentUser = null, currentChannel = 'homework help', currentChannelTopic = '';
-let isOwner = false, isAdmin = false, isModerator = false, isBanned = false;
+let isOwner = false, isAdmin = false, isModerator = false, isBanned = false, isPrimeMember = false;
 let isSignupMode = true, banListener = null, maintenanceListener = null;
 let blockedUsers = [], customChannels = {}, reports = {};
 let isMaintenanceMode = false;
@@ -32,6 +32,7 @@ let vipRooms = {};
 let userVipAccess = {};
 let privateRooms = {};
 let userPrivateAccess = {};
+let primeMembers = {};
 const OWNER_EMAILS = ['redstoneb3@gmail.com', 'haventeam3@gmail.com'];
 const ADMIN_EMAILS = ['work.redstoneb5@gmail.com', '31christianhwang@usd266.com'];
 const MAINTENANCE_PASSWORD = 'owner123';
@@ -49,6 +50,36 @@ function isProtectedAccount(email) {
 
 function isAdminAccount(email) {
     return ADMIN_EMAILS.includes(email);
+}
+
+function isPrimeMemberAccount(email) {
+    if (!email) return false;
+    const key = email.replace(/\./g, '_');
+    return primeMembers[key] === true;
+}
+
+function loadPrimeMembers() {
+    database.ref('primeMembers').on('value', (snapshot) => {
+        primeMembers = snapshot.exists() ? snapshot.val() : {};
+        if (currentUser) {
+            isPrimeMember = isPrimeMemberAccount(currentUser);
+        }
+    });
+}
+
+function togglePrimeMember(email) {
+    if (!isOwner && !isAdmin) return;
+    if (isProtectedAccount(email)) { alert('Cannot assign Prime to owner accounts!'); return; }
+    const key = email.replace(/\./g, '_');
+    if (primeMembers[key]) {
+        if (confirm(`Remove Prime Member status from ${users[email]?.username || email}?`)) {
+            database.ref('primeMembers/' + key).remove().then(() => loadAdminPanel());
+        }
+    } else {
+        if (confirm(`Grant Prime Member status to ${users[email]?.username || email}?`)) {
+            database.ref('primeMembers/' + key).set(true).then(() => loadAdminPanel());
+        }
+    }
 }
 
 function ensureProtectedAccountNotBanned(email) {
@@ -637,6 +668,7 @@ window.onload = function() {
         loadCustomSettings();
         return;
     }
+    // FIX: Was THREE_DAYS_MS (undefined), now correctly uses ONE_MONTH_MS
     if (checkLoginExpiration()) {
         localStorage.removeItem('loggedInUser');
         localStorage.removeItem('lastLoginTime');
@@ -871,6 +903,7 @@ function showChat() {
     loadMessages();
     loadVipRooms();
     loadAnnouncement();
+    loadPrimeMembers();
     setInterval(updateLastActivity, 60000);
 }
 
@@ -909,6 +942,7 @@ function logout() {
     location.reload();
 }
 
+// FIX: Was referencing undefined THREE_DAYS_MS — now uses ONE_MONTH_MS (30 days)
 function checkLoginExpiration() {
     const lastLogin = localStorage.getItem('lastLoginTime');
     if (!lastLogin) return true;
@@ -962,6 +996,8 @@ function addMessageToUI(msg, messageId) {
         badge = '<span class="badge owner-badge">Owner</span>';
     } else if (isAdminAccount(msg.email)) {
         badge = '<span class="badge admin-badge">Admin</span>';
+    } else if (isPrimeMemberAccount(msg.email)) {
+        badge = '<span class="badge prime-badge">⭐ Prime Member</span>';
     }
 
     const safeText = escapeHtml(msg.text);
@@ -1053,7 +1089,6 @@ async function loadAdminPanel() {
 
     OWNER_EMAILS.forEach(email => ensureProtectedAccountNotBanned(email));
 
-    // --- Step 1: Get banned list (this path is usually readable) ---
     let bannedData = {};
     try {
         const bannedSnapshot = await database.ref('banned').once('value');
@@ -1063,24 +1098,18 @@ async function loadAdminPanel() {
     }
     const bannedEmails = Object.keys(bannedData).map(key => key.replace(/_/g, '.'));
 
-    // --- Step 2: Try to get Firebase /users for online status ---
     let firebaseUsers = {};
     try {
         const usersSnapshot = await database.ref('users').once('value');
         firebaseUsers = usersSnapshot.val() || {};
     } catch (e) {
-        // Permission denied — fall back to localStorage only, no online status
         console.warn('Cannot read /users from Firebase (permission denied). Falling back to localStorage.');
     }
 
-    // --- Step 3: Build the full email list from all sources ---
     const allEmails = new Set([...Object.keys(users)]);
-    // Add any emails found in Firebase
     Object.keys(firebaseUsers).forEach(key => allEmails.add(key.replace(/_/g, '.')));
-    // Always make sure owner + admin accounts appear even if not in localStorage
     OWNER_EMAILS.forEach(e => allEmails.add(e));
     ADMIN_EMAILS.forEach(e => allEmails.add(e));
-    // Include banned users so they can be unbanned
     bannedEmails.forEach(email => allEmails.add(email));
 
     adminUsersDiv.innerHTML = '';
@@ -1091,8 +1120,9 @@ async function loadAdminPanel() {
         const isOnline = lastActive > 0 && (now - lastActive) < FIVE_MINUTES;
         const isBannedUser = bannedEmails.includes(email);
         const displayName = users[email]?.username || email.split('@')[0];
+        const isPrime = primeMembers[userKey] === true;
         return {
-            email, displayName, lastActive, isOnline, isBannedUser,
+            email, displayName, lastActive, isOnline, isBannedUser, isPrime,
             isProtected: isProtectedAccount(email), isAdminUser: isAdminAccount(email)
         };
     });
@@ -1115,6 +1145,7 @@ async function loadAdminPanel() {
         let badges = '';
         if (user.isProtected) badges = ' <span class="badge owner-badge">Owner</span>';
         else if (user.isAdminUser) badges = ' <span class="badge admin-badge">Admin</span>';
+        else if (user.isPrime) badges = ' <span class="badge prime-badge">⭐ Prime</span>';
 
         let banButtonHtml = '';
         if (!user.isProtected) {
@@ -1125,6 +1156,11 @@ async function loadAdminPanel() {
             }
         }
 
+        let primeButtonHtml = '';
+        if ((isOwner || isAdmin) && !user.isProtected && !user.isAdminUser) {
+            primeButtonHtml = `<button style="background:${user.isPrime ? '#f59e0b' : '#6366f1'}; color:white; padding:8px 12px; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; transition:all 0.2s;" onclick="togglePrimeMember('${user.email}')">${user.isPrime ? '⭐ Remove Prime' : '⭐ Grant Prime'}</button>`;
+        }
+
         userDiv.innerHTML = `
             <div class="admin-user-name" onclick="viewUserActivity('${user.email}')">
                 ${onlineIndicator}${user.displayName}${badges}${user.isBannedUser ? ' <small>(BANNED)</small>' : ''}
@@ -1132,6 +1168,7 @@ async function loadAdminPanel() {
             <div class="admin-user-buttons">
                 <button class="view-activity-btn" onclick="viewUserActivity('${user.email}')">View Activity</button>
                 ${banButtonHtml}
+                ${primeButtonHtml}
                 ${isOwner && !user.isProtected ? `<button class="delete-account-btn" onclick="deleteAccount('${user.email}')">Delete Account</button>` : ''}
             </div>
         `;
@@ -1182,6 +1219,7 @@ function deleteAccount(email) {
 
         database.ref('users/' + userKey).remove();
         database.ref('banned/' + userKey).remove();
+        database.ref('primeMembers/' + userKey).remove();
 
         const allChannels = ['homework help', 'teacher complaints', 'study hall', 'science lab'];
         Object.keys(customChannels).forEach(ch => allChannels.push(ch));
