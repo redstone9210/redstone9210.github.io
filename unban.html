@@ -18,16 +18,16 @@
             --text-secondary: #a1a1aa;
             --text-muted: #71717a;
         }
-        
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             background: var(--bg-secondary);
             padding: 40px;
@@ -38,180 +38,237 @@
             margin: 0 auto;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        h1 {
-            color: var(--text-primary);
-            text-align: center;
-            margin-bottom: 12px;
-            font-size: 32px;
-            font-weight: 700;
-        }
-        
-        .subtitle {
-            text-align: center;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-            font-size: 14px;
-        }
-        
-        .auth-section {
-            background: var(--bg-tertiary);
-            padding: 24px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            border: 2px solid var(--accent-warning);
-        }
-        
-        .auth-section h2 {
-            color: var(--accent-warning);
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 16px;
-        }
-        
-        .auth-section input {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--bg-primary);
-            border: 2px solid transparent;
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 15px;
-            margin-bottom: 12px;
-        }
-        
-        .auth-section input:focus {
-            outline: none;
-            border-color: var(--accent-primary);
-        }
-        
-        .locked-section {
-            filter: blur(4px);
-            pointer-events: none;
-            opacity: 0.5;
-        }
-        
-        .status {
-            background: var(--bg-primary);
-            padding: 24px;
-            border-radius: 12px;
-            margin-bottom: 24px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            color: var(--text-secondary);
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid var(--bg-tertiary);
-        }
-        
-        .status div {
-            margin: 6px 0;
-            padding: 6px 0;
-        }
-        
+
+        h1 { color: var(--text-primary); text-align: center; margin-bottom: 12px; font-size: 32px; font-weight: 700; }
+        .subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 32px; font-size: 14px; }
+
+        .auth-section { background: var(--bg-tertiary); padding: 24px; border-radius: 12px; margin-bottom: 24px; border: 2px solid var(--accent-warning); }
+        .auth-section h2 { color: var(--accent-warning); font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+        .auth-section input { width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 2px solid transparent; border-radius: 8px; color: var(--text-primary); font-size: 15px; margin-bottom: 12px; }
+        .auth-section input:focus { outline: none; border-color: var(--accent-primary); }
+
+        .locked-section { filter: blur(4px); pointer-events: none; opacity: 0.5; }
+
+        .status { background: var(--bg-primary); padding: 24px; border-radius: 12px; margin-bottom: 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-secondary); max-height: 400px; overflow-y: auto; border: 1px solid var(--bg-tertiary); }
+        .status div { margin: 6px 0; padding: 6px 0; }
+
         .success { color: var(--accent-success); font-weight: 600; }
         .error { color: var(--accent-danger); font-weight: 600; }
         .info { color: var(--accent-primary); }
         .warning { color: var(--accent-warning); font-weight: 600; }
-        
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        
-        button {
-            padding: 16px;
-            background: linear-gradient(135deg, var(--accent-primary), #4f46e5);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Outfit', sans-serif;
-        }
-        
-        button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
-        }
-        
-        button:disabled {
-            background: var(--bg-tertiary);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-            opacity: 0.5;
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, var(--accent-danger), #dc2626);
-        }
-        
-        .btn-danger:hover:not(:disabled) {
-            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
-        }
-        
-        .btn-warning {
-            background: linear-gradient(135deg, var(--accent-warning), #d97706);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, var(--accent-success), #059669);
-        }
-        
-        .owners-list {
-            background: var(--bg-tertiary);
-            padding: 20px;
-            border-radius: 12px;
-            margin: 24px 0;
-            border-left: 4px solid var(--accent-warning);
-        }
-        
-        .owners-list h3 {
-            color: var(--accent-warning);
-            margin-bottom: 12px;
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .owners-list div {
-            color: var(--text-primary);
-            padding: 8px 0;
-            font-size: 15px;
-        }
+
+        .button-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 24px; }
+
+        button { padding: 16px; background: linear-gradient(135deg, var(--accent-primary), #4f46e5); border: none; border-radius: 12px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s; font-family: 'Outfit', sans-serif; }
+        button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4); }
+        button:disabled { background: var(--bg-tertiary); cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.5; }
+
+        .btn-danger { background: linear-gradient(135deg, var(--accent-danger), #dc2626); }
+        .btn-danger:hover:not(:disabled) { box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4); }
+        .btn-warning { background: linear-gradient(135deg, var(--accent-warning), #d97706); }
+        .btn-success { background: linear-gradient(135deg, var(--accent-success), #059669); }
+
+        .owners-list { background: var(--bg-tertiary); padding: 20px; border-radius: 12px; margin: 24px 0; border-left: 4px solid var(--accent-warning); }
+        .owners-list h3 { color: var(--accent-warning); margin-bottom: 12px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .owners-list div { color: var(--text-primary); padding: 8px 0; font-size: 15px; }
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-secondary); }
         ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 4px; }
-        
-        .section-title {
+
+        .section-title { color: var(--text-primary); font-size: 18px; font-weight: 700; margin: 32px 0 16px 0; padding-bottom: 8px; border-bottom: 2px solid var(--bg-tertiary); }
+
+        /* Message Log Styles */
+        .msg-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .msg-controls input, .msg-controls select {
+            padding: 10px 14px;
+            background: var(--bg-primary);
+            border: 2px solid var(--bg-tertiary);
+            border-radius: 8px;
             color: var(--text-primary);
-            font-size: 18px;
-            font-weight: 700;
-            margin: 32px 0 16px 0;
-            padding-bottom: 8px;
+            font-size: 14px;
+            font-family: 'Outfit', sans-serif;
+            transition: border-color 0.2s;
+        }
+        .msg-controls input:focus, .msg-controls select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        .msg-controls input { flex: 1; min-width: 180px; }
+        .msg-controls select { min-width: 160px; }
+        .msg-controls select option { background: var(--bg-secondary); }
+
+        .msg-stats {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .msg-stat-chip {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            border-left: 3px solid var(--accent-primary);
+        }
+        .msg-stat-chip span { color: var(--text-primary); font-weight: 700; }
+
+        .msg-log {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            border: 1px solid var(--bg-tertiary);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .msg-log-empty {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px;
+            font-style: italic;
+            font-size: 14px;
+        }
+        .msg-channel-group {
             border-bottom: 2px solid var(--bg-tertiary);
         }
+        .msg-channel-group:last-child { border-bottom: none; }
+        .msg-channel-header {
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .msg-channel-header:hover { background: var(--bg-secondary); }
+        .msg-channel-header .ch-count {
+            background: var(--accent-primary);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 11px;
+        }
+        .msg-channel-header .ch-toggle { color: var(--text-muted); font-size: 11px; }
+        .msg-channel-body { display: block; }
+        .msg-channel-body.collapsed { display: none; }
+
+        .msg-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.15s;
+        }
+        .msg-row:last-child { border-bottom: none; }
+        .msg-row:hover { background: rgba(255,255,255,0.03); }
+        .msg-row:hover .msg-delete-btn { opacity: 1; }
+
+        .msg-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .msg-avatar.owner-av { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+        .msg-avatar.admin-av { background: linear-gradient(135deg, #8b5cf6, #6366f1); }
+
+        .msg-body { flex: 1; min-width: 0; }
+        .msg-meta {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 3px;
+            flex-wrap: wrap;
+        }
+        .msg-username {
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+        .msg-badge {
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .owner-badge-sm { background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; }
+        .admin-badge-sm { background: linear-gradient(135deg, #8b5cf6, #6366f1); color: white; }
+        .msg-time { font-size: 11px; color: var(--text-muted); }
+        .msg-text {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.5;
+            word-break: break-word;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .msg-delete-btn {
+            background: var(--accent-danger);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.15s, transform 0.15s;
+            flex-shrink: 0;
+            align-self: center;
+        }
+        .msg-delete-btn:hover { transform: scale(1.05); }
+
+        .msg-loading {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .msg-loading::after {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--accent-primary);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .msg-highlight { background: rgba(99,102,241,0.15); border-radius: 2px; }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 24px;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-            
-            .button-grid {
-                grid-template-columns: 1fr;
-            }
+            .container { padding: 24px; }
+            h1 { font-size: 24px; }
+            .button-grid { grid-template-columns: 1fr; }
+            .msg-controls { flex-direction: column; }
+            .msg-controls input, .msg-controls select { width: 100%; }
         }
     </style>
 </head>
@@ -219,84 +276,81 @@
     <div class="container">
         <h1>👑 Owner Control Panel</h1>
         <p class="subtitle">Advanced management and emergency tools</p>
-        
+
         <div class="auth-section">
             <h2>🔐 Authentication Required</h2>
             <input type="password" id="accessCode" placeholder="Enter owner access code..." />
             <button onclick="authenticate()" class="btn-success">Unlock Panel</button>
         </div>
-        
+
         <div id="mainPanel" class="locked-section">
             <div class="owners-list">
                 <h3>👑 PROTECTED OWNER ACCOUNTS</h3>
-                <div>• redstoneb3@gmail.com</div>
-                <div>• haventeam3@gmail.com</div>
+                <div>• <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3d4f58594e495253585f0e7d5a505c5451135e5250">[email&#160;protected]</a></div>
+                <div>• <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="21494057444f5544404c1261464c40484d0f424e4c">[email&#160;protected]</a></div>
             </div>
-            
+
             <div class="status" id="status">
                 <div class="info">Waiting for authentication...</div>
             </div>
-            
+
             <div class="section-title">🚨 Emergency Controls</div>
             <div class="button-grid">
-                <button onclick="emergencyUnban()" class="btn-danger">
-                    🔓 Force Unban All Owners
-                </button>
-                
-                <button onclick="clearAllBans()" class="btn-danger">
-                    🗑️ Clear ALL Bans
-                </button>
-                
-                <button onclick="unbanSpecificUser()" class="btn-warning">
-                    👤 Unban Specific User
-                </button>
-                
-                <button onclick="banSpecificUser()" class="btn-warning">
-                    🚫 Ban Specific User
-                </button>
+                <button onclick="emergencyUnban()" class="btn-danger">🔓 Force Unban All Owners</button>
+                <button onclick="clearAllBans()" class="btn-danger">🗑️ Clear ALL Bans</button>
+                <button onclick="unbanSpecificUser()" class="btn-warning">👤 Unban Specific User</button>
+                <button onclick="banSpecificUser()" class="btn-warning">🚫 Ban Specific User</button>
             </div>
-            
+
             <div class="section-title">📊 Database Management</div>
             <div class="button-grid">
-                <button onclick="viewDatabase()">
-                    📊 View Database Status
-                </button>
-                
-                <button onclick="viewAllUsers()">
-                    👥 View All Users
-                </button>
-                
-                <button onclick="deleteInactiveAccounts()" class="btn-warning">
-                    🧹 Delete Inactive Accounts (30+ days)
-                </button>
-                
-                <button onclick="resetUserStrikes()">
-                    ⚡ Reset All User Strikes
-                </button>
+                <button onclick="viewDatabase()">📊 View Database Status</button>
+                <button onclick="viewAllUsers()">👥 View All Users</button>
+                <button onclick="deleteInactiveAccounts()" class="btn-warning">🧹 Delete Inactive Accounts (30+ days)</button>
+                <button onclick="resetUserStrikes()">⚡ Reset All User Strikes</button>
             </div>
-            
+
             <div class="section-title">🔧 System Tools</div>
             <div class="button-grid">
-                <button onclick="exportBackup()" class="btn-success">
-                    💾 Export Database Backup
-                </button>
-                
-                <button onclick="clearReports()">
-                    📝 Clear All Reports
-                </button>
-                
-                <button onclick="resetBannedWords()">
-                    🔤 Reset Banned Words List
-                </button>
-                
-                <button onclick="window.location.href='index.html'" class="btn-primary">
-                    🏠 Return to Chat
-                </button>
+                <button onclick="exportBackup()" class="btn-success">💾 Export Database Backup</button>
+                <button onclick="clearReports()">📝 Clear All Reports</button>
+                <button onclick="resetBannedWords()">🔤 Reset Banned Words List</button>
+                <button onclick="window.location.href='index.html'" class="btn-primary">🏠 Return to Chat</button>
             </div>
-        </div>
-    </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+            <div class="section-title">💬 Message Log — All Channels</div>
+            <div class="button-grid" style="margin-bottom:16px;">
+                <button onclick="loadAllMessages()" class="btn-success">📥 Load All Messages</button>
+                <button onclick="clearMessageLog()" class="btn-warning">🔄 Clear / Reset View</button>
+                <button onclick="deleteFilteredMessages()" class="btn-danger">🗑️ Delete All Shown Messages</button>
+            </div>
+
+            <div class="msg-controls">
+                <input type="text" id="msgSearch" placeholder="🔍 Search message text..." oninput="filterMessages()" />
+                <select id="msgChannelFilter" onchange="filterMessages()">
+                    <option value="">All Channels</option>
+                </select>
+                <select id="msgUserFilter" onchange="filterMessages()">
+                    <option value="">All Users</option>
+                </select>
+                <select id="msgSort" onchange="filterMessages()">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                </select>
+            </div>
+
+            <div class="msg-stats" id="msgStats" style="display:none;">
+                <div class="msg-stat-chip">Total: <span id="statTotal">0</span></div>
+                <div class="msg-stat-chip">Showing: <span id="statShowing">0</span></div>
+                <div class="msg-stat-chip">Channels: <span id="statChannels">0</span></div>
+                <div class="msg-stat-chip">Users: <span id="statUsers">0</span></div>
+            </div>
+
+            <div class="msg-log" id="msgLog">
+                <div class="msg-log-empty">Click "Load All Messages" to fetch every message from every channel.</div>
+            </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
@@ -313,17 +367,13 @@
 
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        
-        const OWNER_ACCOUNTS = [
-            'redstoneb3@gmail.com',
-            'haventeam3@gmail.com'
-        ];
-        
+
+        const OWNER_ACCOUNTS = ['redstoneb3@gmail.com', 'haventeam3@gmail.com'];
         const ACCESS_CODE = 'owner123';
         const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
-        
+
         let isAuthenticated = false;
-        
+
         function log(message, type = 'info') {
             const statusDiv = document.getElementById('status');
             const logDiv = document.createElement('div');
@@ -332,7 +382,7 @@
             statusDiv.appendChild(logDiv);
             statusDiv.scrollTop = statusDiv.scrollHeight;
         }
-        
+
         function authenticate() {
             const code = document.getElementById('accessCode').value.trim();
             if (code === ACCESS_CODE) {
@@ -346,82 +396,69 @@
                 log('✗ Authentication failed', 'error');
             }
         }
-        
+
         async function emergencyUnban() {
             if (!isAuthenticated) return;
-            
             log('========================================', 'warning');
             log('EMERGENCY UNBAN INITIATED', 'warning');
             log('========================================', 'warning');
-            
+
             for (const email of OWNER_ACCOUNTS) {
                 const userKey = email.replace(/\./g, '_');
-                
                 log(`Processing: ${email}`, 'info');
-                
                 try {
                     await database.ref('banned/' + userKey).remove();
                     log(`✓ Removed ban entry for ${email}`, 'success');
-                    
+
                     let strikes = JSON.parse(localStorage.getItem('userStrikes') || '{}');
                     if (strikes[email]) {
                         delete strikes[email];
                         localStorage.setItem('userStrikes', JSON.stringify(strikes));
                         log(`✓ Cleared strikes for ${email}`, 'success');
                     }
-                    
-                    await database.ref('users/' + userKey).update({
-                        lastActive: Date.now(),
-                        isOwner: true
-                    });
+
+                    await database.ref('users/' + userKey).update({ lastActive: Date.now(), isOwner: true });
                     log(`✓ Updated database record for ${email}`, 'success');
-                    
                 } catch (error) {
                     log(`✗ Error processing ${email}: ${error.message}`, 'error');
                 }
             }
-            
+
             log('========================================', 'warning');
             log('UNBAN COMPLETE - All owner accounts unbanned', 'success');
             log('========================================', 'warning');
         }
-        
+
         async function clearAllBans() {
             if (!isAuthenticated) return;
-            if (!confirm('⚠️ WARNING: This will unban ALL users in the database. Continue?')) {
-                return;
-            }
-            
+            if (!confirm('⚠️ WARNING: This will unban ALL users in the database. Continue?')) return;
+
             log('========================================', 'warning');
             log('CLEARING ALL BANS', 'warning');
-            
+
             try {
                 await database.ref('banned').remove();
                 log('✓ All bans cleared from database', 'success');
-                
                 localStorage.setItem('userStrikes', JSON.stringify({}));
                 log('✓ All strikes cleared from localStorage', 'success');
-                
                 log('Database is now clean - all users unbanned', 'success');
             } catch (error) {
                 log(`✗ Error clearing bans: ${error.message}`, 'error');
             }
-            
+
             log('========================================', 'warning');
         }
-        
+
         async function unbanSpecificUser() {
             if (!isAuthenticated) return;
-            
             const email = prompt('Enter email address to unban:');
             if (!email) return;
-            
             const userKey = email.replace(/\./g, '_');
-            
+
             try {
                 await database.ref('banned/' + userKey).remove();
                 log(`✓ Unbanned ${email}`, 'success');
-                
+
                 let strikes = JSON.parse(localStorage.getItem('userStrikes') || '{}');
                 if (strikes[email]) {
                     delete strikes[email];
@@ -432,20 +469,14 @@
                 log(`✗ Error unbanning ${email}: ${error.message}`, 'error');
             }
         }
-        
+
         async function banSpecificUser() {
             if (!isAuthenticated) return;
-            
             const email = prompt('Enter email address to ban:');
             if (!email) return;
-            
-            if (OWNER_ACCOUNTS.includes(email)) {
-                alert('❌ Cannot ban owner accounts!');
-                return;
-            }
-            
+            if (OWNER_ACCOUNTS.includes(email)) { alert('❌ Cannot ban owner accounts!'); return; }
             const userKey = email.replace(/\./g, '_');
-            
+
             try {
                 await database.ref('banned/' + userKey).set(true);
                 log(`✓ Banned ${email}`, 'success');
@@ -453,17 +484,16 @@
                 log(`✗ Error banning ${email}: ${error.message}`, 'error');
             }
         }
-        
+
         async function viewDatabase() {
             if (!isAuthenticated) return;
-            
             log('========================================', 'info');
             log('FETCHING DATABASE STATUS...', 'info');
-            
+
             try {
                 const bannedSnapshot = await database.ref('banned').once('value');
                 const bannedData = bannedSnapshot.val() || {};
-                
+
                 log('Current Banned Users:', 'warning');
                 if (Object.keys(bannedData).length === 0) {
                     log('  No users are currently banned', 'success');
@@ -474,156 +504,166 @@
                         log(`  • ${email} ${isOwner ? '⚠️ OWNER ACCOUNT!' : ''}`, isOwner ? 'error' : 'info');
                     });
                 }
-                
+
                 log('Owner Account Status:', 'info');
                 for (const email of OWNER_ACCOUNTS) {
                     const userKey = email.replace(/\./g, '_');
                     const isBanned = bannedData[userKey] === true;
                     log(`  • ${email}: ${isBanned ? '🚫 BANNED' : '✅ NOT BANNED'}`, isBanned ? 'error' : 'success');
                 }
-                
             } catch (error) {
                 log(`Error fetching database: ${error.message}`, 'error');
             }
-            
+
             log('========================================', 'info');
         }
-        
+
         async function viewAllUsers() {
             if (!isAuthenticated) return;
-            
             log('========================================', 'info');
             log('FETCHING ALL USERS...', 'info');
-            
+
+            // Always load from localStorage first (this always works)
+            const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
+            const allEmails = new Set(Object.keys(localUsers));
+            const now = Date.now();
+
+            // Try to get Firebase users — gracefully handle permission errors
+            let firebaseUsers = {};
             try {
                 const usersSnapshot = await database.ref('users').once('value');
-                const firebaseUsers = usersSnapshot.val() || {};
-                const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
-                
-                const allEmails = new Set([...Object.keys(localUsers)]);
+                firebaseUsers = usersSnapshot.val() || {};
                 Object.keys(firebaseUsers).forEach(key => allEmails.add(key.replace(/_/g, '.')));
-                
-                const now = Date.now();
-                
-                log(`Total Users: ${allEmails.size}`, 'info');
-                log('', 'info');
-                
-                allEmails.forEach(email => {
-                    const userKey = email.replace(/\./g, '_');
-                    const username = localUsers[email]?.username || email.split('@')[0];
-                    const lastActive = firebaseUsers[userKey]?.lastActive || 0;
-                    const daysSinceActive = lastActive > 0 ? Math.floor((now - lastActive) / (24 * 60 * 60 * 1000)) : 'Never';
-                    
-                    let role = '';
-                    if (OWNER_ACCOUNTS.includes(email)) role = '👑 OWNER';
-                    
-                    log(`${username} (${email}) ${role}`, 'info');
-                    log(`  Last active: ${daysSinceActive} days ago`, 'info');
-                });
-                
+                log(`Loaded ${Object.keys(firebaseUsers).length} users from Firebase database`, 'success');
             } catch (error) {
-                log(`Error fetching users: ${error.message}`, 'error');
+                if (error.code === 'PERMISSION_DENIED') {
+                    log('⚠️  Firebase /users access denied — showing localStorage users only', 'warning');
+                    log('   To fix: update Firebase rules to allow owner reads on /users', 'warning');
+                } else {
+                    log(`⚠️  Firebase error: ${error.message}`, 'warning');
+                }
             }
-            
-            log('========================================', 'info');
-        }
-        
-        async function deleteInactiveAccounts() {
-            if (!isAuthenticated) return;
-            
-            if (!confirm('⚠️ This will delete all accounts inactive for 30+ days. Continue?')) {
+
+            if (allEmails.size === 0) {
+                log('No users found in localStorage or Firebase.', 'info');
+                log('========================================', 'info');
                 return;
             }
-            
+
+            log(`Total Users Found: ${allEmails.size}`, 'info');
+            log('', 'info');
+
+            allEmails.forEach(email => {
+                const userKey = email.replace(/\./g, '_');
+                const username = localUsers[email]?.username || email.split('@')[0];
+                const lastActive = firebaseUsers[userKey]?.lastActive || 0;
+                const daysSinceActive = lastActive > 0
+                    ? Math.floor((now - lastActive) / (24 * 60 * 60 * 1000)) + ' days ago'
+                    : 'Never / Unknown';
+
+                let role = '';
+                if (OWNER_ACCOUNTS.includes(email)) role = '👑 OWNER';
+
+                log(`${username} (${email}) ${role}`, 'info');
+                log(`  Last active: ${daysSinceActive}`, 'info');
+            });
+
+            log('========================================', 'info');
+        }
+
+        async function deleteInactiveAccounts() {
+            if (!isAuthenticated) return;
+            if (!confirm('⚠️ This will delete all accounts inactive for 30+ days. Continue?')) return;
+
             log('========================================', 'warning');
             log('SCANNING FOR INACTIVE ACCOUNTS...', 'info');
-            
+
             try {
                 const now = Date.now();
                 const usersSnapshot = await database.ref('users').once('value');
                 const firebaseUsers = usersSnapshot.val() || {};
                 const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
-                
                 let deletedCount = 0;
-                
+
                 for (const userKey in firebaseUsers) {
                     const email = userKey.replace(/_/g, '.');
-                    
                     if (OWNER_ACCOUNTS.includes(email)) continue;
-                    
                     const lastActive = firebaseUsers[userKey].lastActive || 0;
-                    
+
                     if (lastActive > 0 && (now - lastActive) > ONE_MONTH_MS) {
                         const daysSinceActive = Math.floor((now - lastActive) / (24 * 60 * 60 * 1000));
                         log(`Deleting ${email} (inactive for ${daysSinceActive} days)`, 'warning');
-                        
                         await database.ref('users/' + userKey).remove();
                         await database.ref('banned/' + userKey).remove();
-                        
-                        if (localUsers[email]) {
-                            delete localUsers[email];
-                        }
-                        
+                        if (localUsers[email]) delete localUsers[email];
                         deletedCount++;
                     }
                 }
-                
+
                 localStorage.setItem('users', JSON.stringify(localUsers));
-                
                 log(`✓ Deleted ${deletedCount} inactive accounts`, 'success');
-                
             } catch (error) {
-                log(`✗ Error: ${error.message}`, 'error');
+                if (error.code === 'PERMISSION_DENIED') {
+                    log('✗ Permission denied reading /users from Firebase.', 'error');
+                    log('  Update your Firebase rules to allow this operation.', 'warning');
+                } else {
+                    log(`✗ Error: ${error.message}`, 'error');
+                }
             }
-            
+
             log('========================================', 'warning');
         }
-        
+
         async function resetUserStrikes() {
             if (!isAuthenticated) return;
-            
             if (!confirm('Reset all user strikes?')) return;
-            
             localStorage.setItem('userStrikes', JSON.stringify({}));
             log('✓ All user strikes have been reset', 'success');
         }
-        
+
         async function exportBackup() {
             if (!isAuthenticated) return;
-            
             log('Creating backup...', 'info');
-            
+
+            // We export what we can — gracefully handle permission errors on /users
+            let dbData = {};
             try {
                 const snapshot = await database.ref().once('value');
-                const data = snapshot.val();
-                
-                const backup = {
-                    timestamp: new Date().toISOString(),
-                    database: data,
-                    localStorage: {
-                        users: JSON.parse(localStorage.getItem('users') || '{}'),
-                        userStrikes: JSON.parse(localStorage.getItem('userStrikes') || '{}')
-                    }
-                };
-                
-                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `haven-backup-${Date.now()}.json`;
-                a.click();
-                
-                log('✓ Backup exported successfully', 'success');
+                dbData = snapshot.val();
+                log('✓ Full database export successful', 'success');
             } catch (error) {
-                log(`✗ Export failed: ${error.message}`, 'error');
+                log(`⚠️  Could not read full database (${error.message}). Exporting partial data...`, 'warning');
+                // Try to export just /banned and /messages which likely have different rules
+                try {
+                    const bannedSnap = await database.ref('banned').once('value');
+                    dbData = { banned: bannedSnap.val() };
+                } catch (e) {
+                    log('Could not export any Firebase data due to permission restrictions.', 'error');
+                }
             }
+
+            const backup = {
+                timestamp: new Date().toISOString(),
+                database: dbData,
+                localStorage: {
+                    users: JSON.parse(localStorage.getItem('users') || '{}'),
+                    userStrikes: JSON.parse(localStorage.getItem('userStrikes') || '{}')
+                }
+            };
+
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `haven-backup-${Date.now()}.json`;
+            a.click();
+
+            log('✓ Backup exported successfully', 'success');
         }
-        
+
         async function clearReports() {
             if (!isAuthenticated) return;
-            
             if (!confirm('Clear all reports?')) return;
-            
             try {
                 await database.ref('reports').remove();
                 log('✓ All reports cleared', 'success');
@@ -631,14 +671,11 @@
                 log(`✗ Error: ${error.message}`, 'error');
             }
         }
-        
+
         async function resetBannedWords() {
             if (!isAuthenticated) return;
-            
             if (!confirm('Reset banned words list to default?')) return;
-            
             const defaultWords = ['fuck', 'shit', 'damn', 'hell', 'ass', 'bitch', 'bastard', 'crap'];
-            
             try {
                 await database.ref('settings/bannedWords').set(defaultWords);
                 log('✓ Banned words list reset to default', 'success');
@@ -646,11 +683,277 @@
                 log(`✗ Error: ${error.message}`, 'error');
             }
         }
+
         
+        // Allow pressing Enter to authenticate
+        document.getElementById('accessCode').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') authenticate();
+        });
+
+        // ─── MESSAGE LOG ────────────────────────────────────────────────────────────
+
+        let allMessages = [];
+        const OWNER_EMAILS_CONST = ['redstoneb3@gmail.com', 'haventeam3@gmail.com'];
+        const ADMIN_EMAILS_CONST = ['work.redstoneb5@gmail.com', '31christianhwang@usd266.com'];
+        const DEFAULT_CHANNELS = ['homework help', 'teacher complaints', 'study hall', 'science lab'];
+
+        async function loadAllMessages() {
+            if (!isAuthenticated) return;
+
+            const logEl = document.getElementById('msgLog');
+            logEl.innerHTML = '<div class="msg-loading">Fetching messages from all channels</div>';
+            document.getElementById('msgStats').style.display = 'none';
+            allMessages = [];
+
+            // Collect all channel names
+            let channelNames = [...DEFAULT_CHANNELS];
+            try {
+                const customSnap = await database.ref('customChannels').once('value');
+                if (customSnap.exists()) Object.keys(customSnap.val()).forEach(ch => channelNames.push(ch));
+            } catch (e) {}
+            try {
+                const vipSnap = await database.ref('vipRooms').once('value');
+                if (vipSnap.exists()) Object.keys(vipSnap.val()).forEach(ch => channelNames.push(ch));
+            } catch (e) {}
+            try {
+                const privSnap = await database.ref('privateRooms').once('value');
+                if (privSnap.exists()) Object.keys(privSnap.val()).forEach(ch => channelNames.push(ch));
+            } catch (e) {}
+
+            // Fetch messages from every channel
+            for (const channel of channelNames) {
+                try {
+                    const snap = await database.ref('messages/' + channel).once('value');
+                    if (snap.exists()) {
+                        snap.forEach(child => {
+                            const msg = child.val();
+                            allMessages.push({
+                                channel,
+                                msgId: child.key,
+                                user: msg.user || '(unknown)',
+                                email: msg.email || '',
+                                text: msg.text || '',
+                                timestamp: msg.timestamp || 0
+                            });
+                        });
+                    }
+                } catch (e) {}
+            }
+
+            if (allMessages.length === 0) {
+                logEl.innerHTML = '<div class="msg-log-empty">No messages found across any channel.</div>';
+                return;
+            }
+
+            populateFilters();
+            filterMessages();
+        }
+
+        function populateFilters() {
+            const channelSelect = document.getElementById('msgChannelFilter');
+            const userSelect = document.getElementById('msgUserFilter');
+
+            const channels = [...new Set(allMessages.map(m => m.channel))].sort();
+            const users = [...new Set(allMessages.map(m => m.user))].sort();
+
+            channelSelect.innerHTML = '<option value="">All Channels</option>';
+            channels.forEach(ch => {
+                const opt = document.createElement('option');
+                opt.value = ch;
+                opt.textContent = '# ' + ch;
+                channelSelect.appendChild(opt);
+            });
+
+            userSelect.innerHTML = '<option value="">All Users</option>';
+            users.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u;
+                opt.textContent = u;
+                userSelect.appendChild(opt);
+            });
+        }
+
+        function filterMessages() {
+            if (allMessages.length === 0) return;
+
+            const search = document.getElementById('msgSearch').value.trim().toLowerCase();
+            const channelFilter = document.getElementById('msgChannelFilter').value;
+            const userFilter = document.getElementById('msgUserFilter').value;
+            const sort = document.getElementById('msgSort').value;
+
+            let filtered = allMessages.filter(m => {
+                if (channelFilter && m.channel !== channelFilter) return false;
+                if (userFilter && m.user !== userFilter) return false;
+                if (search && !m.text.toLowerCase().includes(search) && !m.user.toLowerCase().includes(search)) return false;
+                return true;
+            });
+
+            filtered.sort((a, b) => {
+                const ta = new Date(a.timestamp).getTime() || 0;
+                const tb = new Date(b.timestamp).getTime() || 0;
+                return sort === 'newest' ? tb - ta : ta - tb;
+            });
+
+            renderMessages(filtered, search);
+        }
+
+        function renderMessages(filtered, highlight) {
+            const logEl = document.getElementById('msgLog');
+
+            const uniqueChannels = new Set(filtered.map(m => m.channel)).size;
+            const uniqueUsers = new Set(filtered.map(m => m.user)).size;
+            document.getElementById('statTotal').textContent = allMessages.length.toLocaleString();
+            document.getElementById('statShowing').textContent = filtered.length.toLocaleString();
+            document.getElementById('statChannels').textContent = uniqueChannels;
+            document.getElementById('statUsers').textContent = uniqueUsers;
+            document.getElementById('msgStats').style.display = 'flex';
+
+            if (filtered.length === 0) {
+                logEl.innerHTML = '<div class="msg-log-empty">No messages match your filters.</div>';
+                return;
+            }
+
+            // Group by channel
+            const grouped = {};
+            filtered.forEach(m => {
+                if (!grouped[m.channel]) grouped[m.channel] = [];
+                grouped[m.channel].push(m);
+            });
+
+            logEl.innerHTML = '';
+
+            Object.keys(grouped).sort().forEach(channel => {
+                const msgs = grouped[channel];
+                const group = document.createElement('div');
+                group.className = 'msg-channel-group';
+
+                const header = document.createElement('div');
+                header.className = 'msg-channel-header';
+                header.innerHTML = `
+                    <span># ${escapeHtmlLog(channel)}</span>
+                    <span style="display:flex;align-items:center;gap:10px;">
+                        <span class="ch-count">${msgs.length} msg${msgs.length !== 1 ? 's' : ''}</span>
+                        <span class="ch-toggle">▼</span>
+                    </span>
+                `;
+                const body = document.createElement('div');
+                body.className = 'msg-channel-body';
+
+                header.addEventListener('click', () => {
+                    body.classList.toggle('collapsed');
+                    header.querySelector('.ch-toggle').textContent = body.classList.contains('collapsed') ? '▶' : '▼';
+                });
+
+                msgs.forEach(m => {
+                    const row = document.createElement('div');
+                    row.className = 'msg-row';
+
+                    const isOwnerMsg = OWNER_EMAILS_CONST.includes(m.email);
+                    const isAdminMsg = ADMIN_EMAILS_CONST.includes(m.email);
+                    const avClass = isOwnerMsg ? 'owner-av' : isAdminMsg ? 'admin-av' : '';
+                    const initial = (m.user || '?').charAt(0).toUpperCase();
+
+                    let badgeHtml = '';
+                    if (isOwnerMsg) badgeHtml = '<span class="msg-badge owner-badge-sm">Owner</span>';
+                    else if (isAdminMsg) badgeHtml = '<span class="msg-badge admin-badge-sm">Admin</span>';
+
+                    const timeStr = m.timestamp
+                        ? new Date(m.timestamp).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                        : 'Unknown time';
+
+                    let displayText = escapeHtmlLog(m.text);
+                    if (highlight) {
+                        const regex = new RegExp('(' + highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+                        displayText = displayText.replace(regex, '<mark class="msg-highlight">$1</mark>');
+                    }
+
+                    const safeChannel = m.channel.replace(/'/g, "\\'");
+                    const safeMsgId = m.msgId.replace(/'/g, "\\'");
+
+                    row.innerHTML = `
+                        <div class="msg-avatar ${avClass}">${initial}</div>
+                        <div class="msg-body">
+                            <div class="msg-meta">
+                                <span class="msg-username">${escapeHtmlLog(m.user)}</span>
+                                ${badgeHtml}
+                                <span class="msg-time">${timeStr}</span>
+                            </div>
+                            <div class="msg-text">${displayText}</div>
+                        </div>
+                        <button class="msg-delete-btn" onclick="deleteOneMessage('${safeChannel}', '${safeMsgId}', this)">Delete</button>
+                    `;
+                    body.appendChild(row);
+                });
+
+                group.appendChild(header);
+                group.appendChild(body);
+                logEl.appendChild(group);
+            });
+        }
+
+        async function deleteOneMessage(channel, msgId, btnEl) {
+            if (!isAuthenticated) return;
+            if (!confirm('Delete this message?')) return;
+            try {
+                await database.ref('messages/' + channel + '/' + msgId).remove();
+                allMessages = allMessages.filter(m => !(m.channel === channel && m.msgId === msgId));
+                const row = btnEl.closest('.msg-row');
+                row.style.opacity = '0';
+                row.style.transition = 'opacity 0.3s';
+                setTimeout(() => { row.remove(); filterMessages(); }, 300);
+                log('✓ Deleted message in #' + channel, 'success');
+            } catch (e) {
+                log('✗ Could not delete message: ' + e.message, 'error');
+            }
+        }
+
+        async function deleteFilteredMessages() {
+            if (!isAuthenticated) return;
+            const search = document.getElementById('msgSearch').value.trim().toLowerCase();
+            const channelFilter = document.getElementById('msgChannelFilter').value;
+            const userFilter = document.getElementById('msgUserFilter').value;
+
+            const toDelete = allMessages.filter(m => {
+                if (channelFilter && m.channel !== channelFilter) return false;
+                if (userFilter && m.user !== userFilter) return false;
+                if (search && !m.text.toLowerCase().includes(search) && !m.user.toLowerCase().includes(search)) return false;
+                return true;
+            });
+
+            if (toDelete.length === 0) { alert('No messages match current filters.'); return; }
+            if (!confirm('⚠️ This will permanently delete ' + toDelete.length + ' message(s). Are you sure?')) return;
+
+            log('Deleting ' + toDelete.length + ' messages...', 'warning');
+            let count = 0;
+            for (const m of toDelete) {
+                try {
+                    await database.ref('messages/' + m.channel + '/' + m.msgId).remove();
+                    count++;
+                } catch (e) {}
+            }
+            allMessages = allMessages.filter(m => !toDelete.includes(m));
+            log('✓ Deleted ' + count + ' messages', 'success');
+            filterMessages();
+        }
+
+        function clearMessageLog() {
+            allMessages = [];
+            document.getElementById('msgLog').innerHTML = '<div class="msg-log-empty">Click "Load All Messages" to fetch every message from every channel.</div>';
+            document.getElementById('msgStats').style.display = 'none';
+            document.getElementById('msgSearch').value = '';
+            document.getElementById('msgChannelFilter').innerHTML = '<option value="">All Channels</option>';
+            document.getElementById('msgUserFilter').innerHTML = '<option value="">All Users</option>';
+        }
+
+        function escapeHtmlLog(text) {
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
         window.onload = function() {
             log('Owner Control Panel loaded', 'info');
             log('Enter access code to unlock features', 'warning');
-            log(`Access Code: ${ACCESS_CODE}`, 'info');
         };
     </script>
 </body>

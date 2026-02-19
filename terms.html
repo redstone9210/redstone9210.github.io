@@ -4,176 +4,131 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Haven Chat - Terms of Service</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-primary: #0f0f14;
-            --bg-secondary: #16161d;
-            --bg-tertiary: #1d1d26;
-            --accent-primary: #6366f1;
-            --accent-danger: #ef4444;
-            --accent-success: #10b981;
-            --text-primary: #e4e4e7;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --border-color: #27272a;
-        }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
-            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            color: var(--text-primary);
+            font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #dbdee1;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
-
         .terms-container {
-            background: var(--bg-secondary);
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            background: #313338;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
             max-width: 700px;
             width: 100%;
             max-height: 90vh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            border: 1px solid var(--border-color);
         }
-
         .terms-header {
-            background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
-            padding: 32px;
+            background: #5865f2;
+            padding: 24px 32px;
             text-align: center;
         }
-
         .terms-header h1 {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             color: white;
             margin-bottom: 8px;
         }
-
         .terms-header p {
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.9);
+            color: #e3e5e8;
+            opacity: 0.9;
         }
-
         .terms-content {
             padding: 32px;
             overflow-y: auto;
             flex: 1;
         }
-
         .terms-content::-webkit-scrollbar { width: 8px; }
-        .terms-content::-webkit-scrollbar-track { background: var(--bg-primary); }
-        .terms-content::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 4px; }
-
+        .terms-content::-webkit-scrollbar-track { background: #2b2d31; }
+        .terms-content::-webkit-scrollbar-thumb { background: #1a1b1e; border-radius: 4px; }
+        .terms-content::-webkit-scrollbar-thumb:hover { background: #141517; }
         .terms-section {
-            margin-bottom: 32px;
+            margin-bottom: 28px;
         }
-
         .terms-section h2 {
-            color: var(--accent-primary);
+            color: #5865f2;
             font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
         }
-
         .terms-section h2::before {
             content: '▸';
-            margin-right: 12px;
-            font-size: 18px;
+            margin-right: 8px;
+            font-size: 16px;
         }
-
         .terms-section p, .terms-section li {
-            color: var(--text-secondary);
+            color: #b5bac1;
             font-size: 15px;
-            line-height: 1.7;
+            line-height: 1.6;
             margin-bottom: 12px;
         }
-
         .terms-section ul {
             list-style: none;
             padding-left: 0;
         }
-
         .terms-section li {
-            padding-left: 28px;
+            padding-left: 24px;
             position: relative;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
-
         .terms-section li::before {
             content: '•';
-            color: var(--accent-primary);
+            color: #5865f2;
             font-weight: bold;
             position: absolute;
-            left: 12px;
-            font-size: 18px;
+            left: 8px;
         }
-
         .warning-box {
-            background: rgba(239, 68, 68, 0.1);
-            border-left: 4px solid var(--accent-danger);
-            padding: 20px;
-            border-radius: 12px;
-            margin: 24px 0;
+            background: rgba(237, 66, 69, 0.1);
+            border-left: 4px solid #ed4245;
+            padding: 16px;
+            border-radius: 4px;
+            margin: 20px 0;
         }
-
         .warning-box h3 {
-            color: var(--accent-danger);
+            color: #ed4245;
             font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
         }
-
         .warning-box h3::before {
             content: '⚠️';
-            margin-right: 10px;
+            margin-right: 8px;
         }
-
         .warning-box p {
-            color: var(--text-primary);
+            color: #dbdee1;
             font-size: 14px;
-            line-height: 1.6;
+            line-height: 1.5;
         }
-
         .highlight {
-            color: #f59e0b;
-            font-weight: 700;
+            color: #faa61a;
+            font-weight: 600;
         }
-
         .terms-footer {
-            background: var(--bg-tertiary);
-            padding: 32px;
-            border-top: 1px solid var(--border-color);
+            background: #2b2d31;
+            padding: 24px 32px;
+            border-top: 1px solid #1e1f22;
         }
-
         .checkbox-container {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             cursor: pointer;
-            background: var(--bg-primary);
-            padding: 16px;
-            border-radius: 12px;
-            border: 2px solid transparent;
-            transition: all 0.3s;
         }
-
-        .checkbox-container:hover {
-            border-color: var(--accent-primary);
-        }
-
         .checkbox-container input[type="checkbox"] {
             width: 20px;
             height: 20px;
@@ -182,67 +137,53 @@
             cursor: pointer;
             flex-shrink: 0;
         }
-
         .checkbox-container label {
-            color: var(--text-primary);
+            color: #dbdee1;
             font-size: 14px;
-            line-height: 1.6;
+            line-height: 1.5;
             cursor: pointer;
             user-select: none;
         }
-
         .button-group {
             display: flex;
             gap: 12px;
         }
-
         .btn {
             flex: 1;
-            padding: 16px 24px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 12px;
+            border-radius: 4px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Outfit', sans-serif;
+            transition: all 0.2s;
         }
-
         .btn-accept {
-            background: var(--accent-success);
+            background: #23a55a;
             color: white;
         }
-
         .btn-accept:hover:not(:disabled) {
-            background: #059669;
-            transform: translateY(-2px);
+            background: #1e8e4f;
         }
-
         .btn-accept:disabled {
-            background: var(--bg-primary);
+            background: #4e5058;
             cursor: not-allowed;
             opacity: 0.5;
         }
-
         .btn-decline {
-            background: var(--accent-danger);
+            background: #ed4245;
             color: white;
         }
-
         .btn-decline:hover {
-            background: #dc2626;
-            transform: translateY(-2px);
+            background: #c03537;
         }
-
         .error-msg {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid var(--accent-danger);
-            color: var(--accent-danger);
+            background: #ed4245;
+            color: white;
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 4px;
             margin-bottom: 16px;
             font-size: 14px;
-            font-weight: 500;
             text-align: center;
             display: none;
         }
@@ -267,11 +208,11 @@
                 <ul>
                     <li><strong>Harassment and Bullying:</strong> Any form of harassment, threats, intimidation, or bullying towards other users will get you banned</li>
                     <li><strong>Hate Speech:</strong> Discriminatory language, slurs, or content targeting individuals or groups based on race, ethnicity, religion, gender, sexual orientation, disability, or other protected characteristics will get you banned immediately</li>
-                    <li><strong>Profanity and Vulgar Content:</strong> Excessive profanity or sexually explicit content</li>
+                    <li><strong>Profanity and Vulgar Content:</strong> Excessive profanity or sexually explicit content (Note: some channels may have different moderation levels)</li>
                     <li><strong>Spam and Disruption:</strong> Flooding chat with repetitive messages, advertisements, or content intended to disrupt conversations</li>
-                    <li><strong>Illegal Content:</strong> Sharing or promoting illegal activities</li>
+                    <li><strong>Illegal Content:</strong> Sharing or promoting illegal activities, including but not limited to piracy, drug use, or violence</li>
                     <li><strong>Impersonation:</strong> Pretending to be another user, staff member, or public figure</li>
-                    <li><strong>Personal Information:</strong> Sharing your own or others' private information without consent</li>
+                    <li><strong>Personal Information:</strong> Sharing your own or others' private information without consent (doxxing)</li>
                 </ul>
             </div>
 
@@ -280,18 +221,18 @@
                 <p>Haven Chat operates a <span class="highlight">three-strike warning system</span> for most violations:</p>
                 <ul>
                     <li><strong>Strike 1:</strong> First warning - you'll receive a notice and your message will be blocked</li>
-                    <li><strong>Strike 2:</strong> Second warning - temporary suspension of messaging privileges</li>
+                    <li><strong>Strike 2:</strong> Second warning - you'll receive a notice and your message will be blocked</li>
                     <li><strong>Strike 3:</strong> Permanent account ban from Haven Chat</li>
                 </ul>
-                <p><span class="highlight">Immediate Ban:</span> Certain severe violations will result in an <strong>immediate and permanent ban</strong> without warning.</p>
+                <p><span class="highlight">Immediate Ban:</span> Certain severe violations, including but not limited to racist slurs, hate speech, threats of violence, or sharing illegal content, will result in an <strong>immediate and permanent ban</strong> without warning.</p>
             </div>
 
             <div class="terms-section">
                 <h2>3. User Responsibilities</h2>
                 <ul>
                     <li>You are responsible for maintaining the security of your account credentials</li>
-                    <li>You must be at least 13 years of age to use this service</li>
-                    <li>You agree to report violations through the appropriate reporting channels</li>
+                    <li>You must be at least 10 years of age to use this service</li>
+                    <li>You agree to report violations of these terms through the appropriate reporting channels</li>
                     <li>You understand that all messages may be monitored by administrators for safety purposes</li>
                     <li>You acknowledge that your account may be suspended or terminated for violations</li>
                 </ul>
@@ -305,12 +246,30 @@
                     <li>We reserve the right to remove any content that violates these terms</li>
                     <li>Your username and activity may be visible to other users and administrators</li>
                     <li>We do not sell your personal information to third parties</li>
+                    <li>Administrators of external communities are prohibited from using any information obtained from this website or its communities as grounds for disciplinary action against Haven members.
+                    </li>
                 </ul>
+            </div>
+
+            <div class="terms-section">
+                <h2>5. Limitation of Liability</h2>
+                <p>Haven Chat is provided "as is" without warranties of any kind. We are not responsible for:</p>
+                <ul>
+                    <li>User-generated content or interactions between users</li>
+                    <li>Service interruptions, data loss, or technical issues</li>
+                    <li>Actions taken by users that violate local, state, or federal laws</li>
+                    <li>Any damages resulting from your use of the service</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h2>6. Changes to Terms</h2>
+                <p>We reserve the right to modify these Terms of Service at any time. Continued use of Haven Chat after changes constitutes acceptance of the updated terms. Major changes will be announced through the platform.</p>
             </div>
 
             <div class="warning-box">
                 <h3>Final Reminder</h3>
-                <p>Haven Chat is a community space. Treat others with respect, follow the rules, and enjoy connecting with others.</p>
+                <p>Haven Chat is a community space. Treat others with respect, follow the rules, and enjoy connecting with others. If you see someone breaking these rules, please report them to help keep our community safe.</p>
             </div>
         </div>
 
@@ -332,9 +291,11 @@
     </div>
 
     <script>
+        // Check if user is logged in when page loads
         window.onload = function() {
             const loggedInUser = localStorage.getItem('loggedInUser');
             if (!loggedInUser) {
+                // No user logged in, redirect to login
                 alert('Please log in first');
                 window.location.href = 'index.html';
             }
@@ -369,14 +330,17 @@
                 return;
             }
             
+            // Mark that user has accepted terms
             localStorage.setItem('termsAccepted_' + loggedInUser, 'true');
             localStorage.setItem('termsAcceptedDate_' + loggedInUser, new Date().toISOString());
             
+            // Redirect back to main chat
             window.location.href = 'index.html';
         }
 
         function declineTerms() {
             if (confirm('If you decline the terms, you will be logged out and cannot use Haven Chat. Are you sure?')) {
+                // Remove the logged in user and terms acceptance
                 const loggedInUser = localStorage.getItem('loggedInUser');
                 if (loggedInUser) {
                     localStorage.removeItem('termsAccepted_' + loggedInUser);
@@ -385,6 +349,7 @@
                 localStorage.removeItem('loggedInUser');
                 localStorage.removeItem('lastLoginTime');
                 
+                // Redirect back to login
                 window.location.href = 'index.html';
             }
         }

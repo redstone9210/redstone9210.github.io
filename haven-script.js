@@ -11,14 +11,10 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
-const storage = firebase.storage();
 
-// Test Firebase connection
 console.log('Firebase initialized');
 console.log('Database:', database ? 'Connected' : 'Not connected');
-console.log('Storage:', storage ? 'Connected' : 'Not connected');
 
-// Test database connectivity
 database.ref('.info/connected').on('value', (snapshot) => {
     if (snapshot.val() === true) {
         console.log('✅ Firebase database connected successfully');
@@ -27,7 +23,7 @@ database.ref('.info/connected').on('value', (snapshot) => {
     }
 });
 
-let currentUser = null, currentChannel = 'room 1', currentChannelTopic = '';
+let currentUser = null, currentChannel = 'homework help', currentChannelTopic = '';
 let isOwner = false, isAdmin = false, isModerator = false, isBanned = false;
 let isSignupMode = true, banListener = null, maintenanceListener = null;
 let blockedUsers = [], customChannels = {}, reports = {};
@@ -35,13 +31,11 @@ let isMaintenanceMode = false;
 let vipRooms = {};
 let userVipAccess = {};
 let privateRooms = {};
-let selectedImage = null;
 let userPrivateAccess = {};
 const OWNER_EMAILS = ['redstoneb3@gmail.com', 'haventeam3@gmail.com'];
 const ADMIN_EMAILS = ['work.redstoneb5@gmail.com', '31christianhwang@usd266.com'];
 const MAINTENANCE_PASSWORD = 'owner123';
 const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
-const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 const BANNED_CHANNEL_WORDS = ['fuck', 'shit', 'bitch', 'ass', 'damn', 'nigger', 'nigga', 'nazi', 'hitler', 'porn', 'sex', 'nsfw'];
 
 let users = JSON.parse(localStorage.getItem('users') || '{}');
@@ -60,32 +54,20 @@ function isAdminAccount(email) {
 function ensureProtectedAccountNotBanned(email) {
     return new Promise((resolve, reject) => {
         if (!isProtectedAccount(email)) {
-            console.log('Not a protected account, skipping unban');
             resolve();
             return;
         }
-        
-        console.log('Ensuring protected account is not banned:', email);
         const userKey = email.replace(/\./g, '_');
-        
         database.ref('banned/' + userKey).remove()
             .then(() => {
-                console.log('Removed any ban entries for protected account');
                 if (userStrikes[email]) {
                     delete userStrikes[email];
                     localStorage.setItem('userStrikes', JSON.stringify(userStrikes));
-                    console.log('Cleared strikes for protected account');
                 }
-                if (currentUser === email) {
-                    isBanned = false;
-                }
+                if (currentUser === email) isBanned = false;
                 resolve();
             })
-            .catch((error) => {
-                console.error('Error ensuring protected account unban:', error);
-                // Don't reject, just resolve - this isn't critical
-                resolve();
-            });
+            .catch(() => resolve());
     });
 }
 
@@ -110,74 +92,10 @@ function getUserRoleClass(email) {
     return '';
 }
 
-// Escape HTML to prevent HTML injection
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
-}
-
-// Image handling functions
-function handleImageSelect(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    // Validate file type
-    const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-    if (!validTypes.includes(file.type)) {
-        alert('Only PNG and JPEG/JPG screenshots are allowed!');
-        event.target.value = '';
-        return;
-    }
-    
-    // Validate file size (max 5MB)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-        alert('Image must be smaller than 5MB!');
-        event.target.value = '';
-        return;
-    }
-    
-    selectedImage = file;
-    
-    // Show preview
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        document.getElementById('previewImg').src = e.target.result;
-        document.getElementById('imagePreview').classList.remove('hidden');
-    };
-    reader.readAsDataURL(file);
-}
-
-function removeImagePreview() {
-    selectedImage = null;
-    document.getElementById('imageInput').value = '';
-    document.getElementById('imagePreview').classList.add('hidden');
-    document.getElementById('previewImg').src = '';
-}
-
-function openImageModal(imageUrl) {
-    document.getElementById('modalImage').src = imageUrl;
-    document.getElementById('imageModal').classList.add('show');
-}
-
-function closeImageModal() {
-    document.getElementById('imageModal').classList.remove('show');
-}
-
-async function uploadImage(file) {
-    const timestamp = Date.now();
-    const filename = `${currentUser.replace(/[@.]/g, '_')}_${timestamp}_${file.name}`;
-    const storageRef = storage.ref(`chat-images/${filename}`);
-    
-    try {
-        const snapshot = await storageRef.put(file);
-        const downloadURL = await snapshot.ref.getDownloadURL();
-        return downloadURL;
-    } catch (error) {
-        console.error('Image upload error:', error);
-        throw error;
-    }
 }
 
 function toggleCollapsible(contentId) {
@@ -198,22 +116,21 @@ function displayReports() {
     const reportsList = document.getElementById('reportsList');
     const reportsBadge = document.getElementById('reportsBadge');
     const reportsArray = Object.keys(reports).map(key => ({ id: key, ...reports[key] }));
-    
+
     if (reportsArray.length === 0) {
         reportsList.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px; font-style:italic;">No reports</div>';
         reportsBadge.classList.add('hidden');
         return;
     }
-    
+
     reportsBadge.textContent = reportsArray.length;
     reportsBadge.classList.remove('hidden');
     reportsList.innerHTML = '';
-    
+
     reportsArray.sort((a, b) => b.timestamp - a.timestamp).forEach(report => {
         const date = new Date(report.timestamp);
         const timeStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-        let content = `<strong>${report.reporter}</strong>: ${report.message}`;
-        
+        const content = `<strong>${report.reporter}</strong>: ${report.message}`;
         const reportDiv = document.createElement('div');
         reportDiv.className = 'report-item';
         reportDiv.innerHTML = `
@@ -237,7 +154,7 @@ function loadCustomSettings() {
         if (snapshot.exists()) bannedWords = snapshot.val();
         if (isOwner || isAdmin) loadBannedWordsList();
     });
-    
+
     database.ref('customChannels').on('value', (snapshot) => {
         customChannels = snapshot.exists() ? snapshot.val() : {};
         loadCustomChannels();
@@ -248,12 +165,12 @@ function loadCustomChannels() {
     const list = document.getElementById('customChannelsList');
     const section = document.getElementById('customChannelsSection');
     list.innerHTML = '';
-    
+
     if (Object.keys(customChannels).length === 0) {
         section.classList.add('hidden');
         return;
     }
-    
+
     section.classList.remove('hidden');
     Object.keys(customChannels).forEach(name => {
         const channel = customChannels[name];
@@ -284,7 +201,7 @@ function createNewChannel() {
     const name = document.getElementById('newChannelName').value.trim().toLowerCase();
     const topic = document.getElementById('newChannelTopic').value.trim();
     const errorEl = document.getElementById('channelError');
-    
+
     if (!name) {
         errorEl.textContent = 'Please enter a channel name';
         errorEl.classList.remove('hidden');
@@ -295,21 +212,19 @@ function createNewChannel() {
         errorEl.classList.remove('hidden');
         return;
     }
-    
     const hasBannedWord = BANNED_CHANNEL_WORDS.some(word => name.includes(word));
     if (hasBannedWord) {
         errorEl.textContent = 'Channel name contains inappropriate content';
         errorEl.classList.remove('hidden');
         return;
     }
-    
-    const defaults = ['room-1', 'room-2', 'room-3', 'room-4'];
+    const defaults = ['homework-help', 'teacher-complaints', 'study-hall', 'science-lab'];
     if (defaults.includes(name) || customChannels[name]) {
         errorEl.textContent = 'Channel already exists';
         errorEl.classList.remove('hidden');
         return;
     }
-    
+
     database.ref('customChannels/' + name).set({
         name, topic: topic || '', createdBy: currentUser, createdAt: Date.now()
     }).then(() => closeCreateChannelModal());
@@ -321,30 +236,29 @@ function deleteChannel(event, name) {
     if (confirm(`Delete #${name}? All messages will be lost.`)) {
         database.ref('customChannels/' + name).remove();
         database.ref('messages/' + name).remove();
-        if (currentChannel === name) switchChannel('room 1', '');
+        if (currentChannel === name) switchChannel('homework help', '');
     }
 }
 
 function loadVipRooms() {
     if (!currentUser) return;
-    
+
     database.ref('vipRooms').on('value', (snapshot) => {
         vipRooms = snapshot.exists() ? snapshot.val() : {};
         loadVipChannels();
     });
-    
+
     const userKey = currentUser.replace(/\./g, '_');
     database.ref('vipAccess/' + userKey).on('value', (snapshot) => {
         userVipAccess = snapshot.exists() ? snapshot.val() : {};
         loadVipChannels();
     });
-    
-    // Load private rooms
+
     database.ref('privateRooms').on('value', (snapshot) => {
         privateRooms = snapshot.exists() ? snapshot.val() : {};
         loadPrivateChannels();
     });
-    
+
     database.ref('privateAccess/' + userKey).on('value', (snapshot) => {
         userPrivateAccess = snapshot.exists() ? snapshot.val() : {};
         loadPrivateChannels();
@@ -355,34 +269,26 @@ function loadVipChannels() {
     const list = document.getElementById('vipChannelsList');
     const section = document.getElementById('vipChannelsSection');
     const addBtn = document.getElementById('addVipRoomBtn');
-    
+
     if (!list || !section) return;
-    
     list.innerHTML = '';
-    
     if (isOwner && addBtn) addBtn.style.display = 'block';
-    
-    let visibleVipRooms = [];
-    
-    if (isOwner) {
-        visibleVipRooms = Object.keys(vipRooms);
-    } else {
-        visibleVipRooms = Object.keys(vipRooms).filter(roomName => userVipAccess[roomName] === true);
-    }
-    
+
+    let visibleVipRooms = isOwner
+        ? Object.keys(vipRooms)
+        : Object.keys(vipRooms).filter(roomName => userVipAccess[roomName] === true);
+
     if (visibleVipRooms.length === 0) {
         section.classList.add('hidden');
         return;
     }
-    
+
     section.classList.remove('hidden');
-    
     visibleVipRooms.forEach(roomName => {
         const room = vipRooms[roomName];
         const div = document.createElement('div');
         div.className = 'channel vip-channel';
         div.onclick = () => switchChannel(roomName, room.topic);
-        
         div.innerHTML = `
             <span class="channel-name">${roomName}</span>
             ${isOwner ? `<button class="delete-channel-btn" onclick="deleteVipRoom(event, '${roomName}')">×</button>` : ''}
@@ -404,60 +310,53 @@ function closeCreateVipRoomModal() {
     document.getElementById('createVipRoomModal').classList.remove('show');
 }
 
-function loadUsersForVipAccess() {
+async function loadUsersForVipAccess() {
     const usersList = document.getElementById('vipUsersList');
     usersList.innerHTML = '';
-    
-    database.ref('users').once('value', (snapshot) => {
+
+    const allEmails = new Set([...Object.keys(users)]);
+
+    try {
+        const snapshot = await database.ref('users').once('value');
         const firebaseUsers = snapshot.val() || {};
-        const allEmails = new Set([...Object.keys(users)]);
         Object.keys(firebaseUsers).forEach(key => allEmails.add(key.replace(/_/g, '.')));
-        
-        allEmails.forEach(email => {
-            if (isProtectedAccount(email)) return;
-            
-            const displayName = users[email]?.username || email.split('@')[0];
-            const checkbox = document.createElement('div');
-            checkbox.className = 'vip-user-checkbox';
-            checkbox.innerHTML = `
-                <label>
-                    <input type="checkbox" value="${email}" class="vip-user-select">
-                    <span>${displayName}</span>
-                </label>
-            `;
-            usersList.appendChild(checkbox);
-        });
+    } catch (e) {
+        console.warn('Cannot read /users for VIP access list (permission denied). Using localStorage only.');
+    }
+
+    allEmails.forEach(email => {
+        if (isProtectedAccount(email)) return;
+        const displayName = users[email]?.username || email.split('@')[0];
+        const checkbox = document.createElement('div');
+        checkbox.className = 'vip-user-checkbox';
+        checkbox.innerHTML = `
+            <label>
+                <input type="checkbox" value="${email}" class="vip-user-select">
+                <span>${displayName}</span>
+            </label>
+        `;
+        usersList.appendChild(checkbox);
     });
+
+    if (usersList.children.length === 0) {
+        usersList.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:10px;">No users found.</div>';
+    }
 }
 
 function createVipRoom() {
     if (!isOwner) return;
-    
     const name = document.getElementById('vipRoomName').value.trim();
     const topic = document.getElementById('vipRoomTopic').value.trim();
     const errorEl = document.getElementById('vipRoomError');
-    
-    if (!name) {
-        errorEl.textContent = 'Please enter a room name';
-        errorEl.classList.remove('hidden');
-        return;
-    }
-    
-    if (vipRooms[name]) {
-        errorEl.textContent = 'VIP room already exists';
-        errorEl.classList.remove('hidden');
-        return;
-    }
-    
+
+    if (!name) { errorEl.textContent = 'Please enter a room name'; errorEl.classList.remove('hidden'); return; }
+    if (vipRooms[name]) { errorEl.textContent = 'VIP room already exists'; errorEl.classList.remove('hidden'); return; }
+
     const checkboxes = document.querySelectorAll('.vip-user-select:checked');
     const selectedUsers = Array.from(checkboxes).map(cb => cb.value);
-    
-    if (selectedUsers.length === 0) {
-        errorEl.textContent = 'Please select at least one user';
-        errorEl.classList.remove('hidden');
-        return;
-    }
-    
+
+    if (selectedUsers.length === 0) { errorEl.textContent = 'Please select at least one user'; errorEl.classList.remove('hidden'); return; }
+
     database.ref('vipRooms/' + name).set({
         name, topic: topic || '', createdBy: currentUser, createdAt: Date.now()
     }).then(() => {
@@ -475,64 +374,48 @@ function createVipRoom() {
 function deleteVipRoom(event, name) {
     event.stopPropagation();
     if (!isOwner) return;
-    
     if (confirm(`Delete VIP room "${name}"? All messages and access will be lost.`)) {
         database.ref('vipRooms/' + name).remove();
         database.ref('messages/' + name).remove();
-        
         database.ref('vipAccess').once('value', (snapshot) => {
             if (snapshot.exists()) {
                 const allAccess = snapshot.val();
                 Object.keys(allAccess).forEach(userKey => {
-                    if (allAccess[userKey][name]) {
-                        database.ref('vipAccess/' + userKey + '/' + name).remove();
-                    }
+                    if (allAccess[userKey][name]) database.ref('vipAccess/' + userKey + '/' + name).remove();
                 });
             }
         });
-        
-        if (currentChannel === name) switchChannel('room 1', '');
+        if (currentChannel === name) switchChannel('homework help', '');
     }
 }
 
-// Private Rooms Functions
 function loadPrivateChannels() {
     const list = document.getElementById('privateChannelsList');
     const section = document.getElementById('privateChannelsSection');
     const addBtn = document.getElementById('addPrivateRoomBtn');
-    
+
     if (!list || !section) return;
-    
     list.innerHTML = '';
-    
-    // Always show section so users can access the join button
     section.classList.remove('hidden');
-    
     if (isOwner && addBtn) addBtn.style.display = 'block';
-    
-    let visiblePrivateRooms = [];
-    
-    if (isOwner) {
-        visiblePrivateRooms = Object.keys(privateRooms);
-    } else {
-        visiblePrivateRooms = Object.keys(privateRooms).filter(roomName => {
+
+    let visiblePrivateRooms = isOwner
+        ? Object.keys(privateRooms)
+        : Object.keys(privateRooms).filter(roomName => {
             const userKey = currentUser.replace(/\./g, '_');
             return privateRooms[roomName].members && privateRooms[roomName].members[userKey] === true;
         });
-    }
-    
+
     if (visiblePrivateRooms.length === 0 && !isOwner) {
-        // Show message for non-owners with no access
         list.innerHTML = '<div style="padding: 12px; color: var(--text-muted); font-size: 13px; font-style: italic; text-align: center;">No private rooms<br/>Click 🔑 to join</div>';
         return;
     }
-    
+
     visiblePrivateRooms.forEach(roomName => {
         const room = privateRooms[roomName];
         const div = document.createElement('div');
         div.className = 'channel private-channel';
         div.onclick = () => switchChannel(roomName, room.topic);
-        
         div.innerHTML = `
             <span class="channel-name">${roomName}</span>
             ${isOwner ? `<button class="delete-channel-btn" onclick="deletePrivateRoom(event, '${roomName}')">×</button>` : ''}
@@ -556,48 +439,22 @@ function closeCreatePrivateRoomModal() {
 
 function createPrivateRoom() {
     if (!isOwner) return;
-    
     const name = document.getElementById('privateRoomName').value.trim();
     const topic = document.getElementById('privateRoomTopic').value.trim();
     const accessCode = document.getElementById('privateRoomCode').value.trim();
     const errorEl = document.getElementById('privateRoomError');
-    
-    if (!name) {
-        errorEl.textContent = 'Please enter a room name';
-        errorEl.classList.remove('hidden');
-        return;
-    }
-    
-    if (!accessCode) {
-        errorEl.textContent = 'Please enter an access code';
-        errorEl.classList.remove('hidden');
-        return;
-    }
-    
-    if (accessCode.length < 4) {
-        errorEl.textContent = 'Access code must be at least 4 characters';
-        errorEl.classList.remove('hidden');
-        return;
-    }
-    
-    if (privateRooms[name]) {
-        errorEl.textContent = 'Private room already exists';
-        errorEl.classList.remove('hidden');
-        return;
-    }
-    
-    // Initialize with owner as first member
+
+    if (!name) { errorEl.textContent = 'Please enter a room name'; errorEl.classList.remove('hidden'); return; }
+    if (!accessCode) { errorEl.textContent = 'Please enter an access code'; errorEl.classList.remove('hidden'); return; }
+    if (accessCode.length < 4) { errorEl.textContent = 'Access code must be at least 4 characters'; errorEl.classList.remove('hidden'); return; }
+    if (privateRooms[name]) { errorEl.textContent = 'Private room already exists'; errorEl.classList.remove('hidden'); return; }
+
     const ownerKey = currentUser.replace(/\./g, '_');
     const members = {};
     members[ownerKey] = true;
-    
+
     database.ref('privateRooms/' + name).set({
-        name,
-        topic: topic || '',
-        accessCode: accessCode,
-        createdBy: currentUser,
-        createdAt: Date.now(),
-        members: members
+        name, topic: topic || '', accessCode, createdBy: currentUser, createdAt: Date.now(), members
     }).then(() => {
         closeCreatePrivateRoomModal();
         alert(`Private room "${name}" created!\nAccess Code: ${accessCode}\n\nShare this code with users who should have access.`);
@@ -607,12 +464,10 @@ function createPrivateRoom() {
 function deletePrivateRoom(event, name) {
     event.stopPropagation();
     if (!isOwner) return;
-    
     if (confirm(`Delete private room "${name}"? All messages and access will be lost.`)) {
         database.ref('privateRooms/' + name).remove();
         database.ref('messages/' + name).remove();
-        
-        if (currentChannel === name) switchChannel('room 1', '');
+        if (currentChannel === name) switchChannel('homework help', '');
     }
 }
 
@@ -629,29 +484,16 @@ function closeJoinPrivateRoomModal() {
 function joinPrivateRoom() {
     const code = document.getElementById('joinPrivateRoomCode').value.trim();
     const errorEl = document.getElementById('joinPrivateRoomError');
-    
-    if (!code) {
-        errorEl.textContent = 'Please enter an access code';
-        errorEl.classList.remove('hidden');
-        return;
-    }
-    
-    // Search for room with matching code
+
+    if (!code) { errorEl.textContent = 'Please enter an access code'; errorEl.classList.remove('hidden'); return; }
+
     let foundRoom = null;
     for (const roomName in privateRooms) {
-        if (privateRooms[roomName].accessCode === code) {
-            foundRoom = roomName;
-            break;
-        }
+        if (privateRooms[roomName].accessCode === code) { foundRoom = roomName; break; }
     }
-    
-    if (!foundRoom) {
-        errorEl.textContent = 'Invalid access code';
-        errorEl.classList.remove('hidden');
-        return;
-    }
-    
-    // Check if already a member
+
+    if (!foundRoom) { errorEl.textContent = 'Invalid access code'; errorEl.classList.remove('hidden'); return; }
+
     const userKey = currentUser.replace(/\./g, '_');
     if (privateRooms[foundRoom].members && privateRooms[foundRoom].members[userKey]) {
         errorEl.textContent = 'You already have access to this room!';
@@ -659,8 +501,7 @@ function joinPrivateRoom() {
         closeJoinPrivateRoomModal();
         return;
     }
-    
-    // Grant access by adding to members
+
     database.ref('privateRooms/' + foundRoom + '/members/' + userKey).set(true).then(() => {
         closeJoinPrivateRoomModal();
         alert(`Access granted to "${foundRoom}"!`);
@@ -675,7 +516,8 @@ function switchChannel(channel, topic) {
     document.getElementById('messageInput').placeholder = `Message #${channel}`;
     document.querySelectorAll('.channel').forEach(ch => ch.classList.remove('active'));
     if (event && event.target) {
-        event.target.closest('.channel').classList.add('active');
+        const channelEl = event.target.closest('.channel');
+        if (channelEl) channelEl.classList.add('active');
     }
     loadMessages();
 }
@@ -695,10 +537,7 @@ function addBannedWord() {
     if (!isOwner && !isAdmin) return;
     const word = document.getElementById('newBannedWord').value.trim().toLowerCase();
     if (!word) return;
-    if (bannedWords.includes(word)) {
-        alert('Word already banned');
-        return;
-    }
+    if (bannedWords.includes(word)) { alert('Word already banned'); return; }
     bannedWords.push(word);
     database.ref('settings/bannedWords').set(bannedWords).then(() => {
         document.getElementById('newBannedWord').value = '';
@@ -719,47 +558,30 @@ function setupMaintenanceListener() {
     maintenanceListener.on('value', (snapshot) => {
         const maintenanceActive = snapshot.exists() && snapshot.val() === true;
         isMaintenanceMode = maintenanceActive;
-        
         updateMaintenanceUI(maintenanceActive);
-        
-        if (maintenanceActive && !isOwner && !isAdmin) {
-            showMaintenanceScreen();
-        }
+        if (maintenanceActive && !isOwner && !isAdmin) showMaintenanceScreen();
     });
 }
 
 function updateMaintenanceUI(active) {
     const banner = document.getElementById('maintenanceActiveBanner');
     const toggleBtn = document.getElementById('maintenanceToggleBtn');
-    
     if (active) {
-        if (isOwner || isAdmin) {
-            banner.classList.add('show');
-        }
-        if (toggleBtn) {
-            toggleBtn.textContent = '✅ Disable Maintenance';
-            toggleBtn.classList.add('active');
-        }
+        if (isOwner || isAdmin) banner.classList.add('show');
+        if (toggleBtn) { toggleBtn.textContent = '✅ Disable Maintenance'; toggleBtn.classList.add('active'); }
     } else {
         banner.classList.remove('show');
-        if (toggleBtn) {
-            toggleBtn.textContent = '🔧 Enable Maintenance';
-            toggleBtn.classList.remove('active');
-        }
+        if (toggleBtn) { toggleBtn.textContent = '🔧 Enable Maintenance'; toggleBtn.classList.remove('active'); }
     }
 }
 
 function toggleMaintenanceMode() {
     if (!isOwner) return;
-    
     database.ref('maintenance').once('value', (snapshot) => {
         const currentState = snapshot.exists() && snapshot.val() === true;
-        
         if (currentState) {
             if (confirm('Disable maintenance mode? All users will be able to access the chat.')) {
-                database.ref('maintenance').set(false).then(() => {
-                    alert('Maintenance mode disabled!');
-                });
+                database.ref('maintenance').set(false).then(() => alert('Maintenance mode disabled!'));
             }
         } else {
             openMaintenanceModal();
@@ -808,89 +630,57 @@ function toggleMobileMenu() {
     document.getElementById('sidebar').classList.toggle('mobile-open');
 }
 
-// FIXED: Improved initialization and login flow
 window.onload = function() {
-    console.log('Page loaded, checking login status...');
-    
     const savedUser = localStorage.getItem('loggedInUser');
-    
-    // If no user is saved, show auth screen
     if (!savedUser) {
-        console.log('No saved user, showing auth screen');
         updateAuthUI();
         loadCustomSettings();
         return;
     }
-    
-    // Check if login has expired
     if (checkLoginExpiration()) {
-        console.log('Login expired, clearing and showing auth');
         localStorage.removeItem('loggedInUser');
         localStorage.removeItem('lastLoginTime');
         updateAuthUI();
         loadCustomSettings();
         return;
     }
-    
-    console.log('Saved user found:', savedUser);
-    
+
     currentUser = savedUser;
     const role = checkUserRole(currentUser);
     isOwner = (role === 'owner');
     isAdmin = (role === 'owner' || role === 'admin');
-    
-    // Start the login process
-    console.log('Starting login process for', currentUser);
-    
+
     ensureProtectedAccountNotBanned(currentUser)
+        .then(() => checkBanStatus())
         .then(() => {
-            console.log('Checking ban status...');
-            return checkBanStatus();
-        })
-        .then(() => {
-            console.log('Ban check complete, isBanned:', isBanned);
-            if (isBanned) {
-                showBannedScreen();
-                return Promise.reject('User is banned');
-            }
-            console.log('Checking maintenance mode...');
+            if (isBanned) { showBannedScreen(); return Promise.reject('User is banned'); }
             return database.ref('maintenance').once('value');
         })
         .then((snapshot) => {
             const maintenanceActive = snapshot.exists() && snapshot.val() === true;
             isMaintenanceMode = maintenanceActive;
-            console.log('Maintenance mode:', maintenanceActive);
-            
             if (maintenanceActive && !isOwner && !isAdmin) {
                 showMaintenanceScreen();
                 return Promise.reject('Maintenance mode active');
             }
-            
-            console.log('All checks passed, showing chat');
             updateLastActivity();
             showChat();
             setupMaintenanceListener();
         })
         .catch((error) => {
-            // Handle permission errors gracefully
             if (error && error.code === 'PERMISSION_DENIED') {
-                console.log('Permission denied, skipping Firebase checks and showing chat');
                 updateLastActivity();
                 showChat();
                 return;
             }
-            
             if (error !== 'User is banned' && error !== 'Maintenance mode active') {
-                console.error('Login error:', error);
-                // If it's a permission error in the message, still show chat
                 if (error && error.message && error.message.includes('permission')) {
-                    console.log('Permission error in message, showing chat anyway');
                     updateLastActivity();
                     showChat();
                 }
             }
         });
-    
+
     loadCustomSettings();
     loadVipRooms();
 };
@@ -909,7 +699,7 @@ function updateAuthUI() {
     const toggleLink = document.getElementById('authToggleLink');
     const usernameField = document.getElementById('usernameField');
     const confirmField = document.getElementById('confirmPasswordField');
-    
+
     if (isSignupMode) {
         title.textContent = 'Create an account';
         subtitle.textContent = "We're so excited to see you!";
@@ -938,174 +728,90 @@ function signup() {
     const email = document.getElementById('emailInput').value.trim();
     const password = document.getElementById('passwordInput').value;
     const confirmPassword = document.getElementById('confirmPasswordInput').value;
-    
-    if (!username || !email || !password || !confirmPassword) {
-        showError('Please fill in all fields');
-        return;
-    }
-    if (password !== confirmPassword) {
-        showError('Passwords do not match');
-        return;
-    }
-    if (password.length < 6) {
-        showError('Password must be at least 6 characters');
-        return;
-    }
-    if (users[email]) {
-        showError('Email already registered');
-        return;
-    }
-    if (Object.values(users).some(u => u.username.toLowerCase() === username.toLowerCase())) {
-        showError('Username taken');
-        return;
-    }
-    
+
+    if (!username || !email || !password || !confirmPassword) { showError('Please fill in all fields'); return; }
+    if (password !== confirmPassword) { showError('Passwords do not match'); return; }
+    if (password.length < 6) { showError('Password must be at least 6 characters'); return; }
+    if (users[email]) { showError('Email already registered'); return; }
+    if (Object.values(users).some(u => u.username.toLowerCase() === username.toLowerCase())) { showError('Username taken'); return; }
+
     users[email] = { username, password, createdAt: new Date().toISOString() };
     localStorage.setItem('users', JSON.stringify(users));
-    database.ref('users/' + email.replace(/\./g, '_')).set({
-        username, createdAt: new Date().toISOString()
-    });
-    
+    database.ref('users/' + email.replace(/\./g, '_')).set({ username, createdAt: new Date().toISOString() });
+
     localStorage.setItem('loggedInUser', email);
     localStorage.setItem('lastLoginTime', Date.now().toString());
-    
+
     showSuccess('Account created! Redirecting to terms...');
-    setTimeout(() => {
-        window.location.href = 'terms.html';
-    }, 1000);
+    setTimeout(() => { window.location.href = 'terms.html'; }, 1000);
 }
 
-// FIXED: Improved login function with permission error handling
 function login() {
     const email = document.getElementById('emailInput').value.trim();
     const password = document.getElementById('passwordInput').value;
-    
-    if (!email || !password) {
-        showError('Please enter email and password');
-        return;
-    }
-    if (!users[email]) {
-        showError('Account not found');
-        return;
-    }
-    if (users[email].password !== password) {
-        showError('Invalid password');
-        return;
-    }
-    
-    console.log('=== LOGIN PROCESS STARTED ===');
-    console.log('Email:', email);
-    console.log('Login successful for', email);
-    
+
+    if (!email || !password) { showError('Please enter email and password'); return; }
+    if (!users[email]) { showError('Account not found'); return; }
+    if (users[email].password !== password) { showError('Invalid password'); return; }
+
     currentUser = email;
     localStorage.setItem('loggedInUser', email);
     localStorage.setItem('lastLoginTime', Date.now().toString());
-    
+
     const role = checkUserRole(currentUser);
     isOwner = (role === 'owner');
     isAdmin = (role === 'owner' || role === 'admin');
-    console.log('User role:', role, '| isOwner:', isOwner, '| isAdmin:', isAdmin);
-    
-    // Check if terms have been accepted
+
     const termsAccepted = localStorage.getItem('termsAccepted_' + email);
-    console.log('Terms accepted?', termsAccepted);
-    
-    if (!termsAccepted) {
-        console.log('Terms not accepted, redirecting to terms page');
-        window.location.href = 'terms.html';
-        return;
-    }
-    
-    console.log('Terms accepted, proceeding with login checks');
-    
-    // Proceed with ban check and show chat
+    if (!termsAccepted) { window.location.href = 'terms.html'; return; }
+
     ensureProtectedAccountNotBanned(currentUser)
+        .then(() => checkBanStatus())
         .then(() => {
-            console.log('Step 1: Protected account check complete');
-            console.log('Checking ban status...');
-            return checkBanStatus();
-        })
-        .then(() => {
-            console.log('Step 2: Ban status checked, isBanned:', isBanned);
-            if (isBanned) {
-                console.log('User is banned, showing banned screen');
-                showBannedScreen();
-                return Promise.reject('User is banned');
-            }
-            console.log('User is not banned, checking maintenance...');
+            if (isBanned) { showBannedScreen(); return Promise.reject('User is banned'); }
             return database.ref('maintenance').once('value');
         })
         .then((snapshot) => {
-            console.log('Step 3: Maintenance check complete');
             const maintenanceActive = snapshot.exists() && snapshot.val() === true;
-            console.log('Maintenance active:', maintenanceActive);
-            
             if (maintenanceActive && !isOwner && !isAdmin) {
-                console.log('Maintenance mode active for non-admin, showing maintenance screen');
                 showMaintenanceScreen();
                 return Promise.reject('Maintenance active');
             }
-            
-            console.log('Step 4: All checks passed, showing chat');
             updateLastActivity();
             showChat();
             setupMaintenanceListener();
-            console.log('=== LOGIN COMPLETE ===');
         })
         .catch((error) => {
-            console.error('=== LOGIN ERROR ===');
-            console.error('Error type:', typeof error);
-            console.error('Error value:', error);
-            
-            // Handle permission errors gracefully
             if (error && error.code === 'PERMISSION_DENIED') {
-                console.log('Permission denied on Firebase, skipping maintenance check and proceeding to chat');
                 updateLastActivity();
                 showChat();
-                // Don't setup maintenance listener if we don't have permission
-                console.log('=== LOGIN COMPLETE (with permission warning) ===');
                 return;
             }
-            
             if (error !== 'User is banned' && error !== 'Maintenance active') {
-                console.error('Unexpected error during login:', error);
-                // Try to show chat anyway for non-critical errors
                 if (error && error.message && error.message.includes('permission')) {
-                    console.log('Permission error detected, proceeding to chat anyway');
                     updateLastActivity();
                     showChat();
                 } else {
                     showError('Login error: ' + (error.message || error));
                 }
-            } else {
-                console.log('Expected error (ban/maintenance):', error);
             }
         });
 }
 
 function showChat() {
-    console.log('showChat called');
-    
-    if (isProtectedAccount(currentUser)) {
-        isBanned = false;
-    }
-    if (isBanned) {
-        showBannedScreen();
-        return;
-    }
-    
+    if (isProtectedAccount(currentUser)) isBanned = false;
+    if (isBanned) { showBannedScreen(); return; }
+
     document.getElementById('authScreen').style.display = 'none';
     document.getElementById('chatContainer').style.display = 'flex';
     document.getElementById('bannedScreen').classList.remove('show');
     document.getElementById('maintenanceScreen').classList.remove('show');
-    
+
     const displayName = users[currentUser]?.username || currentUser.split('@')[0];
     const initial = getUserInitial(currentUser);
-    const roleClass = getUserRoleClass(currentUser);
-    
-    let badge = '';
     const userAvatarSmall = document.getElementById('userAvatarSmall');
-    
+
+    let badge = '';
     if (isOwner) {
         badge = '<span class="badge owner-badge">Owner</span>';
         document.getElementById('adminPanelHeader').textContent = '👑 OWNER PANEL';
@@ -1118,10 +824,10 @@ function showChat() {
     } else {
         userAvatarSmall.className = 'user-avatar-small';
     }
-    
+
     userAvatarSmall.textContent = initial;
     document.getElementById('currentUser').innerHTML = displayName + badge;
-    
+
     if (!isProtectedAccount(currentUser)) {
         banListener = database.ref('banned/' + currentUser.replace(/\./g, '_'));
         banListener.on('value', (snapshot) => {
@@ -1131,7 +837,7 @@ function showChat() {
             }
         });
     }
-    
+
     if (isOwner || isAdmin) {
         document.getElementById('adminPanel').classList.add('show');
         loadAdminPanel();
@@ -1139,19 +845,18 @@ function showChat() {
         document.getElementById('reportsSection').classList.remove('hidden');
         document.getElementById('bannedWordsSection').classList.remove('hidden');
         loadBannedWordsList();
-        
-        // Hide announcements for admins
+
         if (!isOwner) {
             const announcements = document.getElementById('announcementsSection');
             if (announcements) announcements.style.display = 'none';
         }
-        
+
         if (isOwner) {
             document.getElementById('ownerControls').classList.remove('hidden');
         } else {
             document.getElementById('ownerControls').classList.add('hidden');
         }
-        
+
         database.ref('maintenance').once('value', (snapshot) => {
             const maintenanceActive = snapshot.exists() && snapshot.val() === true;
             updateMaintenanceUI(maintenanceActive);
@@ -1159,7 +864,7 @@ function showChat() {
     } else {
         document.getElementById('helpButton').classList.remove('hidden');
     }
-    
+
     blockedUsers = JSON.parse(localStorage.getItem('blockedUsers_' + currentUser) || '[]');
     updateLastActivity();
     loadCustomSettings();
@@ -1170,10 +875,7 @@ function showChat() {
 }
 
 function showBannedScreen() {
-    if (isProtectedAccount(currentUser)) {
-        isBanned = false;
-        return;
-    }
+    if (isProtectedAccount(currentUser)) { isBanned = false; return; }
     if (banListener) banListener.off();
     if (maintenanceListener) maintenanceListener.off();
     document.getElementById('authScreen').style.display = 'none';
@@ -1225,21 +927,17 @@ let currentMessageListener = null;
 function loadMessages() {
     const messagesDiv = document.getElementById('messages');
     messagesDiv.innerHTML = '';
-    
-    // Turn off the old listener if it exists
+
     if (currentMessageListener) {
         database.ref('messages/' + currentMessageListener).off();
     }
-    
-    // Set current listener
     currentMessageListener = currentChannel;
-    
-    // Listen to current channel only
+
     database.ref('messages/' + currentChannel).limitToLast(50).on('child_added', (snapshot) => {
         addMessageToUI(snapshot.val(), snapshot.key);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     });
-    
+
     database.ref('messages/' + currentChannel).on('child_removed', (snapshot) => {
         const el = document.querySelector(`[data-message-id="${snapshot.key}"]`);
         if (el) el.remove();
@@ -1248,33 +946,26 @@ function loadMessages() {
 
 function addMessageToUI(msg, messageId) {
     if (blockedUsers.includes(msg.user)) return;
-    
+
     const messagesDiv = document.getElementById('messages');
     const messageEl = document.createElement('div');
     messageEl.className = 'message';
     messageEl.setAttribute('data-message-id', messageId);
-    
+
     const initial = msg.user.charAt(0).toUpperCase();
     const roleClass = getUserRoleClass(msg.email);
-    const time = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const canDelete = isAdmin || isOwner || isModerator;
-    
+
     let badge = '';
     if (isProtectedAccount(msg.email)) {
         badge = '<span class="badge owner-badge">Owner</span>';
     } else if (isAdminAccount(msg.email)) {
         badge = '<span class="badge admin-badge">Admin</span>';
     }
-    
-    // Escape HTML in message text
+
     const safeText = escapeHtml(msg.text);
-    
-    // Build image HTML if present
-    let imageHtml = '';
-    if (msg.imageUrl) {
-        imageHtml = `<img src="${msg.imageUrl}" class="message-image" onclick="openImageModal('${msg.imageUrl}')" alt="Shared image" />`;
-    }
-    
+
     messageEl.innerHTML = `
         <div class="message-avatar ${roleClass}" onclick="viewUserActivity('${msg.email}')" title="Click to view activity">${initial}</div>
         <div class="message-content">
@@ -1284,7 +975,6 @@ function addMessageToUI(msg, messageId) {
                 <span class="message-time">${time}</span>
             </div>
             <div class="message-text">${safeText}</div>
-            ${imageHtml}
         </div>
         ${canDelete ? `<div class="message-buttons">
             <button class="message-btn" onclick="deleteMessage('${messageId}')" title="Delete">🗑️</button>
@@ -1301,51 +991,25 @@ function deleteMessage(messageId) {
 }
 
 function handleKeyPress(event) {
-    if (event.key === 'Enter' && !selectedImage) sendMessage();
+    if (event.key === 'Enter') sendMessage();
 }
 
-async function sendMessage() {
+function sendMessage() {
     const input = document.getElementById('messageInput');
     const text = input.value.trim();
-    
-    // Must have either text or image
-    if (!text && !selectedImage) return;
-    
-    // Protected accounts bypass all checks
+    if (!text) return;
+
     if (isProtectedAccount(currentUser)) {
         const displayName = users[currentUser]?.username || currentUser.split('@')[0];
-        const messageData = {
-            user: displayName,
-            email: currentUser,
-            text: text,
-            timestamp: new Date().toISOString()
-        };
-        
-        if (selectedImage) {
-            try {
-                const imageUrl = await uploadImage(selectedImage);
-                messageData.imageUrl = imageUrl;
-            } catch (error) {
-                alert('Failed to upload image. Please try again.');
-                return;
-            }
-        }
-        
-        // CRITICAL FIX: Send message to current channel only
-        database.ref('messages/' + currentChannel).push(messageData);
+        database.ref('messages/' + currentChannel).push({
+            user: displayName, email: currentUser, text, timestamp: new Date().toISOString()
+        });
         input.value = '';
-        removeImagePreview();
         return;
     }
-    
-    if (isBanned) {
-        alert('You are banned');
-        input.value = '';
-        removeImagePreview();
-        return;
-    }
-    
-    // Check for racist slurs
+
+    if (isBanned) { alert('You are banned'); input.value = ''; return; }
+
     const lowerText = text.toLowerCase();
     if (racistSlurs.some(slur => lowerText.includes(slur))) {
         database.ref('banned/' + currentUser.replace(/\./g, '_')).set(true);
@@ -1354,15 +1018,14 @@ async function sendMessage() {
         showBannedScreen();
         return;
     }
-    
-    // Check for profanity
+
     if (bannedWords.some(word => lowerText.includes(word))) {
         if (!userStrikes[currentUser]) userStrikes[currentUser] = 0;
         userStrikes[currentUser]++;
         localStorage.setItem('userStrikes', JSON.stringify(userStrikes));
         document.getElementById('strikeCount').textContent = userStrikes[currentUser];
         document.getElementById('warningBanner').classList.remove('hidden');
-        
+
         if (userStrikes[currentUser] >= 3) {
             database.ref('banned/' + currentUser.replace(/\./g, '_')).set(true);
             alert('Banned for excessive profanity (3 strikes)');
@@ -1372,145 +1035,122 @@ async function sendMessage() {
         }
         setTimeout(() => document.getElementById('warningBanner').classList.add('hidden'), 3000);
         input.value = '';
-        removeImagePreview();
         return;
     }
-    
-    // Send message
+
     const displayName = users[currentUser]?.username || currentUser.split('@')[0];
-    const messageData = {
-        user: displayName,
-        email: currentUser,
-        text: text,
-        timestamp: new Date().toISOString()
-    };
-    
-    if (selectedImage) {
-        try {
-            const imageUrl = await uploadImage(selectedImage);
-            messageData.imageUrl = imageUrl;
-        } catch (error) {
-            alert('Failed to upload image. Please try again.');
-            return;
-        }
-    }
-    
-    // CRITICAL FIX: Send message to current channel only
-    database.ref('messages/' + currentChannel).push(messageData);
+    database.ref('messages/' + currentChannel).push({
+        user: displayName, email: currentUser, text, timestamp: new Date().toISOString()
+    });
     input.value = '';
-    removeImagePreview();
 }
 
-function loadAdminPanel() {
+async function loadAdminPanel() {
     const adminUsersDiv = document.getElementById('adminUsers');
-    adminUsersDiv.innerHTML = '';
+    adminUsersDiv.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px;">Loading users...</div>';
     const now = Date.now();
-    const FIVE_MINUTES = 5 * 60 * 1000; // 5 minutes in milliseconds
-    
+    const FIVE_MINUTES = 5 * 60 * 1000;
+
     OWNER_EMAILS.forEach(email => ensureProtectedAccountNotBanned(email));
-    
-    database.ref('banned').once('value', (bannedSnapshot) => {
-        const bannedData = bannedSnapshot.val() || {};
-        const bannedEmails = Object.keys(bannedData).map(key => key.replace(/_/g, '.'));
-        
-        database.ref('users').once('value', (snapshot) => {
-            const firebaseUsers = snapshot.val() || {};
-            const allEmails = new Set([...Object.keys(users)]);
-            Object.keys(firebaseUsers).forEach(key => allEmails.add(key.replace(/_/g, '.')));
-            bannedEmails.forEach(email => allEmails.add(email));
-            
-            // Convert to array and sort by online status and name
-            const usersList = Array.from(allEmails).map(email => {
-                const userKey = email.replace(/\./g, '_');
-                const lastActive = firebaseUsers[userKey]?.lastActive || 0;
-                const isOnline = lastActive > 0 && (now - lastActive) < FIVE_MINUTES;
-                const isBannedUser = bannedEmails.includes(email);
-                const displayName = users[email]?.username || email.split('@')[0];
-                
-                return {
-                    email,
-                    displayName,
-                    lastActive,
-                    isOnline,
-                    isBannedUser,
-                    isProtected: isProtectedAccount(email),
-                    isAdminUser: isAdminAccount(email)
-                };
-            });
-            
-            // Sort: Protected accounts first, then online users, then by name
-            usersList.sort((a, b) => {
-                if (a.isProtected !== b.isProtected) return a.isProtected ? -1 : 1;
-                if (a.isOnline !== b.isOnline) return a.isOnline ? -1 : 1;
-                return a.displayName.localeCompare(b.displayName);
-            });
-            
-            // Display all users
-            usersList.forEach(user => {
-                const userDiv = document.createElement('div');
-                userDiv.className = 'admin-user' + (user.isBannedUser ? ' banned' : '');
-                
-                const onlineIndicator = user.isOnline ? '<span style="color: #43b581; font-size: 20px; margin-right: 5px;">●</span>' : '<span style="color: #747f8d; font-size: 20px; margin-right: 5px;">●</span>';
-                
-                let badges = '';
-                if (user.isProtected) {
-                    badges = ' <span class="badge owner-badge">Owner</span>';
-                } else if (user.isAdminUser) {
-                    badges = ' <span class="badge admin-badge">Admin</span>';
-                }
-                
-                let banButtonHtml = '';
-                // Don't show ban button for protected accounts
-                if (!user.isProtected) {
-                    if (isOwner) {
-                        banButtonHtml = `<button class="${user.isBannedUser ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${user.email}')">
-                            ${user.isBannedUser ? 'Unban' : 'Ban'}
-                        </button>`;
-                    } else if (isAdmin && !user.isAdminUser) {
-                        banButtonHtml = `<button class="${user.isBannedUser ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${user.email}')">
-                            ${user.isBannedUser ? 'Unban' : 'Ban'}
-                        </button>`;
-                    }
-                }
-                
-                userDiv.innerHTML = `
-                    <div class="admin-user-name" onclick="viewUserActivity('${user.email}')">
-                        ${onlineIndicator}${user.displayName}${badges}${user.isBannedUser ? ' <small>(BANNED)</small>' : ''}
-                    </div>
-                    <div class="admin-user-buttons">
-                        <button class="view-activity-btn" onclick="viewUserActivity('${user.email}')">View Activity</button>
-                        ${banButtonHtml}
-                        ${isOwner && !user.isProtected ? `<button class="delete-account-btn" onclick="deleteAccount('${user.email}')">Delete Account</button>` : ''}
-                    </div>
-                `;
-                adminUsersDiv.appendChild(userDiv);
-            });
-            
-            // Add count summary
-            const onlineCount = usersList.filter(u => u.isOnline).length;
-            const totalCount = usersList.length;
-            const summaryDiv = document.createElement('div');
-            summaryDiv.style.cssText = 'padding: 10px; text-align: center; color: var(--text-muted); font-size: 13px; border-top: 1px solid var(--background-tertiary); margin-top: 10px;';
-            summaryDiv.textContent = `${onlineCount} online • ${totalCount} total users`;
-            adminUsersDiv.appendChild(summaryDiv);
-        });
+
+    // --- Step 1: Get banned list (this path is usually readable) ---
+    let bannedData = {};
+    try {
+        const bannedSnapshot = await database.ref('banned').once('value');
+        bannedData = bannedSnapshot.val() || {};
+    } catch (e) {
+        console.warn('Could not read /banned:', e.message);
+    }
+    const bannedEmails = Object.keys(bannedData).map(key => key.replace(/_/g, '.'));
+
+    // --- Step 2: Try to get Firebase /users for online status ---
+    let firebaseUsers = {};
+    try {
+        const usersSnapshot = await database.ref('users').once('value');
+        firebaseUsers = usersSnapshot.val() || {};
+    } catch (e) {
+        // Permission denied — fall back to localStorage only, no online status
+        console.warn('Cannot read /users from Firebase (permission denied). Falling back to localStorage.');
+    }
+
+    // --- Step 3: Build the full email list from all sources ---
+    const allEmails = new Set([...Object.keys(users)]);
+    // Add any emails found in Firebase
+    Object.keys(firebaseUsers).forEach(key => allEmails.add(key.replace(/_/g, '.')));
+    // Always make sure owner + admin accounts appear even if not in localStorage
+    OWNER_EMAILS.forEach(e => allEmails.add(e));
+    ADMIN_EMAILS.forEach(e => allEmails.add(e));
+    // Include banned users so they can be unbanned
+    bannedEmails.forEach(email => allEmails.add(email));
+
+    adminUsersDiv.innerHTML = '';
+
+    const usersList = Array.from(allEmails).map(email => {
+        const userKey = email.replace(/\./g, '_');
+        const lastActive = firebaseUsers[userKey]?.lastActive || 0;
+        const isOnline = lastActive > 0 && (now - lastActive) < FIVE_MINUTES;
+        const isBannedUser = bannedEmails.includes(email);
+        const displayName = users[email]?.username || email.split('@')[0];
+        return {
+            email, displayName, lastActive, isOnline, isBannedUser,
+            isProtected: isProtectedAccount(email), isAdminUser: isAdminAccount(email)
+        };
     });
+
+    usersList.sort((a, b) => {
+        if (a.isProtected !== b.isProtected) return a.isProtected ? -1 : 1;
+        if (a.isAdminUser !== b.isAdminUser) return a.isAdminUser ? -1 : 1;
+        if (a.isOnline !== b.isOnline) return a.isOnline ? -1 : 1;
+        return a.displayName.localeCompare(b.displayName);
+    });
+
+    usersList.forEach(user => {
+        const userDiv = document.createElement('div');
+        userDiv.className = 'admin-user' + (user.isBannedUser ? ' banned' : '');
+
+        const onlineIndicator = user.isOnline
+            ? '<span style="color: #43b581; font-size: 20px; margin-right: 5px;">●</span>'
+            : '<span style="color: #747f8d; font-size: 20px; margin-right: 5px;">●</span>';
+
+        let badges = '';
+        if (user.isProtected) badges = ' <span class="badge owner-badge">Owner</span>';
+        else if (user.isAdminUser) badges = ' <span class="badge admin-badge">Admin</span>';
+
+        let banButtonHtml = '';
+        if (!user.isProtected) {
+            if (isOwner) {
+                banButtonHtml = `<button class="${user.isBannedUser ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${user.email}')">${user.isBannedUser ? 'Unban' : 'Ban'}</button>`;
+            } else if (isAdmin && !user.isAdminUser) {
+                banButtonHtml = `<button class="${user.isBannedUser ? 'unban-btn' : 'ban-btn'}" onclick="toggleBan('${user.email}')">${user.isBannedUser ? 'Unban' : 'Ban'}</button>`;
+            }
+        }
+
+        userDiv.innerHTML = `
+            <div class="admin-user-name" onclick="viewUserActivity('${user.email}')">
+                ${onlineIndicator}${user.displayName}${badges}${user.isBannedUser ? ' <small>(BANNED)</small>' : ''}
+            </div>
+            <div class="admin-user-buttons">
+                <button class="view-activity-btn" onclick="viewUserActivity('${user.email}')">View Activity</button>
+                ${banButtonHtml}
+                ${isOwner && !user.isProtected ? `<button class="delete-account-btn" onclick="deleteAccount('${user.email}')">Delete Account</button>` : ''}
+            </div>
+        `;
+        adminUsersDiv.appendChild(userDiv);
+    });
+
+    const onlineCount = usersList.filter(u => u.isOnline).length;
+    const totalCount = usersList.length;
+    const summaryDiv = document.createElement('div');
+    summaryDiv.style.cssText = 'padding: 10px; text-align: center; color: var(--text-muted); font-size: 13px; border-top: 1px solid var(--border-color); margin-top: 10px;';
+    summaryDiv.textContent = `${onlineCount} online • ${totalCount} total users`;
+    adminUsersDiv.appendChild(summaryDiv);
 }
 
 function toggleBan(email) {
     if (!isOwner && !isAdmin) return;
-    
-    if (isProtectedAccount(email)) {
-        alert('Cannot ban owner account!');
-        ensureProtectedAccountNotBanned(email);
-        return;
-    }
-    
-    if (isAdminAccount(email) && !isOwner) {
-        alert('Only owners can ban admin accounts!');
-        return;
-    }
-    
+    if (isProtectedAccount(email)) { alert('Cannot ban owner account!'); ensureProtectedAccountNotBanned(email); return; }
+    if (isAdminAccount(email) && !isOwner) { alert('Only owners can ban admin accounts!'); return; }
+
     const userKey = email.replace(/\./g, '_');
     database.ref('banned/' + userKey).once('value', (snapshot) => {
         if (snapshot.exists() && snapshot.val() === true) {
@@ -1529,34 +1169,23 @@ function toggleBan(email) {
 
 function deleteAccount(email) {
     if (!isOwner) return;
-    if (isProtectedAccount(email) || isAdminAccount(email)) {
-        alert('Cannot delete owner or admin accounts!');
-        return;
-    }
-    
+    if (isProtectedAccount(email) || isAdminAccount(email)) { alert('Cannot delete owner or admin accounts!'); return; }
+
     if (confirm(`Are you sure you want to permanently delete the account for ${email}?\n\nThis will:\n- Delete their user data\n- Delete all their messages\n- Remove them from the system\n\nThis action CANNOT be undone!`)) {
         const userKey = email.replace(/\./g, '_');
         const displayName = users[email]?.username || email.split('@')[0];
-        
-        if (users[email]) {
-            delete users[email];
-            localStorage.setItem('users', JSON.stringify(users));
-        }
-        
+
+        if (users[email]) { delete users[email]; localStorage.setItem('users', JSON.stringify(users)); }
         localStorage.removeItem('termsAccepted_' + email);
         localStorage.removeItem('termsAcceptedDate_' + email);
-        
-        if (userStrikes[email]) {
-            delete userStrikes[email];
-            localStorage.setItem('userStrikes', JSON.stringify(userStrikes));
-        }
-        
+        if (userStrikes[email]) { delete userStrikes[email]; localStorage.setItem('userStrikes', JSON.stringify(userStrikes)); }
+
         database.ref('users/' + userKey).remove();
         database.ref('banned/' + userKey).remove();
-        
-        const allChannels = ['room 1', 'room 2', 'room 3', 'room 4'];
+
+        const allChannels = ['homework help', 'teacher complaints', 'study hall', 'science lab'];
         Object.keys(customChannels).forEach(ch => allChannels.push(ch));
-        
+
         allChannels.forEach(channel => {
             database.ref('messages/' + channel).once('value', (snapshot) => {
                 snapshot.forEach(child => {
@@ -1567,7 +1196,7 @@ function deleteAccount(email) {
                 });
             });
         });
-        
+
         alert(`Account for ${email} has been permanently deleted.`);
         loadAdminPanel();
     }
@@ -1575,34 +1204,14 @@ function deleteAccount(email) {
 
 function checkBanStatus() {
     return new Promise((resolve, reject) => {
-        if (isProtectedAccount(currentUser)) {
-            console.log('Protected account, skipping ban check');
-            isBanned = false;
-            resolve();
-            return;
-        }
-        
-        console.log('Checking ban status for:', currentUser);
+        if (isProtectedAccount(currentUser)) { isBanned = false; resolve(); return; }
         const userKey = currentUser.replace(/\./g, '_');
-        console.log('Database key:', userKey);
-        
         database.ref('banned/' + userKey).once('value')
             .then((snapshot) => {
-                console.log('Ban check snapshot exists:', snapshot.exists());
-                console.log('Ban check value:', snapshot.val());
-                if (snapshot.exists() && snapshot.val() === true) {
-                    isBanned = true;
-                    console.log('User is banned');
-                } else {
-                    isBanned = false;
-                    console.log('User is not banned');
-                }
+                isBanned = snapshot.exists() && snapshot.val() === true;
                 resolve();
             })
-            .catch((error) => {
-                console.error('Error checking ban status:', error);
-                reject(error);
-            });
+            .catch((error) => reject(error));
     });
 }
 
@@ -1611,46 +1220,44 @@ function viewUserActivity(email) {
     const username = users[email]?.username || email.split('@')[0];
     document.getElementById('activityUserName').textContent = username;
     document.getElementById('activityUserEmail').textContent = email;
-    
-    const allChannels = ['room 1', 'room 2', 'room 3', 'room 4'];
+
+    const allChannels = ['homework help', 'teacher complaints', 'study hall', 'science lab'];
     Object.keys(customChannels).forEach(ch => allChannels.push(ch));
-    
+
     const activityList = document.getElementById('activityChannelsList');
     activityList.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px;">Loading...</div>';
     document.getElementById('userActivityModal').classList.add('show');
-    
+
     Promise.all(allChannels.map(ch => {
         return database.ref('messages/' + ch).once('value').then(snapshot => {
             const messages = [];
             snapshot.forEach(child => {
                 const msg = child.val();
-                if (msg.user === username || msg.email === email) {
-                    messages.push({ ...msg, id: child.key });
-                }
+                if (msg.user === username || msg.email === email) messages.push({ ...msg, id: child.key });
             });
             return { channelName: ch, messages };
         });
     })).then(results => {
         activityList.innerHTML = '';
         const channelsWithMessages = results.filter(r => r.messages.length > 0);
-        
+
         if (channelsWithMessages.length === 0) {
             activityList.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px; font-style:italic;">No messages found</div>';
             return;
         }
-        
+
         channelsWithMessages.forEach(result => {
             const section = document.createElement('div');
             section.className = 'channel-section';
-            
+
             const header = document.createElement('div');
             header.className = 'channel-section-header';
             header.innerHTML = `<span># ${result.channelName}</span><span class="message-count">${result.messages.length}</span>`;
-            
+
             const msgs = document.createElement('div');
             msgs.className = 'channel-messages';
             msgs.style.display = 'none';
-            
+
             result.messages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).forEach(msg => {
                 const item = document.createElement('div');
                 item.className = 'user-message-item';
@@ -1661,7 +1268,7 @@ function viewUserActivity(email) {
                 `;
                 msgs.appendChild(item);
             });
-            
+
             header.onclick = () => msgs.style.display = msgs.style.display === 'none' ? 'block' : 'none';
             section.appendChild(header);
             section.appendChild(msgs);
@@ -1688,8 +1295,7 @@ function reportBullying() {
         const details = prompt('Please describe what happened (optional):');
         const displayName = users[currentUser]?.username || currentUser.split('@')[0];
         database.ref('reports').push({
-            reporter: displayName,
-            reporterEmail: currentUser,
+            reporter: displayName, reporterEmail: currentUser,
             message: `Reported ${username} for bullying. ${details ? 'Details: ' + details : ''}`,
             timestamp: Date.now()
         });
@@ -1703,10 +1309,8 @@ function reportProblem() {
     if (problem) {
         const displayName = users[currentUser]?.username || currentUser.split('@')[0];
         database.ref('reports').push({
-            reporter: displayName,
-            reporterEmail: currentUser,
-            message: `Problem: ${problem}`,
-            timestamp: Date.now()
+            reporter: displayName, reporterEmail: currentUser,
+            message: `Problem: ${problem}`, timestamp: Date.now()
         });
         alert('Problem reported. An admin will look into it.');
         closeHelpModal();
@@ -1718,10 +1322,8 @@ function contactAdmin() {
     if (message) {
         const displayName = users[currentUser]?.username || currentUser.split('@')[0];
         database.ref('reports').push({
-            reporter: displayName,
-            reporterEmail: currentUser,
-            message: `Message: ${message}`,
-            timestamp: Date.now()
+            reporter: displayName, reporterEmail: currentUser,
+            message: `Message: ${message}`, timestamp: Date.now()
         });
         alert('Message sent to admin.');
         closeHelpModal();
@@ -1740,19 +1342,13 @@ function resetAllMessages() {
     }
 }
 
-// Announcement functions
 function postAnnouncement() {
     if (!isOwner) return;
     const text = document.getElementById('newAnnouncement').value.trim();
-    if (!text) {
-        alert('Please enter an announcement text');
-        return;
-    }
-    
+    if (!text) { alert('Please enter an announcement text'); return; }
+
     database.ref('announcement').set({
-        text: text,
-        timestamp: Date.now(),
-        postedBy: currentUser
+        text, timestamp: Date.now(), postedBy: currentUser
     }).then(() => {
         document.getElementById('newAnnouncement').value = '';
         alert('Announcement posted!');
@@ -1784,13 +1380,10 @@ function showAnnouncementBanner(text) {
 function loadAnnouncement() {
     database.ref('announcement').on('value', (snapshot) => {
         if (snapshot.exists()) {
-            const announcement = snapshot.val();
-            showAnnouncementBanner(announcement.text);
+            showAnnouncementBanner(snapshot.val().text);
         } else {
             document.getElementById('announcementsBanner').classList.remove('show');
-            if (isOwner) {
-                document.getElementById('currentAnnouncementText').textContent = 'None';
-            }
+            if (isOwner) document.getElementById('currentAnnouncementText').textContent = 'None';
         }
     });
 }
