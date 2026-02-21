@@ -22,6 +22,7 @@
             --border-color: #27272a;
             --owner-gradient: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
             --admin-gradient: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            --prime-gradient: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -148,6 +149,11 @@
         .user-info button:hover { background: #dc2626; }
         .user-info button.terms-btn { background: var(--accent-primary); }
         .user-info button.terms-btn:hover { background: #4f46e5; }
+        .user-info button.inbox-btn { background: var(--accent-success); position: relative; }
+        .user-info button.inbox-btn:hover { background: #059669; }
+
+        /* DM Inbox Badge */
+        .inbox-badge { position: absolute; top: -6px; right: -6px; background: var(--accent-danger); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 
         /* Chat Area */
         .chat-area { flex: 1; display: flex; flex-direction: column; background: var(--bg-chat); }
@@ -184,9 +190,24 @@
         .message-header { display: flex; align-items: baseline; margin-bottom: 4px; gap: 8px; flex-wrap: wrap; }
         .message-username { font-weight: 700; font-size: 15px; color: var(--text-primary); cursor: pointer; }
         .message-username:hover { text-decoration: underline; }
-        .badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Badges */
+        .badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 3px; }
         .owner-badge { background: var(--owner-gradient); color: white; }
         .admin-badge { background: var(--admin-gradient); color: white; }
+        /* ⭐ PRIME MEMBER BADGE */
+        .prime-badge {
+            background: var(--prime-gradient);
+            color: #1a1a00;
+            font-weight: 800;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+            animation: primeGlow 2s ease-in-out infinite alternate;
+        }
+        @keyframes primeGlow {
+            from { box-shadow: 0 0 4px rgba(245, 158, 11, 0.3); }
+            to { box-shadow: 0 0 12px rgba(245, 158, 11, 0.7); }
+        }
+
         .message-time { font-size: 12px; color: var(--text-muted); font-weight: 500; }
         .message-text { color: var(--text-secondary); line-height: 1.5; font-size: 15px; word-wrap: break-word; }
         .message-buttons { position: absolute; top: -8px; right: 16px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 4px; display: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
@@ -232,6 +253,21 @@
         .view-activity-btn { background: var(--accent-primary); color: white; }
         .delete-account-btn { background: #dc2626; color: white; }
 
+        /* Report DM Button */
+        .report-dm-btn {
+            background: var(--accent-success);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .report-dm-btn:hover { background: #059669; transform: translateY(-1px); }
+
         /* Owner Controls */
         .owner-controls { padding: 20px; border-top: 2px solid var(--accent-warning); background: var(--bg-tertiary); }
         .owner-controls h4 { color: var(--accent-warning); font-size: 11px; text-transform: uppercase; margin-bottom: 16px; font-weight: 700; letter-spacing: 1px; }
@@ -275,6 +311,35 @@
         .modal-content .primary-btn:hover { background: #4f46e5; }
         .modal-content .secondary-btn { background: var(--bg-tertiary); color: var(--text-secondary); }
         .modal-content .secondary-btn:hover { background: var(--bg-primary); }
+
+        /* DM Modal */
+        .dm-recipient-label {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+        .dm-recipient-label strong { color: var(--accent-success); font-size: 17px; }
+        .dm-context { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 6px; font-style: italic; }
+
+        /* DM Inbox Modal */
+        .inbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .inbox-modal.show { display: flex; }
+        .inbox-content { background: var(--bg-secondary); padding: 32px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); width: 520px; max-width: 100%; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border-color); }
+        .inbox-content h2 { text-align: center; margin-bottom: 24px; color: var(--text-primary); font-size: 22px; font-weight: 700; }
+        .dm-item { padding: 16px; background: var(--bg-tertiary); margin-bottom: 10px; border-radius: 10px; border-left: 3px solid var(--accent-primary); transition: all 0.2s; }
+        .dm-item.dm-unread { background: rgba(99, 102, 241, 0.1); border-left-color: var(--accent-success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.15); }
+        .dm-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
+        .dm-from { font-weight: 700; color: var(--text-primary); font-size: 14px; }
+        .dm-time { font-size: 11px; color: var(--text-muted); }
+        .dm-new-badge { background: var(--accent-success); color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; }
+        .dm-message { color: var(--text-secondary); font-size: 14px; line-height: 1.5; }
+        .close-inbox-btn { width: 100%; padding: 12px; background: var(--bg-tertiary); color: var(--text-secondary); border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; margin-top: 16px; transition: all 0.2s; }
+        .close-inbox-btn:hover { background: var(--bg-primary); }
 
         /* Banned / Maintenance Screens */
         .banned-screen { display: none; height: 100vh; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); justify-content: center; align-items: center; flex-direction: column; color: white; }
@@ -445,6 +510,11 @@
                     <div class="user-avatar-small" id="userAvatarSmall"></div>
                     <span class="user-name-display" id="currentUser"></span>
                 </div>
+                <!-- DM Inbox button (shown to regular users) -->
+                <button class="inbox-btn hidden" id="dmInboxBtn" onclick="openDmInbox()" style="position:relative;">
+                    📬
+                    <span class="inbox-badge hidden" id="dmInboxBadge">0</span>
+                </button>
                 <button onclick="window.location.href='terms.html'" class="terms-btn">Terms</button>
                 <button onclick="logout()">Logout</button>
             </div>
@@ -606,6 +676,34 @@
         </div>
     </div>
 
+    <!-- ✉️ Owner DM Modal -->
+    <div class="modal" id="dmModal">
+        <div class="modal-content">
+            <h3>💬 Send Direct Message</h3>
+            <input type="hidden" id="dmTargetEmail" />
+            <div class="dm-recipient-label">
+                Sending to: <strong id="dmTargetName"></strong>
+            </div>
+            <div class="dm-context hidden" id="dmReportContext"></div>
+            <textarea id="dmMessageInput" placeholder="Type your message here..." maxlength="500" style="min-height: 120px;"></textarea>
+            <div class="error-msg hidden" id="dmError"></div>
+            <div>
+                <button class="primary-btn" onclick="sendDm()" style="background: var(--accent-success);">Send Message</button>
+                <button class="secondary-btn" onclick="closeDmModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📬 User DM Inbox Modal -->
+    <div class="inbox-modal" id="dmInboxModal">
+        <div class="inbox-content">
+            <h2>📬 Your Messages</h2>
+            <p style="text-align:center; color:var(--text-muted); font-size:13px; margin-bottom:20px;">Private messages from the Haven team</p>
+            <div id="dmInboxList"></div>
+            <button class="close-inbox-btn" onclick="closeDmInbox()">Close</button>
+        </div>
+    </div>
+
     <!-- User Activity Modal -->
     <div class="user-activity-modal" id="userActivityModal">
         <div class="user-activity-content">
@@ -642,5 +740,13 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="haven-script.js"></script>
+
+    <script>
+        // Show DM context if present
+        document.getElementById('dmMessageInput').addEventListener('focus', function() {
+            const ctx = document.getElementById('dmReportContext');
+            if (ctx.textContent) ctx.classList.remove('hidden');
+        });
+    </script>
 </body>
 </html>
