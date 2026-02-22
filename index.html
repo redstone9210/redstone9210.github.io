@@ -53,66 +53,333 @@
             justify-content: center;
         }
 
-        /* Auth Screen */
+        /* ══════════════════════════════════════
+           IMPROVED AUTH SCREEN
+        ══════════════════════════════════════ */
         .auth-screen {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: var(--bg-primary);
             position: relative;
             overflow: hidden;
         }
 
-        .auth-screen::before {
-            content: '';
+        /* Animated background blobs */
+        .auth-blob {
             position: absolute;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: gridMove 20s linear infinite;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.25;
+            animation: blobFloat 8s ease-in-out infinite;
         }
-
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
+        .auth-blob-1 {
+            width: 500px; height: 500px;
+            background: var(--accent-primary);
+            top: -150px; left: -150px;
+            animation-delay: 0s;
+        }
+        .auth-blob-2 {
+            width: 400px; height: 400px;
+            background: var(--accent-secondary);
+            bottom: -100px; right: -100px;
+            animation-delay: -4s;
+        }
+        .auth-blob-3 {
+            width: 300px; height: 300px;
+            background: #06b6d4;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -2s;
+        }
+        @keyframes blobFloat {
+            0%, 100% { transform: scale(1) translate(0, 0); }
+            33% { transform: scale(1.05) translate(20px, -20px); }
+            66% { transform: scale(0.95) translate(-15px, 15px); }
+        }
+        .auth-blob-1 { animation-name: blobFloat1; }
+        @keyframes blobFloat1 {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08) translate(25px, 25px); }
         }
 
         .auth-box {
-            background: rgba(18, 18, 26, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 48px;
+            background: rgba(22, 22, 29, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 44px 40px;
             border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            width: 480px;
-            max-width: 90%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.07), 0 24px 64px rgba(0, 0, 0, 0.6);
+            width: 460px;
+            max-width: calc(100vw - 32px);
             position: relative;
             z-index: 1;
-            animation: slideUp 0.5s ease-out;
+            animation: authSlideUp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes authSlideUp {
+            from { opacity: 0; transform: translateY(40px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Logo area */
+        .auth-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+        .auth-logo-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+            margin-bottom: 14px;
+            box-shadow: 0 8px 24px rgba(99,102,241,.4);
+        }
+        .auth-box h2 {
+            text-align: center;
+            color: var(--text-primary);
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .auth-box .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
         }
 
-        .auth-box h2 { text-align: center; margin-bottom: 12px; color: var(--text-primary); font-size: 32px; font-weight: 700; }
-        .auth-box .subtitle { text-align: center; color: var(--text-secondary); font-size: 16px; margin-bottom: 32px; }
-        .auth-box label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .auth-box input { width: 100%; padding: 14px 16px; margin-bottom: 20px; background: var(--bg-tertiary); border: 2px solid transparent; border-radius: 12px; color: var(--text-primary); font-size: 16px; font-family: 'Outfit', sans-serif; transition: all 0.3s; }
-        .auth-box input:focus { outline: none; border-color: var(--accent-primary); background: var(--bg-secondary); }
-        .auth-box button { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); border: none; border-radius: 12px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 16px; transition: all 0.3s; }
-        .auth-box button:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4); }
+        /* Form fields */
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        .input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            font-size: 16px;
+            color: var(--text-muted);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .auth-box input[type="text"],
+        .auth-box input[type="email"],
+        .auth-box input[type="password"] {
+            width: 100%;
+            padding: 13px 16px 13px 42px;
+            background: var(--bg-tertiary);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.25s;
+        }
+        .auth-box input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            background: var(--bg-secondary);
+            box-shadow: 0 0 0 4px rgba(99,102,241,.12);
+        }
+        .auth-box input.input-error {
+            border-color: var(--accent-danger);
+            box-shadow: 0 0 0 4px rgba(239,68,68,.1);
+        }
+        .auth-box input.input-success {
+            border-color: var(--accent-success);
+        }
 
-        .auth-toggle { text-align: center; margin-top: 16px; color: var(--text-muted); font-size: 14px; }
-        .auth-toggle a { color: var(--accent-primary); cursor: pointer; text-decoration: none; font-weight: 600; }
+        /* Show/hide password toggle */
+        .toggle-pw {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-muted);
+            padding: 4px;
+            z-index: 2;
+            transition: color 0.2s;
+            user-select: none;
+        }
+        .toggle-pw:hover { color: var(--text-secondary); }
+
+        /* Strength bar */
+        .strength-bar {
+            display: none;
+            height: 3px;
+            background: var(--bg-tertiary);
+            border-radius: 99px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+        .strength-bar.show { display: block; }
+        .strength-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.3s, background 0.3s;
+            width: 0%;
+        }
+        .strength-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            height: 14px;
+            transition: color 0.3s;
+        }
+
+        /* Field hint */
+        .field-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 5px;
+            display: none;
+        }
+        .field-hint.show { display: block; }
+        .field-hint.ok { color: var(--accent-success); }
+        .field-hint.err { color: var(--accent-danger); }
+
+        /* Remember me row */
+        .remember-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 4px 0 20px;
+        }
+        .remember-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .remember-label input[type="checkbox"] {
+            width: 16px; height: 16px;
+            border-radius: 4px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        /* Auth button */
+        .auth-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .auth-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0);
+            transition: background 0.2s;
+        }
+        .auth-btn:hover:not(:disabled)::after { background: rgba(255,255,255,0.08); }
+        .auth-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(99, 102, 241, 0.45); }
+        .auth-btn:active:not(:disabled) { transform: translateY(0); }
+        .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        /* Loading spinner inside button */
+        .btn-spinner {
+            display: inline-block;
+            width: 18px; height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Divider */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 4px 0 16px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        .auth-divider::before, .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .auth-toggle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .auth-toggle a {
+            color: var(--accent-primary);
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+        }
         .auth-toggle a:hover { text-decoration: underline; }
 
-        .error-msg, .success-msg { padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; font-weight: 500; }
-        .error-msg { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--accent-danger); color: var(--accent-danger); }
-        .success-msg { background: rgba(16, 185, 129, 0.15); border: 1px solid var(--accent-success); color: var(--accent-success); }
+        .error-msg, .success-msg {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .error-msg {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239,68,68,.3);
+            color: #fca5a5;
+        }
+        .success-msg {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16,185,129,.3);
+            color: #6ee7b7;
+        }
+
+        /* Shake animation for wrong password */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+        .shake { animation: shake 0.4s ease; }
 
         /* Chat Container */
         .chat-container { display: none; height: 100vh; flex-direction: row; }
@@ -121,11 +388,9 @@
         .sidebar { width: 280px; background: var(--bg-secondary); display: flex; flex-direction: column; border-right: 1px solid var(--border-color); transition: transform 0.3s; }
         .server-name { padding: 20px; font-weight: 700; color: var(--text-primary); font-size: 18px; border-bottom: 1px solid var(--border-color); background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .channels { flex: 1; overflow-y: auto; padding: 16px; }
-
         .channel-category { color: var(--text-muted); font-size: 11px; font-weight: 700; margin: 24px 8px 8px 8px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; letter-spacing: 1px; }
         .add-channel-btn { background: none; color: var(--text-muted); border: none; width: 20px; height: 20px; cursor: pointer; font-size: 18px; line-height: 1; transition: all 0.2s; border-radius: 4px; }
         .add-channel-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
-
         .channel { padding: 10px 12px; margin: 4px 0; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; color: var(--text-secondary); transition: all 0.2s; font-size: 15px; font-weight: 500; position: relative; }
         .channel:hover { background: var(--bg-tertiary); color: var(--text-primary); }
         .channel.active { background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15)); color: var(--text-primary); border-left: 3px solid var(--accent-primary); }
@@ -134,7 +399,6 @@
         .channel.active .channel-name::before { color: var(--accent-primary); }
         .vip-channel .channel-name::before { content: '👑'; }
         .private-channel .channel-name::before { content: '🔒'; }
-
         .delete-channel-btn { background: var(--accent-danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; opacity: 0; transition: opacity 0.2s; }
         .channel:hover .delete-channel-btn { opacity: 1; }
 
@@ -152,25 +416,20 @@
         .user-info button.inbox-btn { background: var(--accent-success); position: relative; }
         .user-info button.inbox-btn:hover { background: #059669; }
 
-        /* DM Inbox Badge */
         .inbox-badge { position: absolute; top: -6px; right: -6px; background: var(--accent-danger); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 
         /* Chat Area */
         .chat-area { flex: 1; display: flex; flex-direction: column; background: var(--bg-chat); }
-
-        /* Announcements Banner */
         .announcements-banner { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); padding: 16px 24px; text-align: center; font-weight: 600; font-size: 14px; color: white; display: none; position: relative; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); animation: slideDown 0.3s ease-out; }
         @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .announcements-banner.show { display: block; }
         .announcements-banner .announcement-icon { font-size: 18px; margin-right: 8px; }
         .announcements-banner .close-announcement { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
         .announcements-banner .close-announcement:hover { background: rgba(255, 255, 255, 0.3); }
-
         .maintenance-active-banner, .warning-banner { padding: 12px 16px; text-align: center; font-weight: 600; font-size: 14px; display: none; }
         .maintenance-active-banner { background: var(--accent-warning); color: var(--bg-primary); }
         .warning-banner { background: var(--accent-danger); color: white; }
         .maintenance-active-banner.show, .warning-banner.show { display: block; }
-
         .chat-header { padding: 16px 24px; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
         .chat-header-title { font-weight: 700; font-size: 18px; display: flex; align-items: center; color: var(--text-primary); }
         .chat-header-title::before { content: '#'; color: var(--text-muted); margin-right: 12px; font-size: 24px; }
@@ -190,24 +449,11 @@
         .message-header { display: flex; align-items: baseline; margin-bottom: 4px; gap: 8px; flex-wrap: wrap; }
         .message-username { font-weight: 700; font-size: 15px; color: var(--text-primary); cursor: pointer; }
         .message-username:hover { text-decoration: underline; }
-
-        /* Badges */
         .badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 3px; }
         .owner-badge { background: var(--owner-gradient); color: white; }
         .admin-badge { background: var(--admin-gradient); color: white; }
-        /* ⭐ PRIME MEMBER BADGE */
-        .prime-badge {
-            background: var(--prime-gradient);
-            color: #1a1a00;
-            font-weight: 800;
-            box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
-            animation: primeGlow 2s ease-in-out infinite alternate;
-        }
-        @keyframes primeGlow {
-            from { box-shadow: 0 0 4px rgba(245, 158, 11, 0.3); }
-            to { box-shadow: 0 0 12px rgba(245, 158, 11, 0.7); }
-        }
-
+        .prime-badge { background: var(--prime-gradient); color: #1a1a00; font-weight: 800; box-shadow: 0 0 8px rgba(245, 158, 11, 0.4); animation: primeGlow 2s ease-in-out infinite alternate; }
+        @keyframes primeGlow { from { box-shadow: 0 0 4px rgba(245, 158, 11, 0.3); } to { box-shadow: 0 0 12px rgba(245, 158, 11, 0.7); } }
         .message-time { font-size: 12px; color: var(--text-muted); font-weight: 500; }
         .message-text { color: var(--text-secondary); line-height: 1.5; font-size: 15px; word-wrap: break-word; }
         .message-buttons { position: absolute; top: -8px; right: 16px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 8px; padding: 4px; display: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
@@ -231,14 +477,12 @@
         .owner-header { background: var(--owner-gradient); }
         .admin-section { padding: 20px; border-bottom: 1px solid var(--border-color); }
         .admin-section h4 { color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 16px; font-weight: 700; letter-spacing: 1px; }
-
         .collapsible-header { cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-tertiary); border-radius: 8px; transition: all 0.2s; margin-bottom: 12px; font-weight: 600; }
         .collapsible-header:hover { background: var(--bg-primary); }
         .collapsible-header::after { content: '▼'; font-size: 10px; transition: transform 0.2s; color: var(--text-muted); }
         .collapsible-header.collapsed::after { transform: rotate(-90deg); }
         .collapsible-content { max-height: 1000px; overflow: hidden; transition: max-height 0.3s ease-out, opacity 0.3s; opacity: 1; }
         .collapsible-content.collapsed { max-height: 0; opacity: 0; }
-
         .admin-users { max-height: 500px; overflow-y: auto; }
         .admin-user { padding: 16px; background: var(--bg-tertiary); margin-bottom: 12px; border-radius: 8px; transition: all 0.2s; }
         .admin-user:hover { background: var(--bg-primary); }
@@ -252,23 +496,8 @@
         .unban-btn { background: var(--accent-success); color: white; }
         .view-activity-btn { background: var(--accent-primary); color: white; }
         .delete-account-btn { background: #dc2626; color: white; }
-
-        /* Report DM Button */
-        .report-dm-btn {
-            background: var(--accent-success);
-            color: white;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
+        .report-dm-btn { background: var(--accent-success); color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s; flex-shrink: 0; }
         .report-dm-btn:hover { background: #059669; transform: translateY(-1px); }
-
-        /* Owner Controls */
         .owner-controls { padding: 20px; border-top: 2px solid var(--accent-warning); background: var(--bg-tertiary); }
         .owner-controls h4 { color: var(--accent-warning); font-size: 11px; text-transform: uppercase; margin-bottom: 16px; font-weight: 700; letter-spacing: 1px; }
         .owner-control-btn { width: 100%; padding: 12px; margin-bottom: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
@@ -276,20 +505,15 @@
         .maintenance-btn { background: var(--accent-warning); color: var(--bg-primary); }
         .maintenance-btn.active { background: var(--accent-success); color: white; }
         .unban-tool-btn { background: var(--accent-primary); color: white; }
-
         .announcement-input-area { display: flex; gap: 8px; margin-bottom: 16px; }
         .announcement-input-area input { flex: 1; padding: 10px 12px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 14px; }
         .announcement-input-area button { padding: 10px 16px; background: var(--accent-success); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
-
-        /* Banned Words */
         .banned-word-input-area { display: flex; gap: 8px; margin-bottom: 16px; }
         .banned-word-input-area input { flex: 1; padding: 10px 12px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: 14px; }
         .banned-word-input-area button { padding: 10px 16px; background: var(--accent-success); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
         .banned-words-list { max-height: 250px; overflow-y: auto; }
         .banned-word-item { padding: 10px 12px; background: var(--bg-primary); margin-bottom: 8px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
         .remove-word-btn { background: var(--accent-danger); color: white; border: none; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
-
-        /* Reports */
         .reports-badge { background: var(--accent-danger); color: white; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: 700; margin-left: 8px; }
         .report-item { padding: 16px; background: var(--bg-primary); margin-bottom: 12px; border-radius: 8px; border-left: 3px solid var(--accent-danger); }
         .report-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
@@ -311,22 +535,9 @@
         .modal-content .primary-btn:hover { background: #4f46e5; }
         .modal-content .secondary-btn { background: var(--bg-tertiary); color: var(--text-secondary); }
         .modal-content .secondary-btn:hover { background: var(--bg-primary); }
-
-        /* DM Modal */
-        .dm-recipient-label {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 12px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05));
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 10px;
-            font-size: 15px;
-            color: var(--text-secondary);
-        }
+        .dm-recipient-label { text-align: center; margin-bottom: 20px; padding: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.05)); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; font-size: 15px; color: var(--text-secondary); }
         .dm-recipient-label strong { color: var(--accent-success); font-size: 17px; }
         .dm-context { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; padding: 8px 12px; background: var(--bg-tertiary); border-radius: 6px; font-style: italic; }
-
-        /* DM Inbox Modal */
         .inbox-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .inbox-modal.show { display: flex; }
         .inbox-content { background: var(--bg-secondary); padding: 32px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); width: 520px; max-width: 100%; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border-color); }
@@ -340,22 +551,17 @@
         .dm-message { color: var(--text-secondary); font-size: 14px; line-height: 1.5; }
         .close-inbox-btn { width: 100%; padding: 12px; background: var(--bg-tertiary); color: var(--text-secondary); border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; margin-top: 16px; transition: all 0.2s; }
         .close-inbox-btn:hover { background: var(--bg-primary); }
-
-        /* Banned / Maintenance Screens */
         .banned-screen { display: none; height: 100vh; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); justify-content: center; align-items: center; flex-direction: column; color: white; }
         .banned-screen.show { display: flex; }
         .banned-box { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(20px); padding: 60px; border-radius: 16px; text-align: center; max-width: 500px; }
         .banned-box h1 { font-size: 48px; margin-bottom: 20px; }
         .banned-box p { font-size: 18px; margin-bottom: 24px; }
         .banned-box button { padding: 12px 24px; background: white; color: var(--accent-danger); border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin: 0 8px; }
-
         .maintenance-screen { display: none; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); justify-content: center; align-items: center; flex-direction: column; color: white; }
         .maintenance-screen.show { display: flex; }
         .maintenance-box { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(20px); padding: 60px; border-radius: 16px; text-align: center; max-width: 500px; }
         .maintenance-box h1 { font-size: 48px; margin-bottom: 20px; }
         .maintenance-box p { font-size: 18px; margin-bottom: 24px; }
-
-        /* User Activity Modal */
         .user-activity-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .user-activity-modal.show { display: flex; }
         .user-activity-content { background: var(--bg-secondary); padding: 32px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); width: 700px; max-width: 100%; max-height: 85vh; overflow-y: auto; border: 1px solid var(--border-color); }
@@ -369,8 +575,6 @@
         .user-message-item { padding: 12px; background: var(--bg-tertiary); margin-bottom: 10px; border-radius: 6px; border-left: 3px solid var(--accent-primary); }
         .message-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
         .close-activity-btn { width: 100%; padding: 12px; background: var(--accent-danger); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; margin-top: 16px; }
-
-        /* Help Modal */
         .help-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .help-modal.show { display: flex; }
         .help-content { background: var(--bg-secondary); padding: 32px; border-radius: 16px; width: 500px; max-width: 100%; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border-color); }
@@ -379,8 +583,6 @@
         .help-option:hover { background: var(--bg-primary); transform: translateX(4px); }
         .help-option h3 { color: var(--accent-primary); font-size: 16px; margin-bottom: 6px; font-weight: 700; }
         .help-option p { color: var(--text-secondary); font-size: 14px; }
-
-        /* VIP Rooms */
         #vipChannelsSection { margin-top: 16px; }
         #privateChannelsSection { margin-top: 16px; }
         .vip-user-checkbox { padding: 10px; margin-bottom: 8px; background: var(--bg-tertiary); border-radius: 6px; }
@@ -388,7 +590,6 @@
         .vip-user-checkbox input[type="checkbox"] { margin-right: 10px; cursor: pointer; }
         #vipUsersList { max-height: 300px; overflow-y: auto; margin-bottom: 16px; }
 
-        /* Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-secondary); }
         ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 4px; }
@@ -412,33 +613,81 @@
 <body>
     <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
 
-    <!-- Login Screen -->
+    <!-- ══ IMPROVED LOGIN SCREEN ══ -->
     <div class="auth-screen" id="authScreen">
+        <!-- Background blobs -->
+        <div class="auth-blob auth-blob-1"></div>
+        <div class="auth-blob auth-blob-2"></div>
+        <div class="auth-blob auth-blob-3"></div>
+
         <div class="auth-box">
-            <h2 id="authTitle">Create an account</h2>
-            <p class="subtitle" id="authSubtitle">We're so excited to see you!</p>
-            <div id="usernameField" style="margin-bottom: 20px;">
-                <label>USERNAME</label>
-                <input type="text" id="usernameInput" />
+            <div class="auth-logo">
+                <div class="auth-logo-icon">💬</div>
+                <h2 id="authTitle">Create an account</h2>
+                <p class="subtitle" id="authSubtitle">We're so excited to see you!</p>
             </div>
-            <div style="margin-bottom: 20px;">
-                <label>EMAIL</label>
-                <input type="email" id="emailInput" />
+
+            <div id="usernameField" class="form-group">
+                <label for="usernameInput">Username</label>
+                <div class="input-wrap">
+                    <span class="input-icon">👤</span>
+                    <input type="text" id="usernameInput" placeholder="CoolUser123" autocomplete="username" autocapitalize="none" />
+                </div>
+                <div class="field-hint" id="usernameHint"></div>
             </div>
-            <div style="margin-bottom: 20px;">
-                <label>PASSWORD</label>
-                <input type="password" id="passwordInput" />
+
+            <div class="form-group">
+                <label for="emailInput">Email</label>
+                <div class="input-wrap">
+                    <span class="input-icon">📧</span>
+                    <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email" />
+                </div>
+                <div class="field-hint" id="emailHint"></div>
             </div>
-            <div id="confirmPasswordField" style="margin-bottom: 20px;">
-                <label>CONFIRM PASSWORD</label>
-                <input type="password" id="confirmPasswordInput" />
+
+            <div class="form-group">
+                <label for="passwordInput">Password</label>
+                <div class="input-wrap">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" id="passwordInput" placeholder="Min. 6 characters" autocomplete="current-password" oninput="onPasswordInput()" />
+                    <button class="toggle-pw" type="button" onclick="togglePassword('passwordInput', this)" tabindex="-1">👁️</button>
+                </div>
+                <div class="strength-bar" id="strengthBar"><div class="strength-fill" id="strengthFill"></div></div>
+                <div class="strength-label" id="strengthLabel"></div>
             </div>
-            <div class="error-msg hidden" id="errorMsg"></div>
-            <div class="success-msg hidden" id="successMsg"></div>
-            <button onclick="handleAuth()" id="authButton">Continue</button>
+
+            <div id="confirmPasswordField" class="form-group">
+                <label for="confirmPasswordInput">Confirm Password</label>
+                <div class="input-wrap">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" id="confirmPasswordInput" placeholder="Repeat your password" autocomplete="new-password" />
+                    <button class="toggle-pw" type="button" onclick="togglePassword('confirmPasswordInput', this)" tabindex="-1">👁️</button>
+                </div>
+                <div class="field-hint" id="confirmHint"></div>
+            </div>
+
+            <!-- Remember me (login only) -->
+            <div class="remember-row" id="rememberRow" style="display:none;">
+                <label class="remember-label">
+                    <input type="checkbox" id="rememberMe" checked />
+                    Keep me logged in
+                </label>
+            </div>
+
+            <div class="error-msg hidden" id="errorMsg">
+                <span>⚠️</span><span id="errorText"></span>
+            </div>
+            <div class="success-msg hidden" id="successMsg">
+                <span>✅</span><span id="successText"></span>
+            </div>
+
+            <button class="auth-btn" onclick="handleAuth()" id="authButton">Continue</button>
+
+            <div class="auth-divider">or</div>
+
             <div class="auth-toggle">
                 <span id="authToggleText">Already have an account?</span>
-                <a onclick="toggleAuthMode()" id="authToggleLink">Login</a>
+                <a onclick="toggleAuthMode()" id="authToggleLink"> Login</a>
             </div>
         </div>
     </div>
@@ -510,7 +759,6 @@
                     <div class="user-avatar-small" id="userAvatarSmall"></div>
                     <span class="user-name-display" id="currentUser"></span>
                 </div>
-                <!-- DM Inbox button (shown to regular users) -->
                 <button class="inbox-btn hidden" id="dmInboxBtn" onclick="openDmInbox()" style="position:relative;">
                     📬
                     <span class="inbox-badge hidden" id="dmInboxBadge">0</span>
@@ -550,11 +798,8 @@
 
         <div class="admin-panel" id="adminPanel">
             <div class="admin-header" id="adminPanelHeader">ADMIN PANEL</div>
-
             <div class="admin-section" id="announcementsSection">
-                <div class="collapsible-header" onclick="toggleCollapsible('announcementsContent')">
-                    <span>📢 Announcements</span>
-                </div>
+                <div class="collapsible-header" onclick="toggleCollapsible('announcementsContent')"><span>📢 Announcements</span></div>
                 <div class="collapsible-content" id="announcementsContent">
                     <div class="announcement-input-area">
                         <input type="text" id="newAnnouncement" placeholder="Type announcement..." maxlength="200" />
@@ -566,7 +811,6 @@
                     <button class="owner-control-btn" style="background: var(--accent-danger);" onclick="clearAnnouncement()">Clear Announcement</button>
                 </div>
             </div>
-
             <div class="admin-section" id="reportsSection">
                 <div class="collapsible-header" onclick="toggleCollapsible('reportsContent')" id="reportsHeader">
                     <span>Reports<span class="reports-badge hidden" id="reportsBadge">0</span></span>
@@ -575,16 +819,12 @@
                     <div id="reportsList"></div>
                 </div>
             </div>
-
             <div class="admin-section">
                 <h4>Users</h4>
                 <div class="admin-users" id="adminUsers"></div>
             </div>
-
             <div class="admin-section" id="bannedWordsSection">
-                <div class="collapsible-header collapsed" onclick="toggleCollapsible('bannedWordsContent')">
-                    <span>Banned Words</span>
-                </div>
+                <div class="collapsible-header collapsed" onclick="toggleCollapsible('bannedWordsContent')"><span>Banned Words</span></div>
                 <div class="collapsible-content collapsed" id="bannedWordsContent">
                     <div class="banned-word-input-area">
                         <input type="text" id="newBannedWord" placeholder="Add word..." />
@@ -593,7 +833,6 @@
                     <div class="banned-words-list" id="bannedWordsList"></div>
                 </div>
             </div>
-
             <div class="owner-controls hidden" id="ownerControls">
                 <h4>👑 Owner Controls</h4>
                 <button class="owner-control-btn reset-messages-btn" onclick="resetAllMessages()">🗑️ Reset All Messages</button>
@@ -676,7 +915,7 @@
         </div>
     </div>
 
-    <!-- ✉️ Owner DM Modal -->
+    <!-- DM Modal -->
     <div class="modal" id="dmModal">
         <div class="modal-content">
             <h3>💬 Send Direct Message</h3>
@@ -694,7 +933,7 @@
         </div>
     </div>
 
-    <!-- 📬 User DM Inbox Modal -->
+    <!-- DM Inbox Modal -->
     <div class="inbox-modal" id="dmInboxModal">
         <div class="inbox-content">
             <h2>📬 Your Messages</h2>
@@ -742,11 +981,141 @@
     <script src="haven-script.js"></script>
 
     <script>
-        // Show DM context if present
+        // ══════════════════════════════════════
+        // MOBILE DETECTION — runs before anything else
+        // ══════════════════════════════════════
+        (function mobileCheck() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+                || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.userAgent)); // iPad
+            const setupDone = localStorage.getItem('mobileSetupDone') === 'true';
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+            if (isMobile && !setupDone && !isStandalone) {
+                window.location.href = 'mobile-setup.html';
+            }
+        })();
+
+        // ══════════════════════════════════════
+        // IMPROVED AUTH UI HELPERS
+        // ══════════════════════════════════════
+
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️';
+            }
+        }
+
+        function onPasswordInput() {
+            if (!isSignupMode) return;
+            const pw = document.getElementById('passwordInput').value;
+            const bar = document.getElementById('strengthBar');
+            const fill = document.getElementById('strengthFill');
+            const label = document.getElementById('strengthLabel');
+            if (!pw) { bar.classList.remove('show'); label.textContent = ''; return; }
+            bar.classList.add('show');
+            const score = getPasswordStrength(pw);
+            const colors = ['#ef4444', '#f59e0b', '#10b981', '#6366f1'];
+            const labels = ['Weak', 'Fair', 'Good', 'Strong'];
+            fill.style.width = ((score + 1) / 4 * 100) + '%';
+            fill.style.background = colors[score];
+            label.textContent = labels[score];
+            label.style.color = colors[score];
+        }
+
+        function getPasswordStrength(pw) {
+            let score = 0;
+            if (pw.length >= 8) score++;
+            if (/[A-Z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+            return Math.min(score, 3);
+        }
+
+        // DM context helper
         document.getElementById('dmMessageInput').addEventListener('focus', function() {
             const ctx = document.getElementById('dmReportContext');
             if (ctx.textContent) ctx.classList.remove('hidden');
         });
+
+        // Override showError/showSuccess to use new IDs
+        window._origShowError = window.showError;
+        function showError(msg) {
+            document.getElementById('errorText').textContent = msg;
+            document.getElementById('errorMsg').classList.remove('hidden');
+            document.getElementById('successMsg').classList.add('hidden');
+            // Shake the box
+            const box = document.querySelector('.auth-box');
+            box.classList.remove('shake');
+            void box.offsetWidth;
+            box.classList.add('shake');
+            setTimeout(() => box.classList.remove('shake'), 500);
+        }
+        function showSuccess(msg) {
+            document.getElementById('successText').textContent = msg;
+            document.getElementById('successMsg').classList.remove('hidden');
+            document.getElementById('errorMsg').classList.add('hidden');
+        }
+        function clearAuthMessages() {
+            document.getElementById('errorMsg').classList.add('hidden');
+            document.getElementById('successMsg').classList.add('hidden');
+        }
+
+        // Override toggleAuthMode to show/hide remember row + strength bar
+        const _origToggle = window.toggleAuthMode;
+        window.toggleAuthMode = function() {
+            isSignupMode = !isSignupMode;
+            updateAuthUI();
+            clearAuthMessages();
+            document.getElementById('strengthBar').classList.remove('show');
+            document.getElementById('strengthLabel').textContent = '';
+        };
+
+        // Patch updateAuthUI to show/hide remember row
+        const _origUpdateUI = window.updateAuthUI;
+        window.updateAuthUI = function() {
+            const title = document.getElementById('authTitle');
+            const subtitle = document.getElementById('authSubtitle');
+            const button = document.getElementById('authButton');
+            const toggleText = document.getElementById('authToggleText');
+            const toggleLink = document.getElementById('authToggleLink');
+            const usernameField = document.getElementById('usernameField');
+            const confirmField = document.getElementById('confirmPasswordField');
+            const rememberRow = document.getElementById('rememberRow');
+            if (isSignupMode) {
+                title.textContent = 'Create an account';
+                subtitle.textContent = "We're so excited to see you!";
+                button.textContent = 'Create Account';
+                toggleText.textContent = 'Already have an account?';
+                toggleLink.textContent = ' Login';
+                usernameField.classList.remove('hidden');
+                confirmField.classList.remove('hidden');
+                rememberRow.style.display = 'none';
+            } else {
+                title.textContent = 'Welcome back!';
+                subtitle.textContent = "Great to see you again!";
+                button.textContent = 'Log In';
+                toggleText.textContent = "Need an account?";
+                toggleLink.textContent = ' Register';
+                usernameField.classList.add('hidden');
+                confirmField.classList.add('hidden');
+                rememberRow.style.display = 'flex';
+            }
+        };
+
+        // Allow Enter key to submit
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && document.getElementById('authScreen').style.display !== 'none') {
+                handleAuth();
+            }
+        });
+
+        // Init
+        updateAuthUI();
     </script>
 </body>
 </html>
