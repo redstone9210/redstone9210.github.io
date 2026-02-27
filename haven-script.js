@@ -34,7 +34,7 @@ let privateRooms = {};
 let userPrivateAccess = {};
 let primeMembers = {};
 const OWNER_EMAILS = ['redstoneb3@gmail.com', 'haventeam3@gmail.com'];
-const ADMIN_EMAILS = ['31christianhwang@usd266.com'];
+const ADMIN_EMAILS = ['31christianhwang@usd266.com','oliver.zitnak@gmail.com', '31oliverzitnak@gmail.com'];
 const MAINTENANCE_PASSWORD = 'owner123';
 const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 const BANNED_CHANNEL_WORDS = ['fuck', 'shit', 'bitch', 'ass', 'damn', 'nigger', 'nigga', 'nazi', 'hitler', 'porn', 'sex', 'nsfw'];
@@ -1364,4 +1364,5 @@ function loadAnnouncement() {
             if (isOwner) document.getElementById('currentAnnouncementText').textContent = 'None';
         }
     });
+
 }
