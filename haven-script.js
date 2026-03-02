@@ -40,7 +40,7 @@ let vipRooms = {}, userVipAccess = {}, privateRooms = {}, userPrivateAccess = {}
 
 const OWNER_EMAILS         = ['redstoneb3@gmail.com', 'haventeam3@gmail.com'];
 const ADMIN_EMAILS         = ['31christianhwang@usd266.com'];
-const MAINTENANCE_PASSWORD = 'owner123';
+const MAINTENANCE_PASSWORD = 'owner3024';
 const ONE_MONTH_MS         = 30 * 24 * 60 * 60 * 1000;
 const BANNED_CHANNEL_WORDS = ['fuck','shit','bitch','ass','damn','nigger','nigga','nazi','hitler','porn','sex','nsfw'];
 
@@ -862,4 +862,5 @@ function postAnnouncement(){if(!isOwner&&!isPhantom)return;const text=document.g
 function clearAnnouncement(){if(!isOwner&&!isPhantom)return;if(confirm('Clear current announcement?')){safeDbRemove('announcement').then(()=>{document.getElementById('announcementsBanner').classList.remove('show');document.getElementById('currentAnnouncementText').textContent='None';alert('Announcement cleared');});}}
 function dismissAnnouncement(){document.getElementById('announcementsBanner').classList.remove('show');}
 function showAnnouncementBanner(text){document.getElementById('announcementText').textContent=text;document.getElementById('announcementsBanner').classList.add('show');document.getElementById('currentAnnouncementText').textContent=text;}
+
 function loadAnnouncement(){safeDbOn('announcement','value',(s)=>{if(s.exists()){showAnnouncementBanner(s.val().text);}else{document.getElementById('announcementsBanner').classList.remove('show');if(isOwner||isPhantom)document.getElementById('currentAnnouncementText').textContent='None';}});}
