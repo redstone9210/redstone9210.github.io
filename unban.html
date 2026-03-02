@@ -36,7 +36,7 @@
             max-width: 900px;
             width: 100%;
             margin: 0 auto;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         h1 { color: var(--text-primary); text-align: center; margin-bottom: 12px; font-size: 32px; font-weight: 700; }
@@ -44,31 +44,153 @@
 
         .auth-section { background: var(--bg-tertiary); padding: 24px; border-radius: 12px; margin-bottom: 24px; border: 2px solid var(--accent-warning); }
         .auth-section h2 { color: var(--accent-warning); font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
-        .auth-section input { width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 2px solid transparent; border-radius: 8px; color: var(--text-primary); font-size: 15px; margin-bottom: 12px; }
+        .auth-section input { width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 2px solid transparent; border-radius: 8px; color: var(--text-primary); font-size: 15px; margin-bottom: 12px; font-family: 'Outfit', sans-serif; }
         .auth-section input:focus { outline: none; border-color: var(--accent-primary); }
 
         .locked-section { filter: blur(4px); pointer-events: none; opacity: 0.5; }
 
         .status { background: var(--bg-primary); padding: 24px; border-radius: 12px; margin-bottom: 24px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-secondary); max-height: 400px; overflow-y: auto; border: 1px solid var(--bg-tertiary); }
         .status div { margin: 6px 0; padding: 6px 0; }
-
         .success { color: var(--accent-success); font-weight: 600; }
-        .error { color: var(--accent-danger); font-weight: 600; }
-        .info { color: var(--accent-primary); }
+        .error   { color: var(--accent-danger);  font-weight: 600; }
+        .info    { color: var(--accent-primary); }
         .warning { color: var(--accent-warning); font-weight: 600; }
 
         .button-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 24px; }
 
         button { padding: 16px; background: linear-gradient(135deg, var(--accent-primary), #4f46e5); border: none; border-radius: 12px; color: white; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.3s; font-family: 'Outfit', sans-serif; }
-        button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4); }
+        button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(99,102,241,0.4); }
         button:disabled { background: var(--bg-tertiary); cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.5; }
 
-        .btn-danger { background: linear-gradient(135deg, var(--accent-danger), #dc2626); }
-        .btn-danger:hover:not(:disabled) { box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4); }
+        .btn-danger  { background: linear-gradient(135deg, var(--accent-danger), #dc2626); }
+        .btn-danger:hover:not(:disabled)  { box-shadow: 0 8px 24px rgba(239,68,68,0.4); }
         .btn-warning { background: linear-gradient(135deg, var(--accent-warning), #d97706); }
         .btn-success { background: linear-gradient(135deg, var(--accent-success), #059669); }
-        .btn-dm { background: linear-gradient(135deg, #06b6d4, #0891b2); }
-        .btn-dm:hover:not(:disabled) { box-shadow: 0 8px 24px rgba(6,182,212,0.4); }
+
+        /* ── FAILSAFE PANEL ── */
+        .failsafe-panel {
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            border: 2px solid rgba(99,102,241,0.45);
+            position: relative;
+            overflow: hidden;
+        }
+        .failsafe-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed, #06b6d4, #4f46e5);
+            background-size: 300% 100%;
+            animation: shimmer 2.5s linear infinite;
+        }
+        @keyframes shimmer { 0%{background-position:-300% 0} 100%{background-position:300% 0} }
+
+        .failsafe-panel h3 { color: #818cf8; font-size: 16px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .failsafe-panel p  { color: var(--text-secondary); font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
+
+        .failsafe-warning-box {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.35);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #fca5a5;
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+
+        .failsafe-status {
+            display: none;
+            border-radius: 8px;
+            padding: 11px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .failsafe-status.show { display: block; }
+        .failsafe-status.ok  { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); color: #6ee7b7; }
+        .failsafe-status.err { background: rgba(239,68,68,0.12);  border: 1px solid rgba(239,68,68,0.35);  color: #fca5a5; }
+
+        .failsafe-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            padding: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .failsafe-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(99,102,241,0.55); }
+        .failsafe-btn:active { transform: scale(0.98); }
+
+        .lockdown-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            padding: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .lockdown-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(239,68,68,0.5); }
+        .lockdown-btn:active { transform: scale(0.98); }
+
+        .unlock-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .unlock-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(16,185,129,0.45); }
+
+        .lockdown-status-bar {
+            display: none;
+            background: rgba(239,68,68,0.12);
+            border: 1px solid rgba(239,68,68,0.4);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: #fca5a5;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 14px;
+            text-align: center;
+            letter-spacing: 0.04em;
+        }
+        .lockdown-status-bar.active { display: block; }
 
         .owners-list { background: var(--bg-tertiary); padding: 20px; border-radius: 12px; margin: 24px 0; border-left: 4px solid var(--accent-warning); }
         .owners-list h3 { color: var(--accent-warning); margin-bottom: 12px; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
@@ -81,166 +203,43 @@
         .section-title { color: var(--text-primary); font-size: 18px; font-weight: 700; margin: 32px 0 16px 0; padding-bottom: 8px; border-bottom: 2px solid var(--bg-tertiary); }
 
         /* ── DM PANEL ── */
-        .dm-panel {
-            background: var(--bg-tertiary);
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(6,182,212,0.2);
-        }
-        .dm-panel h3 {
-            color: #06b6d4;
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .dm-field-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        .dm-field {
-            flex: 1;
-            min-width: 200px;
-        }
-        .dm-field label {
-            display: block;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-        .dm-field input, .dm-field select, .dm-field textarea {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--bg-primary);
-            border: 2px solid transparent;
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 14px;
-            font-family: 'Outfit', sans-serif;
-            transition: border-color 0.2s;
-        }
-        .dm-field input:focus, .dm-field select:focus, .dm-field textarea:focus {
-            outline: none;
-            border-color: #06b6d4;
-        }
+        .dm-panel { background: var(--bg-tertiary); border-radius: 16px; padding: 28px; margin-bottom: 24px; border: 1px solid rgba(6,182,212,0.2); }
+        .dm-panel h3 { color: #06b6d4; font-size: 16px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .dm-field-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .dm-field { flex: 1; min-width: 200px; }
+        .dm-field label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 8px; }
+        .dm-field input, .dm-field select, .dm-field textarea { width: 100%; padding: 12px 16px; background: var(--bg-primary); border: 2px solid transparent; border-radius: 10px; color: var(--text-primary); font-size: 14px; font-family: 'Outfit', sans-serif; transition: border-color 0.2s; }
+        .dm-field input:focus, .dm-field select:focus, .dm-field textarea:focus { outline: none; border-color: #06b6d4; }
         .dm-field select option { background: var(--bg-secondary); }
         .dm-field textarea { min-height: 100px; resize: vertical; }
-        .dm-send-btn {
-            padding: 14px 32px;
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-            margin-top: 8px;
-        }
+        .dm-send-btn { padding: 14px 32px; background: linear-gradient(135deg, #06b6d4, #0891b2); border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s; width: 100%; margin-top: 8px; font-family: 'Outfit', sans-serif; }
         .dm-send-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(6,182,212,0.4); }
         .dm-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .dm-status {
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-top: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            display: none;
-        }
-        .dm-status.ok { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; display: block; }
-        .dm-status.err { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; display: block; }
+        .dm-status { padding: 10px 14px; border-radius: 8px; margin-top: 12px; font-size: 14px; font-weight: 600; display: none; }
+        .dm-status.ok  { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; display: block; }
+        .dm-status.err { background: rgba(239,68,68,0.15);  border: 1px solid rgba(239,68,68,0.3);  color: #fca5a5; display: block; }
 
         /* ── INBOX VIEWER ── */
-        .inbox-panel {
-            background: var(--bg-tertiary);
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(16,185,129,0.2);
-        }
-        .inbox-panel h3 {
-            color: var(--accent-success);
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-        .inbox-user-select {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .inbox-user-select select {
-            flex: 1;
-            padding: 12px 16px;
-            background: var(--bg-primary);
-            border: 2px solid transparent;
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: 14px;
-            font-family: 'Outfit', sans-serif;
-        }
+        .inbox-panel { background: var(--bg-tertiary); border-radius: 16px; padding: 28px; margin-bottom: 24px; border: 1px solid rgba(16,185,129,0.2); }
+        .inbox-panel h3 { color: var(--accent-success); font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+        .inbox-user-select { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .inbox-user-select select { flex: 1; padding: 12px 16px; background: var(--bg-primary); border: 2px solid transparent; border-radius: 10px; color: var(--text-primary); font-size: 14px; font-family: 'Outfit', sans-serif; }
         .inbox-user-select select:focus { outline: none; border-color: var(--accent-success); }
-        .inbox-user-select button {
-            padding: 12px 24px;
-            background: linear-gradient(135deg, var(--accent-success), #059669);
-        }
-        .inbox-messages {
-            max-height: 400px;
-            overflow-y: auto;
-            background: var(--bg-primary);
-            border-radius: 10px;
-            padding: 16px;
-        }
-        .inbox-msg-item {
-            background: var(--bg-secondary);
-            border-radius: 8px;
-            padding: 14px;
-            margin-bottom: 10px;
-            border-left: 3px solid var(--accent-primary);
-        }
+        .inbox-user-select button { padding: 12px 24px; background: linear-gradient(135deg, var(--accent-success), #059669); }
+        .inbox-messages { max-height: 400px; overflow-y: auto; background: var(--bg-primary); border-radius: 10px; padding: 16px; }
+        .inbox-msg-item { background: var(--bg-secondary); border-radius: 8px; padding: 14px; margin-bottom: 10px; border-left: 3px solid var(--accent-primary); }
         .inbox-msg-item:last-child { margin-bottom: 0; }
-        .inbox-msg-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
+        .inbox-msg-header { display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
         .inbox-msg-from { font-weight: 700; font-size: 13px; color: var(--text-primary); }
         .inbox-msg-time { font-size: 11px; color: var(--text-muted); }
-        .inbox-msg-read {
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: 700;
-        }
+        .inbox-msg-read { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 700; }
         .inbox-msg-read.unread { background: rgba(16,185,129,.2); color: #6ee7b7; }
-        .inbox-msg-read.read { background: rgba(113,113,122,.2); color: var(--text-muted); }
+        .inbox-msg-read.read   { background: rgba(113,113,122,.2); color: var(--text-muted); }
         .inbox-msg-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
-        .inbox-delete-btn {
-            background: var(--accent-danger);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 8px;
-        }
+        .inbox-delete-btn { background: var(--accent-danger); color: white; border: none; border-radius: 5px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; margin-top: 8px; }
         .inbox-empty { text-align: center; color: var(--text-muted); padding: 32px; font-style: italic; font-size: 14px; }
 
-        /* Message Log Styles */
+        /* ── MESSAGE LOG ── */
         .msg-controls { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
         .msg-controls input, .msg-controls select { padding: 10px 14px; background: var(--bg-primary); border: 2px solid var(--bg-tertiary); border-radius: 8px; color: var(--text-primary); font-size: 14px; font-family: 'Outfit', sans-serif; transition: border-color 0.2s; }
         .msg-controls input:focus, .msg-controls select:focus { outline: none; border-color: var(--accent-primary); }
@@ -256,7 +255,7 @@
         .msg-channel-group:last-child { border-bottom: none; }
         .msg-channel-header { padding: 12px 16px; background: var(--bg-tertiary); font-size: 13px; font-weight: 700; color: var(--accent-primary); letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; position: sticky; top: 0; z-index: 1; }
         .msg-channel-header:hover { background: var(--bg-secondary); }
-        .msg-channel-header .ch-count { background: var(--accent-primary); color: white; border-radius: 10px; padding: 2px 8px; font-size: 11px; }
+        .msg-channel-header .ch-count  { background: var(--accent-primary); color: white; border-radius: 10px; padding: 2px 8px; font-size: 11px; }
         .msg-channel-header .ch-toggle { color: var(--text-muted); font-size: 11px; }
         .msg-channel-body { display: block; }
         .msg-channel-body.collapsed { display: none; }
@@ -293,704 +292,723 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>👑 Owner Control Panel</h1>
-        <p class="subtitle">Advanced management and emergency tools</p>
+<div class="container">
+    <h1>👑 Owner Control Panel</h1>
+    <p class="subtitle">Advanced management and emergency tools</p>
 
-        <div class="auth-section">
-            <h2>🔐 Authentication Required</h2>
-            <input type="password" id="accessCode" placeholder="Enter owner access code..." />
-            <button onclick="authenticate()" class="btn-success">Unlock Panel</button>
-        </div>
-
-        <div id="mainPanel" class="locked-section">
-            <div class="owners-list">
-                <h3>👑 PROTECTED OWNER ACCOUNTS</h3>
-                <div>• redstoneb3@gmail.com</div>
-                <div>• haventeam3@gmail.com</div>
-            </div>
-
-            <div class="status" id="status">
-                <div class="info">Waiting for authentication...</div>
-            </div>
-
-            <!-- ══ DIRECT MESSAGE PANEL ══ -->
-            <div class="section-title">💬 Direct Message Users</div>
-            <div class="dm-panel">
-                <h3>💬 Send DM to a User</h3>
-                <div class="dm-field-row">
-                    <div class="dm-field" style="flex:0 0 auto; min-width:180px;">
-                        <label>Select from user list</label>
-                        <select id="dmUserSelect" onchange="onDmUserSelect()">
-                            <option value="">— choose user —</option>
-                        </select>
-                    </div>
-                    <div class="dm-field" style="display:flex; align-items:flex-end;">
-                        <div style="color:var(--text-muted); padding-bottom:14px; font-size:13px;">or</div>
-                    </div>
-                    <div class="dm-field">
-                        <label>Enter email manually</label>
-                        <input type="email" id="dmEmailManual" placeholder="user@example.com" oninput="onManualEmail()" />
-                    </div>
-                </div>
-                <div class="dm-field">
-                    <label>Message</label>
-                    <textarea id="dmMessageBody" placeholder="Type your message to this user..." maxlength="500"></textarea>
-                </div>
-                <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px; text-align:right;">
-                    <span id="dmCharCount">0</span>/500
-                </div>
-                <button class="dm-send-btn" onclick="sendDmFromPanel()" id="dmSendBtn">📨 Send Direct Message</button>
-                <div class="dm-status" id="dmPanelStatus"></div>
-            </div>
-
-            <!-- ══ INBOX VIEWER ══ -->
-            <div class="section-title">📬 View User Inbox</div>
-            <div class="inbox-panel">
-                <h3>📬 View Messages Sent to a User</h3>
-                <div class="inbox-user-select">
-                    <select id="inboxUserSelect">
-                        <option value="">— select user to view their inbox —</option>
-                    </select>
-                    <button onclick="loadUserInbox()" class="btn-success" style="padding:12px 24px;">Load Inbox</button>
-                    <button onclick="clearUserInbox()" class="btn-danger" style="padding:12px 16px;" title="Delete all DMs to this user">🗑️ Clear</button>
-                </div>
-                <div class="inbox-messages" id="inboxMessages">
-                    <div class="inbox-empty">Select a user and click "Load Inbox" to view their messages.</div>
-                </div>
-            </div>
-
-            <div class="section-title">🚨 Emergency Controls</div>
-            <div class="button-grid">
-                <button onclick="emergencyUnban()" class="btn-danger">🔓 Force Unban All Owners</button>
-                <button onclick="clearAllBans()" class="btn-danger">🗑️ Clear ALL Bans</button>
-                <button onclick="unbanSpecificUser()" class="btn-warning">👤 Unban Specific User</button>
-                <button onclick="banSpecificUser()" class="btn-warning">🚫 Ban Specific User</button>
-            </div>
-
-            <div class="section-title">📊 Database Management</div>
-            <div class="button-grid">
-                <button onclick="viewDatabase()">📊 View Database Status</button>
-                <button onclick="viewAllUsers()">👥 View All Users</button>
-                <button onclick="deleteInactiveAccounts()" class="btn-warning">🧹 Delete Inactive Accounts (30+ days)</button>
-                <button onclick="resetUserStrikes()">⚡ Reset All User Strikes</button>
-            </div>
-
-            <div class="section-title">🔧 System Tools</div>
-            <div class="button-grid">
-                <button onclick="exportBackup()" class="btn-success">💾 Export Database Backup</button>
-                <button onclick="clearReports()">📝 Clear All Reports</button>
-                <button onclick="resetBannedWords()">🔤 Reset Banned Words List</button>
-                <button onclick="window.location.href='index.html'">🏠 Return to Chat</button>
-            </div>
-
-            <div class="section-title">💬 Message Log — All Channels</div>
-            <div class="button-grid" style="margin-bottom:16px;">
-                <button onclick="loadAllMessages()" class="btn-success">📥 Load All Messages</button>
-                <button onclick="clearMessageLog()" class="btn-warning">🔄 Clear / Reset View</button>
-                <button onclick="deleteFilteredMessages()" class="btn-danger">🗑️ Delete All Shown Messages</button>
-            </div>
-
-            <div class="msg-controls">
-                <input type="text" id="msgSearch" placeholder="🔍 Search message text..." oninput="filterMessages()" />
-                <select id="msgChannelFilter" onchange="filterMessages()">
-                    <option value="">All Channels</option>
-                </select>
-                <select id="msgUserFilter" onchange="filterMessages()">
-                    <option value="">All Users</option>
-                </select>
-                <select id="msgSort" onchange="filterMessages()">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                </select>
-            </div>
-
-            <div class="msg-stats" id="msgStats" style="display:none;">
-                <div class="msg-stat-chip">Total: <span id="statTotal">0</span></div>
-                <div class="msg-stat-chip">Showing: <span id="statShowing">0</span></div>
-                <div class="msg-stat-chip">Channels: <span id="statChannels">0</span></div>
-                <div class="msg-stat-chip">Users: <span id="statUsers">0</span></div>
-            </div>
-
-            <div class="msg-log" id="msgLog">
-                <div class="msg-log-empty">Click "Load All Messages" to fetch every message from every channel.</div>
-            </div>
-        </div>
+    <div class="auth-section">
+        <h2>🔐 Authentication Required</h2>
+        <input type="password" id="accessCode" placeholder="Enter owner access code..." />
+        <button onclick="authenticate()" class="btn-success">Unlock Panel</button>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <div id="mainPanel" class="locked-section">
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyB6uKGFMQEUCR9IQot1wdgjDmhAXioJOUo",
-            authDomain: "school-dis.firebaseapp.com",
-            databaseURL: "https://school-dis-default-rtdb.firebaseio.com",
-            projectId: "school-dis",
-            storageBucket: "school-dis.firebasestorage.app",
-            messagingSenderId: "53033292390",
-            appId: "1:53033292390:web:f9991ea57386a1ab5f13a7",
-            measurementId: "G-XLLRWR6KM4"
+        <div class="owners-list">
+            <h3>👑 PROTECTED OWNER ACCOUNTS</h3>
+            <div>• redstoneb3@gmail.com</div>
+            <div>• [system account — hidden]</div>
+        </div>
+
+        <div class="status" id="status">
+            <div class="info">Waiting for authentication...</div>
+        </div>
+
+        <!-- ══ GHOST ACCOUNT FAILSAFE ══ -->
+        <div class="section-title">⚙️ Ghost Account Failsafe</div>
+        <div class="failsafe-panel">
+            <h3>⚙️ System Account Protection</h3>
+            <p>
+                Repairs the hidden system account and optionally triggers a
+                <strong style="color:#fca5a5;">full session lockdown</strong> — instantly
+                booting every connected user except the system account itself.
+                The system account carries an internal-only access tier that does
+                not exist anywhere in the public UI.
+            </p>
+
+            <div class="failsafe-warning-box">
+                ⚠️ <strong>LOCKDOWN WARNING:</strong> Triggering a lockdown will
+                immediately force-logout every active user. They will see a maintenance
+                screen. Only the system account is immune. You can lift the lockdown
+                at any time with the "Lift Lockdown" button below.
+            </div>
+
+            <div class="lockdown-status-bar" id="lockdownStatusBar">
+                🔴 LOCKDOWN ACTIVE — All users are being blocked from the chat
+            </div>
+
+            <div class="failsafe-status" id="failsafeStatus"></div>
+
+            <!-- Run full failsafe (repair + lockdown) -->
+            <button class="lockdown-btn" onclick="runGhostFailsafe(true)">
+                🔴 Run Failsafe + Lockdown Everyone
+            </button>
+
+            <!-- Run repair only (no lockdown) -->
+            <button class="failsafe-btn" onclick="runGhostFailsafe(false)">
+                ⚙️ Repair System Account Only (No Lockdown)
+            </button>
+
+            <!-- Lift lockdown -->
+            <button class="unlock-btn" onclick="liftLockdown()">
+                ✅ Lift Lockdown — Let Users Back In
+            </button>
+        </div>
+
+        <!-- ══ DIRECT MESSAGE PANEL ══ -->
+        <div class="section-title">💬 Direct Message Users</div>
+        <div class="dm-panel">
+            <h3>💬 Send DM to a User</h3>
+            <div class="dm-field-row">
+                <div class="dm-field" style="flex:0 0 auto; min-width:180px;">
+                    <label>Select from user list</label>
+                    <select id="dmUserSelect" onchange="onDmUserSelect()">
+                        <option value="">— choose user —</option>
+                    </select>
+                </div>
+                <div class="dm-field" style="display:flex; align-items:flex-end;">
+                    <div style="color:var(--text-muted); padding-bottom:14px; font-size:13px;">or</div>
+                </div>
+                <div class="dm-field">
+                    <label>Enter email manually</label>
+                    <input type="email" id="dmEmailManual" placeholder="user@example.com" oninput="onManualEmail()" />
+                </div>
+            </div>
+            <div class="dm-field">
+                <label>Message</label>
+                <textarea id="dmMessageBody" placeholder="Type your message to this user..." maxlength="500"></textarea>
+            </div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px; text-align:right;">
+                <span id="dmCharCount">0</span>/500
+            </div>
+            <button class="dm-send-btn" onclick="sendDmFromPanel()" id="dmSendBtn">📨 Send Direct Message</button>
+            <div class="dm-status" id="dmPanelStatus"></div>
+        </div>
+
+        <!-- ══ INBOX VIEWER ══ -->
+        <div class="section-title">📬 View User Inbox</div>
+        <div class="inbox-panel">
+            <h3>📬 View Messages Sent to a User</h3>
+            <div class="inbox-user-select">
+                <select id="inboxUserSelect">
+                    <option value="">— select user to view their inbox —</option>
+                </select>
+                <button onclick="loadUserInbox()" class="btn-success" style="padding:12px 24px;">Load Inbox</button>
+                <button onclick="clearUserInbox()" class="btn-danger" style="padding:12px 16px;" title="Delete all DMs to this user">🗑️ Clear</button>
+            </div>
+            <div class="inbox-messages" id="inboxMessages">
+                <div class="inbox-empty">Select a user and click "Load Inbox" to view their messages.</div>
+            </div>
+        </div>
+
+        <div class="section-title">🚨 Emergency Controls</div>
+        <div class="button-grid">
+            <button onclick="emergencyUnban()" class="btn-danger">🔓 Force Unban All Owners</button>
+            <button onclick="clearAllBans()" class="btn-danger">🗑️ Clear ALL Bans</button>
+            <button onclick="unbanSpecificUser()" class="btn-warning">👤 Unban Specific User</button>
+            <button onclick="banSpecificUser()" class="btn-warning">🚫 Ban Specific User</button>
+        </div>
+
+        <div class="section-title">📊 Database Management</div>
+        <div class="button-grid">
+            <button onclick="viewDatabase()">📊 View Database Status</button>
+            <button onclick="viewAllUsers()">👥 View All Users</button>
+            <button onclick="deleteInactiveAccounts()" class="btn-warning">🧹 Delete Inactive Accounts (30+ days)</button>
+            <button onclick="resetUserStrikes()">⚡ Reset All User Strikes</button>
+        </div>
+
+        <div class="section-title">🔧 System Tools</div>
+        <div class="button-grid">
+            <button onclick="exportBackup()" class="btn-success">💾 Export Database Backup</button>
+            <button onclick="clearReports()">📝 Clear All Reports</button>
+            <button onclick="resetBannedWords()">🔤 Reset Banned Words List</button>
+            <button onclick="window.location.href='index.html'">🏠 Return to Chat</button>
+        </div>
+
+        <div class="section-title">💬 Message Log — All Channels</div>
+        <div class="button-grid" style="margin-bottom:16px;">
+            <button onclick="loadAllMessages()" class="btn-success">📥 Load All Messages</button>
+            <button onclick="clearMessageLog()" class="btn-warning">🔄 Clear / Reset View</button>
+            <button onclick="deleteFilteredMessages()" class="btn-danger">🗑️ Delete All Shown Messages</button>
+        </div>
+
+        <div class="msg-controls">
+            <input type="text" id="msgSearch" placeholder="🔍 Search message text..." oninput="filterMessages()" />
+            <select id="msgChannelFilter" onchange="filterMessages()"><option value="">All Channels</option></select>
+            <select id="msgUserFilter"    onchange="filterMessages()"><option value="">All Users</option></select>
+            <select id="msgSort"          onchange="filterMessages()">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+            </select>
+        </div>
+
+        <div class="msg-stats" id="msgStats" style="display:none;">
+            <div class="msg-stat-chip">Total: <span id="statTotal">0</span></div>
+            <div class="msg-stat-chip">Showing: <span id="statShowing">0</span></div>
+            <div class="msg-stat-chip">Channels: <span id="statChannels">0</span></div>
+            <div class="msg-stat-chip">Users: <span id="statUsers">0</span></div>
+        </div>
+
+        <div class="msg-log" id="msgLog">
+            <div class="msg-log-empty">Click "Load All Messages" to fetch every message from every channel.</div>
+        </div>
+
+    </div><!-- /mainPanel -->
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyB6uKGFMQEUCR9IQot1wdgjDmhAXioJOUo",
+        authDomain: "school-dis.firebaseapp.com",
+        databaseURL: "https://school-dis-default-rtdb.firebaseio.com",
+        projectId: "school-dis",
+        storageBucket: "school-dis.firebasestorage.app",
+        messagingSenderId: "53033292390",
+        appId: "1:53033292390:web:f9991ea57386a1ab5f13a7",
+        measurementId: "G-XLLRWR6KM4"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // GHOST / PHANTOM ACCOUNT
+    // Role internally = 'phantom' — a tier that does not exist in any public UI.
+    // No badge is ever rendered. No label is ever shown to any other user.
+    // It is invisible to every admin and owner list. It is only referenced
+    // here in this file and in the constants block of haven-script.js.
+    // ─────────────────────────────────────────────────────────────────────────
+    const GHOST_EMAIL    = 'haventeam3@gmail.com';
+    const GHOST_USERNAME = '[⚙ SYSTEM ⚙]';   // reserved chars — impossible to register normally
+    const GHOST_ROLE     = 'phantom';          // internal-only tier, never shown in UI
+
+    const OWNER_ACCOUNTS = ['redstoneb3@gmail.com', GHOST_EMAIL];
+    const ACCESS_CODE    = 'owner123';
+    const ONE_MONTH_MS   = 30 * 24 * 60 * 60 * 1000;
+
+    let isAuthenticated = false;
+    let knownUsers      = {};
+
+    // ── CHAR COUNT ──
+    document.getElementById('dmMessageBody').addEventListener('input', function() {
+        document.getElementById('dmCharCount').textContent = this.value.length;
+    });
+
+    function log(message, type = 'info') {
+        const statusDiv = document.getElementById('status');
+        const div = document.createElement('div');
+        div.className = type;
+        div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        statusDiv.appendChild(div);
+        statusDiv.scrollTop = statusDiv.scrollHeight;
+    }
+
+    function authenticate() {
+        const code = document.getElementById('accessCode').value.trim();
+        if (code === ACCESS_CODE) {
+            isAuthenticated = true;
+            document.getElementById('mainPanel').classList.remove('locked-section');
+            document.querySelector('.auth-section').style.display = 'none';
+            log('✓ Authentication successful — full access granted', 'success');
+            loadKnownUsers();
+            checkLockdownStatus();
+        } else {
+            alert('❌ Incorrect access code!');
+            log('✗ Authentication failed', 'error');
+        }
+    }
+
+    // ── CHECK & DISPLAY CURRENT LOCKDOWN STATE ────────────────────────────────
+    async function checkLockdownStatus() {
+        try {
+            const snap = await database.ref('systemLockdown').once('value');
+            const active = snap.exists() && snap.val()?.active === true;
+            document.getElementById('lockdownStatusBar').classList.toggle('active', active);
+            if (active) log('⚠️ Lockdown is currently ACTIVE', 'warning');
+        } catch (e) {}
+    }
+
+    // ── GHOST ACCOUNT FAILSAFE ────────────────────────────────────────────────
+    // withLockdown = true  → repair account AND boot every non-phantom session
+    // withLockdown = false → repair account only, no lockdown
+    async function runGhostFailsafe(withLockdown) {
+        if (!isAuthenticated) return;
+
+        if (withLockdown) {
+            if (!confirm('⚠️ This will IMMEDIATELY kick every logged-in user except the system account.\n\nContinue?')) return;
+        }
+
+        const statusEl = document.getElementById('failsafeStatus');
+        statusEl.className = 'failsafe-status ok show';
+        statusEl.textContent = '⏳ Running failsafe…';
+
+        log('======== GHOST ACCOUNT FAILSAFE ========', 'warning');
+
+        // 1. Repair localStorage entry with phantom role marker
+        let localUsers = JSON.parse(localStorage.getItem('users') || '{}');
+        const existed  = !!localUsers[GHOST_EMAIL];
+        localUsers[GHOST_EMAIL] = {
+            username:  GHOST_USERNAME,
+            role:      GHOST_ROLE,   // 'phantom' — internal only, never rendered
+            createdAt: localUsers[GHOST_EMAIL]?.createdAt || new Date().toISOString()
         };
+        localStorage.setItem('users', JSON.stringify(localUsers));
+        log(existed ? '✓ Repaired ghost entry in localStorage' : '✓ Re-created ghost entry in localStorage', 'success');
 
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        const OWNER_ACCOUNTS = ['redstoneb3@gmail.com', 'haventeam3@gmail.com'];
-        const ACCESS_CODE = 'owner123';
-        const ONE_MONTH_MS = 30 * 24 * 60 * 60 * 1000;
-
-        let isAuthenticated = false;
-        let knownUsers = {}; // email → username
-
-        // ── CHAR COUNT ──────────────────────────────────────────────────────────
-        document.getElementById('dmMessageBody').addEventListener('input', function() {
-            document.getElementById('dmCharCount').textContent = this.value.length;
-        });
-
-        function log(message, type = 'info') {
-            const statusDiv = document.getElementById('status');
-            const logDiv = document.createElement('div');
-            logDiv.className = type;
-            logDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
-            statusDiv.appendChild(logDiv);
-            statusDiv.scrollTop = statusDiv.scrollHeight;
+        // 2. Clear any strikes
+        let strikes = JSON.parse(localStorage.getItem('userStrikes') || '{}');
+        if (strikes[GHOST_EMAIL]) {
+            delete strikes[GHOST_EMAIL];
+            localStorage.setItem('userStrikes', JSON.stringify(strikes));
+            log('✓ Cleared strikes', 'success');
+        } else {
+            log('✓ No strikes (clean)', 'success');
         }
 
-        function authenticate() {
-            const code = document.getElementById('accessCode').value.trim();
-            if (code === ACCESS_CODE) {
-                isAuthenticated = true;
-                document.getElementById('mainPanel').classList.remove('locked-section');
-                document.querySelector('.auth-section').style.display = 'none';
-                log('✓ Authentication successful - Full access granted', 'success');
-                log('Owner Control Panel ready', 'info');
-                loadKnownUsers();
-            } else {
-                alert('❌ Incorrect access code!');
-                log('✗ Authentication failed', 'error');
-            }
+        // 3. Remove any Firebase ban
+        const ghostKey = GHOST_EMAIL.replace(/\./g, '_');
+        try {
+            await database.ref('banned/' + ghostKey).remove();
+            log('✓ Firebase ban removed', 'success');
+        } catch (e) {
+            log('⚠️ Ban removal: ' + e.message, 'warning');
         }
 
-        // ── LOAD USERS FOR DM DROPDOWNS ──────────────────────────────────────────
-        async function loadKnownUsers() {
-            const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
-            Object.assign(knownUsers, localUsers);
-
-            try {
-                const snap = await database.ref('users').once('value');
-                if (snap.exists()) {
-                    snap.forEach(child => {
-                        const email = child.key.replace(/_/g, '.');
-                        knownUsers[email] = child.val();
-                    });
-                }
-            } catch (e) { log('⚠️ Could not load Firebase users: ' + e.message, 'warning'); }
-
-            populateDmDropdowns();
-        }
-
-        function populateDmDropdowns() {
-            const emails = Object.keys(knownUsers).filter(e => !OWNER_ACCOUNTS.includes(e));
-            const dmSelect = document.getElementById('dmUserSelect');
-            const inboxSelect = document.getElementById('inboxUserSelect');
-
-            [dmSelect, inboxSelect].forEach(sel => {
-                const placeholder = sel.options[0];
-                sel.innerHTML = '';
-                sel.appendChild(placeholder);
-                emails.sort().forEach(email => {
-                    const name = knownUsers[email]?.username || email.split('@')[0];
-                    const opt = document.createElement('option');
-                    opt.value = email;
-                    opt.textContent = `${name} (${email})`;
-                    sel.appendChild(opt);
-                });
+        // 4. Repair Firebase user record — stores GHOST_ROLE so the main app
+        //    can recognise the phantom tier without ever exposing the label in UI
+        try {
+            await database.ref('users/' + ghostKey).update({
+                email:      GHOST_EMAIL,
+                username:   GHOST_USERNAME,
+                role:       GHOST_ROLE,
+                lastActive: Date.now()
             });
-
-            log(`Loaded ${emails.length} users into DM dropdowns`, 'info');
+            log('✓ Firebase record repaired (role: phantom)', 'success');
+        } catch (e) {
+            log('⚠️ Firebase record: ' + e.message, 'warning');
         }
 
-        function onDmUserSelect() {
-            const sel = document.getElementById('dmUserSelect');
-            if (sel.value) document.getElementById('dmEmailManual').value = '';
-        }
-
-        function onManualEmail() {
-            if (document.getElementById('dmEmailManual').value) {
-                document.getElementById('dmUserSelect').value = '';
-            }
-        }
-
-        function getTargetEmail() {
-            const fromSelect = document.getElementById('dmUserSelect').value;
-            const fromManual = document.getElementById('dmEmailManual').value.trim();
-            return fromSelect || fromManual;
-        }
-
-        // ── SEND DM ──────────────────────────────────────────────────────────────
-        async function sendDmFromPanel() {
-            if (!isAuthenticated) return;
-            const target = getTargetEmail();
-            const message = document.getElementById('dmMessageBody').value.trim();
-            const statusEl = document.getElementById('dmPanelStatus');
-            const btn = document.getElementById('dmSendBtn');
-
-            statusEl.className = 'dm-status';
-            statusEl.textContent = '';
-
-            if (!target) {
-                statusEl.className = 'dm-status err';
-                statusEl.textContent = '❌ Please select or enter a recipient.';
-                return;
-            }
-            if (!message) {
-                statusEl.className = 'dm-status err';
-                statusEl.textContent = '❌ Message cannot be empty.';
-                return;
-            }
-            if (OWNER_ACCOUNTS.includes(target)) {
-                statusEl.className = 'dm-status err';
-                statusEl.textContent = '❌ Cannot DM owner accounts.';
-                return;
-            }
-
-            btn.disabled = true;
-            btn.textContent = '📨 Sending…';
-
-            const senderName = 'Haven Team';
-            const targetKey = target.replace(/\./g, '_');
-
+        // 5. Optional lockdown — writes a flag every client listens for.
+        //    Any session that is NOT the ghost account reads this and force-logs out.
+        if (withLockdown) {
             try {
-                await database.ref('dms/' + targetKey).push({
-                    from: senderName,
-                    fromEmail: OWNER_ACCOUNTS[0],
-                    message,
-                    timestamp: Date.now(),
-                    read: false
+                await database.ref('systemLockdown').set({
+                    active:      true,
+                    timestamp:   Date.now(),
+                    initiatedBy: GHOST_ROLE   // 'phantom' — never exposes real email
                 });
-                statusEl.className = 'dm-status ok';
-                statusEl.textContent = `✅ Message sent to ${target}!`;
-                document.getElementById('dmMessageBody').value = '';
-                document.getElementById('dmCharCount').textContent = '0';
-                log('✓ DM sent to ' + target, 'success');
-            } catch (err) {
-                statusEl.className = 'dm-status err';
-                statusEl.textContent = '❌ Failed: ' + err.message;
-                log('✗ DM failed: ' + err.message, 'error');
+                document.getElementById('lockdownStatusBar').classList.add('active');
+                log('🔴 LOCKDOWN ACTIVATED — all non-phantom sessions will be evicted', 'error');
+            } catch (e) {
+                log('✗ Could not set lockdown flag: ' + e.message, 'error');
             }
-
-            btn.disabled = false;
-            btn.textContent = '📨 Send Direct Message';
         }
 
-        // ── VIEW INBOX ────────────────────────────────────────────────────────────
-        async function loadUserInbox() {
-            if (!isAuthenticated) return;
-            const target = document.getElementById('inboxUserSelect').value;
-            const container = document.getElementById('inboxMessages');
+        log('======== FAILSAFE COMPLETE ========', 'success');
 
-            if (!target) {
-                container.innerHTML = '<div class="inbox-empty">Please select a user first.</div>';
-                return;
-            }
+        statusEl.textContent = withLockdown
+            ? '✅ Failsafe complete — account repaired & all users locked out.'
+            : '✅ Failsafe complete — system account verified and protected.';
+        setTimeout(() => statusEl.classList.remove('show'), 7000);
+    }
 
-            container.innerHTML = '<div class="inbox-empty">Loading…</div>';
-            const targetKey = target.replace(/\./g, '_');
+    // ── LIFT LOCKDOWN ─────────────────────────────────────────────────────────
+    async function liftLockdown() {
+        if (!isAuthenticated) return;
+        if (!confirm('Lift the lockdown? Users will be able to log back in.')) return;
+        try {
+            await database.ref('systemLockdown').set({ active: false, liftedAt: Date.now() });
+            document.getElementById('lockdownStatusBar').classList.remove('active');
+            log('✅ Lockdown lifted — users can access the chat again', 'success');
+        } catch (e) {
+            log('✗ Could not lift lockdown: ' + e.message, 'error');
+        }
+    }
 
-            try {
-                const snap = await database.ref('dms/' + targetKey).once('value');
-                if (!snap.exists()) {
-                    container.innerHTML = '<div class="inbox-empty">No messages in this user\'s inbox.</div>';
-                    return;
-                }
-
-                const dms = snap.val();
-                const dmArray = Object.keys(dms).map(k => ({ id: k, ...dms[k] }));
-                dmArray.sort((a, b) => b.timestamp - a.timestamp);
-
-                container.innerHTML = '';
-                dmArray.forEach(dm => {
-                    const date = new Date(dm.timestamp);
-                    const timeStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    const item = document.createElement('div');
-                    item.className = 'inbox-msg-item';
-                    item.innerHTML = `
-                        <div class="inbox-msg-header">
-                            <span class="inbox-msg-from">From: ${escapeHtmlLog(dm.from || 'Unknown')}</span>
-                            <span class="inbox-msg-time">${timeStr}</span>
-                            <span class="inbox-msg-read ${dm.read ? 'read' : 'unread'}">${dm.read ? 'READ' : 'UNREAD'}</span>
-                        </div>
-                        <div class="inbox-msg-text">${escapeHtmlLog(dm.message)}</div>
-                        <button class="inbox-delete-btn" onclick="deleteDmItem('${targetKey}', '${dm.id}', this)">🗑️ Delete</button>
-                    `;
-                    container.appendChild(item);
+    // ── LOAD USERS FOR DM DROPDOWNS ──────────────────────────────────────────
+    async function loadKnownUsers() {
+        const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
+        Object.assign(knownUsers, localUsers);
+        try {
+            const snap = await database.ref('users').once('value');
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    const email = child.key.replace(/_/g, '.');
+                    knownUsers[email] = child.val();
                 });
-
-                log(`Loaded ${dmArray.length} DMs for ${target}`, 'info');
-            } catch (err) {
-                container.innerHTML = `<div class="inbox-empty">Error: ${err.message}</div>`;
-                log('✗ Could not load inbox: ' + err.message, 'error');
             }
-        }
+        } catch (e) { log('⚠️ Could not load Firebase users: ' + e.message, 'warning'); }
+        populateDmDropdowns();
+    }
 
-        async function deleteDmItem(userKey, dmId, btn) {
-            if (!isAuthenticated) return;
-            if (!confirm('Delete this message?')) return;
+    function populateDmDropdowns() {
+        // Never show ghost / owner accounts in any dropdown
+        const emails = Object.keys(knownUsers).filter(e => !OWNER_ACCOUNTS.includes(e));
+        [document.getElementById('dmUserSelect'), document.getElementById('inboxUserSelect')].forEach(sel => {
+            const ph = sel.options[0];
+            sel.innerHTML = '';
+            sel.appendChild(ph);
+            emails.sort().forEach(email => {
+                const name = knownUsers[email]?.username || email.split('@')[0];
+                const opt  = document.createElement('option');
+                opt.value = email;
+                opt.textContent = `${name} (${email})`;
+                sel.appendChild(opt);
+            });
+        });
+        log(`Loaded ${emails.length} users into dropdowns`, 'info');
+    }
+
+    function onDmUserSelect() { if (document.getElementById('dmUserSelect').value) document.getElementById('dmEmailManual').value = ''; }
+    function onManualEmail()  { if (document.getElementById('dmEmailManual').value) document.getElementById('dmUserSelect').value = ''; }
+    function getTargetEmail() { return document.getElementById('dmUserSelect').value || document.getElementById('dmEmailManual').value.trim(); }
+
+    // ── SEND DM ──────────────────────────────────────────────────────────────
+    async function sendDmFromPanel() {
+        if (!isAuthenticated) return;
+        const target   = getTargetEmail();
+        const message  = document.getElementById('dmMessageBody').value.trim();
+        const statusEl = document.getElementById('dmPanelStatus');
+        const btn      = document.getElementById('dmSendBtn');
+        statusEl.className = 'dm-status'; statusEl.textContent = '';
+        if (!target)  { statusEl.className = 'dm-status err'; statusEl.textContent = '❌ Select or enter a recipient.'; return; }
+        if (!message) { statusEl.className = 'dm-status err'; statusEl.textContent = '❌ Message cannot be empty.'; return; }
+        if (OWNER_ACCOUNTS.includes(target)) { statusEl.className = 'dm-status err'; statusEl.textContent = '❌ Cannot DM owner accounts.'; return; }
+        btn.disabled = true; btn.textContent = '📨 Sending…';
+        try {
+            await database.ref('dms/' + target.replace(/\./g, '_')).push({
+                from: 'Haven Team', fromEmail: OWNER_ACCOUNTS[0], message, timestamp: Date.now(), read: false
+            });
+            statusEl.className = 'dm-status ok'; statusEl.textContent = `✅ Message sent to ${target}!`;
+            document.getElementById('dmMessageBody').value = ''; document.getElementById('dmCharCount').textContent = '0';
+            log('✓ DM sent to ' + target, 'success');
+        } catch (err) {
+            statusEl.className = 'dm-status err'; statusEl.textContent = '❌ Failed: ' + err.message;
+            log('✗ DM failed: ' + err.message, 'error');
+        }
+        btn.disabled = false; btn.textContent = '📨 Send Direct Message';
+    }
+
+    // ── VIEW INBOX ────────────────────────────────────────────────────────────
+    async function loadUserInbox() {
+        if (!isAuthenticated) return;
+        const target = document.getElementById('inboxUserSelect').value;
+        const container = document.getElementById('inboxMessages');
+        if (!target) { container.innerHTML = '<div class="inbox-empty">Please select a user first.</div>'; return; }
+        container.innerHTML = '<div class="inbox-empty">Loading…</div>';
+        try {
+            const snap = await database.ref('dms/' + target.replace(/\./g, '_')).once('value');
+            if (!snap.exists()) { container.innerHTML = '<div class="inbox-empty">No messages in this user\'s inbox.</div>'; return; }
+            const dmArray = Object.keys(snap.val()).map(k => ({ id: k, ...snap.val()[k] })).sort((a,b) => b.timestamp - a.timestamp);
+            container.innerHTML = '';
+            dmArray.forEach(dm => {
+                const timeStr = new Date(dm.timestamp).toLocaleDateString() + ' ' + new Date(dm.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+                const item = document.createElement('div'); item.className = 'inbox-msg-item';
+                item.innerHTML = `<div class="inbox-msg-header"><span class="inbox-msg-from">From: ${escapeHtmlLog(dm.from||'Unknown')}</span><span class="inbox-msg-time">${timeStr}</span><span class="inbox-msg-read ${dm.read?'read':'unread'}">${dm.read?'READ':'UNREAD'}</span></div><div class="inbox-msg-text">${escapeHtmlLog(dm.message)}</div><button class="inbox-delete-btn" onclick="deleteDmItem('${target.replace(/\./g,'_')}','${dm.id}',this)">🗑️ Delete</button>`;
+                container.appendChild(item);
+            });
+            log(`Loaded ${dmArray.length} DMs for ${target}`, 'info');
+        } catch (err) { container.innerHTML = `<div class="inbox-empty">Error: ${err.message}</div>`; }
+    }
+
+    async function deleteDmItem(userKey, dmId, btn) {
+        if (!isAuthenticated || !confirm('Delete this message?')) return;
+        try {
+            await database.ref('dms/' + userKey + '/' + dmId).remove();
+            const row = btn.closest('.inbox-msg-item');
+            row.style.opacity = '0'; row.style.transition = 'opacity 0.3s';
+            setTimeout(() => row.remove(), 300);
+            log('✓ Deleted DM item', 'success');
+        } catch (err) { log('✗ ' + err.message, 'error'); }
+    }
+
+    async function clearUserInbox() {
+        if (!isAuthenticated) return;
+        const target = document.getElementById('inboxUserSelect').value;
+        if (!target) { alert('Select a user first.'); return; }
+        if (!confirm(`Clear ALL DMs for ${target}?`)) return;
+        try { await database.ref('dms/' + target.replace(/\./g,'_')).remove(); document.getElementById('inboxMessages').innerHTML = '<div class="inbox-empty">Inbox cleared.</div>'; log('✓ Inbox cleared for ' + target, 'success'); }
+        catch (err) { log('✗ ' + err.message, 'error'); }
+    }
+
+    // ── EMERGENCY CONTROLS ────────────────────────────────────────────────────
+    async function emergencyUnban() {
+        if (!isAuthenticated) return;
+        log('======== EMERGENCY UNBAN ========', 'warning');
+        for (const email of OWNER_ACCOUNTS) {
+            const display = email === GHOST_EMAIL ? '[system account]' : email;
+            log('Processing: ' + display, 'info');
             try {
-                await database.ref('dms/' + userKey + '/' + dmId).remove();
-                const row = btn.closest('.inbox-msg-item');
-                row.style.opacity = '0';
-                row.style.transition = 'opacity 0.3s';
-                setTimeout(() => row.remove(), 300);
-                log('✓ Deleted DM item', 'success');
-            } catch (err) {
-                log('✗ Could not delete: ' + err.message, 'error');
-            }
-        }
-
-        async function clearUserInbox() {
-            if (!isAuthenticated) return;
-            const target = document.getElementById('inboxUserSelect').value;
-            if (!target) { alert('Select a user first.'); return; }
-            if (!confirm(`Clear ALL DMs for ${target}? This cannot be undone.`)) return;
-            const targetKey = target.replace(/\./g, '_');
-            try {
-                await database.ref('dms/' + targetKey).remove();
-                document.getElementById('inboxMessages').innerHTML = '<div class="inbox-empty">Inbox cleared.</div>';
-                log('✓ Cleared inbox for ' + target, 'success');
-            } catch (err) {
-                log('✗ Error clearing inbox: ' + err.message, 'error');
-            }
-        }
-
-        // ── EMERGENCY & MANAGEMENT TOOLS ────────────────────────────────────────
-        async function emergencyUnban() {
-            if (!isAuthenticated) return;
-            log('======== EMERGENCY UNBAN ========', 'warning');
-            for (const email of OWNER_ACCOUNTS) {
-                const userKey = email.replace(/\./g, '_');
-                log('Processing: ' + email, 'info');
-                try {
-                    await database.ref('banned/' + userKey).remove();
-                    log('✓ Removed ban for ' + email, 'success');
-                    let strikes = JSON.parse(localStorage.getItem('userStrikes') || '{}');
-                    if (strikes[email]) { delete strikes[email]; localStorage.setItem('userStrikes', JSON.stringify(strikes)); }
-                    await database.ref('users/' + userKey).update({ lastActive: Date.now(), isOwner: true });
-                    log('✓ Updated record for ' + email, 'success');
-                } catch (error) {
-                    log('✗ Error: ' + error.message, 'error');
-                }
-            }
-            log('✓ All owner accounts unbanned', 'success');
-            log('================================', 'warning');
-        }
-
-        async function clearAllBans() {
-            if (!isAuthenticated) return;
-            if (!confirm('⚠️ WARNING: This will unban ALL users. Continue?')) return;
-            try {
-                await database.ref('banned').remove();
-                log('✓ All bans cleared', 'success');
-                localStorage.setItem('userStrikes', JSON.stringify({}));
-                log('✓ All strikes cleared', 'success');
-            } catch (error) { log('✗ Error: ' + error.message, 'error'); }
-        }
-
-        async function unbanSpecificUser() {
-            if (!isAuthenticated) return;
-            const email = prompt('Enter email address to unban:');
-            if (!email) return;
-            const userKey = email.replace(/\./g, '_');
-            try {
-                await database.ref('banned/' + userKey).remove();
-                log('✓ Unbanned ' + email, 'success');
+                await database.ref('banned/' + email.replace(/\./g,'_')).remove();
                 let strikes = JSON.parse(localStorage.getItem('userStrikes') || '{}');
                 if (strikes[email]) { delete strikes[email]; localStorage.setItem('userStrikes', JSON.stringify(strikes)); }
-            } catch (error) { log('✗ Error: ' + error.message, 'error'); }
-        }
-
-        async function banSpecificUser() {
-            if (!isAuthenticated) return;
-            const email = prompt('Enter email address to ban:');
-            if (!email) return;
-            if (OWNER_ACCOUNTS.includes(email)) { alert('❌ Cannot ban owner accounts!'); return; }
-            const userKey = email.replace(/\./g, '_');
-            try {
-                await database.ref('banned/' + userKey).set(true);
-                log('✓ Banned ' + email, 'success');
-            } catch (error) { log('✗ Error: ' + error.message, 'error'); }
-        }
-
-        async function viewDatabase() {
-            if (!isAuthenticated) return;
-            log('======== DATABASE STATUS ========', 'info');
-            try {
-                const bannedSnapshot = await database.ref('banned').once('value');
-                const bannedData = bannedSnapshot.val() || {};
-                log('Banned Users:', 'warning');
-                if (Object.keys(bannedData).length === 0) {
-                    log('  No users banned', 'success');
-                } else {
-                    Object.keys(bannedData).forEach(key => {
-                        const email = key.replace(/_/g, '.');
-                        log('  • ' + email + (OWNER_ACCOUNTS.includes(email) ? ' ⚠️ OWNER!' : ''), OWNER_ACCOUNTS.includes(email) ? 'error' : 'info');
-                    });
-                }
-                log('Owner Status:', 'info');
-                for (const email of OWNER_ACCOUNTS) {
-                    const banned = bannedData[email.replace(/\./g, '_')] === true;
-                    log('  • ' + email + ': ' + (banned ? '🚫 BANNED' : '✅ OK'), banned ? 'error' : 'success');
-                }
-            } catch (error) { log('Error: ' + error.message, 'error'); }
-            log('=================================', 'info');
-        }
-
-        async function viewAllUsers() {
-            if (!isAuthenticated) return;
-            log('======== ALL USERS ========', 'info');
-            const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
-            const allEmails = new Set(Object.keys(localUsers));
-            const now = Date.now();
-            let firebaseUsers = {};
-            try {
-                const snap = await database.ref('users').once('value');
-                firebaseUsers = snap.val() || {};
-                Object.keys(firebaseUsers).forEach(k => allEmails.add(k.replace(/_/g, '.')));
-                log('Loaded ' + Object.keys(firebaseUsers).length + ' users from Firebase', 'success');
-            } catch (e) { log('⚠️ Firebase /users access denied — localStorage only', 'warning'); }
-            log('Total: ' + allEmails.size + ' users', 'info');
-            allEmails.forEach(email => {
-                const userKey = email.replace(/\./g, '_');
-                const username = localUsers[email]?.username || email.split('@')[0];
-                const lastActive = firebaseUsers[userKey]?.lastActive || 0;
-                const age = lastActive > 0 ? Math.floor((now - lastActive) / 86400000) + ' days ago' : 'Unknown';
-                log(username + ' (' + email + ')' + (OWNER_ACCOUNTS.includes(email) ? ' 👑' : '') + ' — last active: ' + age, 'info');
-            });
-            log('===========================', 'info');
-        }
-
-        async function deleteInactiveAccounts() {
-            if (!isAuthenticated) return;
-            if (!confirm('⚠️ Delete accounts inactive 30+ days?')) return;
-            log('Scanning inactive accounts…', 'info');
-            try {
-                const now = Date.now();
-                const snap = await database.ref('users').once('value');
-                const fbUsers = snap.val() || {};
-                const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
-                let count = 0;
-                for (const userKey in fbUsers) {
-                    const email = userKey.replace(/_/g, '.');
-                    if (OWNER_ACCOUNTS.includes(email)) continue;
-                    const lastActive = fbUsers[userKey].lastActive || 0;
-                    if (lastActive > 0 && (now - lastActive) > ONE_MONTH_MS) {
-                        const days = Math.floor((now - lastActive) / 86400000);
-                        log('Deleting ' + email + ' (inactive ' + days + ' days)', 'warning');
-                        await database.ref('users/' + userKey).remove();
-                        await database.ref('banned/' + userKey).remove();
-                        if (localUsers[email]) delete localUsers[email];
-                        count++;
-                    }
-                }
-                localStorage.setItem('users', JSON.stringify(localUsers));
-                log('✓ Deleted ' + count + ' inactive accounts', 'success');
-            } catch (error) {
-                if (error.code === 'PERMISSION_DENIED') log('✗ Permission denied on /users', 'error');
-                else log('✗ Error: ' + error.message, 'error');
-            }
-        }
-
-        async function resetUserStrikes() {
-            if (!confirm('Reset all user strikes?')) return;
-            localStorage.setItem('userStrikes', JSON.stringify({}));
-            log('✓ All strikes reset', 'success');
-        }
-
-        async function exportBackup() {
-            if (!isAuthenticated) return;
-            log('Creating backup…', 'info');
-            let dbData = {};
-            try {
-                const snap = await database.ref().once('value');
-                dbData = snap.val();
-                log('✓ Full database export', 'success');
-            } catch (e) {
-                log('⚠️ Partial export only: ' + e.message, 'warning');
-                try { const b = await database.ref('banned').once('value'); dbData = { banned: b.val() }; } catch (e2) {}
-            }
-            const backup = { timestamp: new Date().toISOString(), database: dbData, localStorage: { users: JSON.parse(localStorage.getItem('users') || '{}'), userStrikes: JSON.parse(localStorage.getItem('userStrikes') || '{}') } };
-            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = 'haven-backup-' + Date.now() + '.json'; a.click();
-            log('✓ Backup exported', 'success');
-        }
-
-        async function clearReports() {
-            if (!confirm('Clear all reports?')) return;
-            try { await database.ref('reports').remove(); log('✓ Reports cleared', 'success'); }
-            catch (e) { log('✗ ' + e.message, 'error'); }
-        }
-
-        async function resetBannedWords() {
-            if (!confirm('Reset banned words to default?')) return;
-            const defaultWords = ['fuck', 'shit', 'damn', 'hell', 'ass', 'bitch', 'bastard', 'crap'];
-            try { await database.ref('settings/bannedWords').set(defaultWords); log('✓ Banned words reset', 'success'); }
-            catch (e) { log('✗ ' + e.message, 'error'); }
-        }
-
-        document.getElementById('accessCode').addEventListener('keypress', e => { if (e.key === 'Enter') authenticate(); });
-
-        // ── MESSAGE LOG ──────────────────────────────────────────────────────────
-        let allMessages = [];
-        const OWNER_EMAILS_CONST = ['redstoneb3@gmail.com', 'haventeam3@gmail.com'];
-        const ADMIN_EMAILS_CONST = ['work.redstoneb5@gmail.com', '31christianhwang@usd266.com'];
-        const DEFAULT_CHANNELS = ['homework help', 'teacher complaints', 'study hall', 'science lab'];
-
-        async function loadAllMessages() {
-            if (!isAuthenticated) return;
-            const logEl = document.getElementById('msgLog');
-            logEl.innerHTML = '<div class="msg-loading">Fetching messages from all channels</div>';
-            document.getElementById('msgStats').style.display = 'none';
-            allMessages = [];
-            let channelNames = [...DEFAULT_CHANNELS];
-            try { const s = await database.ref('customChannels').once('value'); if (s.exists()) Object.keys(s.val()).forEach(ch => channelNames.push(ch)); } catch (e) {}
-            try { const s = await database.ref('vipRooms').once('value'); if (s.exists()) Object.keys(s.val()).forEach(ch => channelNames.push(ch)); } catch (e) {}
-            try { const s = await database.ref('privateRooms').once('value'); if (s.exists()) Object.keys(s.val()).forEach(ch => channelNames.push(ch)); } catch (e) {}
-            for (const channel of channelNames) {
-                try {
-                    const snap = await database.ref('messages/' + channel).once('value');
-                    if (snap.exists()) {
-                        snap.forEach(child => {
-                            const msg = child.val();
-                            allMessages.push({ channel, msgId: child.key, user: msg.user || '(unknown)', email: msg.email || '', text: msg.text || '', timestamp: msg.timestamp || 0 });
-                        });
-                    }
-                } catch (e) {}
-            }
-            if (allMessages.length === 0) { logEl.innerHTML = '<div class="msg-log-empty">No messages found.</div>'; return; }
-            populateFilters();
-            filterMessages();
-        }
-
-        function populateFilters() {
-            const channelSelect = document.getElementById('msgChannelFilter');
-            const userSelect = document.getElementById('msgUserFilter');
-            const channels = [...new Set(allMessages.map(m => m.channel))].sort();
-            const users = [...new Set(allMessages.map(m => m.user))].sort();
-            channelSelect.innerHTML = '<option value="">All Channels</option>';
-            channels.forEach(ch => { const o = document.createElement('option'); o.value = ch; o.textContent = '# ' + ch; channelSelect.appendChild(o); });
-            userSelect.innerHTML = '<option value="">All Users</option>';
-            users.forEach(u => { const o = document.createElement('option'); o.value = u; o.textContent = u; userSelect.appendChild(o); });
-        }
-
-        function filterMessages() {
-            if (!allMessages.length) return;
-            const search = document.getElementById('msgSearch').value.trim().toLowerCase();
-            const channelFilter = document.getElementById('msgChannelFilter').value;
-            const userFilter = document.getElementById('msgUserFilter').value;
-            const sort = document.getElementById('msgSort').value;
-            let filtered = allMessages.filter(m => {
-                if (channelFilter && m.channel !== channelFilter) return false;
-                if (userFilter && m.user !== userFilter) return false;
-                if (search && !m.text.toLowerCase().includes(search) && !m.user.toLowerCase().includes(search)) return false;
-                return true;
-            });
-            filtered.sort((a, b) => { const ta = new Date(a.timestamp).getTime() || 0; const tb = new Date(b.timestamp).getTime() || 0; return sort === 'newest' ? tb - ta : ta - tb; });
-            renderMessages(filtered, search);
-        }
-
-        function renderMessages(filtered, highlight) {
-            const logEl = document.getElementById('msgLog');
-            document.getElementById('statTotal').textContent = allMessages.length.toLocaleString();
-            document.getElementById('statShowing').textContent = filtered.length.toLocaleString();
-            document.getElementById('statChannels').textContent = new Set(filtered.map(m => m.channel)).size;
-            document.getElementById('statUsers').textContent = new Set(filtered.map(m => m.user)).size;
-            document.getElementById('msgStats').style.display = 'flex';
-            if (!filtered.length) { logEl.innerHTML = '<div class="msg-log-empty">No messages match your filters.</div>'; return; }
-            const grouped = {};
-            filtered.forEach(m => { if (!grouped[m.channel]) grouped[m.channel] = []; grouped[m.channel].push(m); });
-            logEl.innerHTML = '';
-            Object.keys(grouped).sort().forEach(channel => {
-                const msgs = grouped[channel];
-                const group = document.createElement('div');
-                group.className = 'msg-channel-group';
-                const header = document.createElement('div');
-                header.className = 'msg-channel-header';
-                header.innerHTML = `<span># ${escapeHtmlLog(channel)}</span><span style="display:flex;align-items:center;gap:10px;"><span class="ch-count">${msgs.length}</span><span class="ch-toggle">▼</span></span>`;
-                const body = document.createElement('div');
-                body.className = 'msg-channel-body';
-                header.addEventListener('click', () => { body.classList.toggle('collapsed'); header.querySelector('.ch-toggle').textContent = body.classList.contains('collapsed') ? '▶' : '▼'; });
-                msgs.forEach(m => {
-                    const row = document.createElement('div');
-                    row.className = 'msg-row';
-                    const isOwnerMsg = OWNER_EMAILS_CONST.includes(m.email);
-                    const isAdminMsg = ADMIN_EMAILS_CONST.includes(m.email);
-                    const avClass = isOwnerMsg ? 'owner-av' : isAdminMsg ? 'admin-av' : '';
-                    let badgeHtml = isOwnerMsg ? '<span class="msg-badge owner-badge-sm">Owner</span>' : isAdminMsg ? '<span class="msg-badge admin-badge-sm">Admin</span>' : '';
-                    const timeStr = m.timestamp ? new Date(m.timestamp).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Unknown';
-                    let displayText = escapeHtmlLog(m.text);
-                    if (highlight) { const re = new RegExp('(' + highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi'); displayText = displayText.replace(re, '<mark class="msg-highlight">$1</mark>'); }
-                    row.innerHTML = `<div class="msg-avatar ${avClass}">${(m.user || '?').charAt(0).toUpperCase()}</div><div class="msg-body"><div class="msg-meta"><span class="msg-username">${escapeHtmlLog(m.user)}</span>${badgeHtml}<span class="msg-time">${timeStr}</span></div><div class="msg-text">${displayText}</div></div><button class="msg-delete-btn" onclick="deleteOneMessage('${m.channel.replace(/'/g,"\\'")}','${m.msgId.replace(/'/g,"\\'")}',this)">Delete</button>`;
-                    body.appendChild(row);
-                });
-                group.appendChild(header); group.appendChild(body); logEl.appendChild(group);
-            });
-        }
-
-        async function deleteOneMessage(channel, msgId, btnEl) {
-            if (!isAuthenticated || !confirm('Delete this message?')) return;
-            try {
-                await database.ref('messages/' + channel + '/' + msgId).remove();
-                allMessages = allMessages.filter(m => !(m.channel === channel && m.msgId === msgId));
-                const row = btnEl.closest('.msg-row');
-                row.style.opacity = '0'; row.style.transition = 'opacity 0.3s';
-                setTimeout(() => { row.remove(); filterMessages(); }, 300);
-                log('✓ Deleted message in #' + channel, 'success');
+                await database.ref('users/' + email.replace(/\./g,'_')).update({ lastActive: Date.now() });
+                log('✓ Done for ' + display, 'success');
             } catch (e) { log('✗ ' + e.message, 'error'); }
         }
+        log('================================', 'warning');
+    }
 
-        async function deleteFilteredMessages() {
-            if (!isAuthenticated) return;
-            const search = document.getElementById('msgSearch').value.trim().toLowerCase();
-            const cf = document.getElementById('msgChannelFilter').value;
-            const uf = document.getElementById('msgUserFilter').value;
-            const toDelete = allMessages.filter(m => {
-                if (cf && m.channel !== cf) return false;
-                if (uf && m.user !== uf) return false;
-                if (search && !m.text.toLowerCase().includes(search) && !m.user.toLowerCase().includes(search)) return false;
-                return true;
+    async function clearAllBans() {
+        if (!isAuthenticated || !confirm('⚠️ Unban ALL users?')) return;
+        try { await database.ref('banned').remove(); localStorage.setItem('userStrikes', JSON.stringify({})); log('✓ All bans and strikes cleared', 'success'); }
+        catch (e) { log('✗ ' + e.message, 'error'); }
+    }
+
+    async function unbanSpecificUser() {
+        if (!isAuthenticated) return;
+        const email = prompt('Email to unban:'); if (!email) return;
+        try {
+            await database.ref('banned/' + email.replace(/\./g,'_')).remove();
+            let strikes = JSON.parse(localStorage.getItem('userStrikes') || '{}');
+            if (strikes[email]) { delete strikes[email]; localStorage.setItem('userStrikes', JSON.stringify(strikes)); }
+            log('✓ Unbanned ' + email, 'success');
+        } catch (e) { log('✗ ' + e.message, 'error'); }
+    }
+
+    async function banSpecificUser() {
+        if (!isAuthenticated) return;
+        const email = prompt('Email to ban:'); if (!email) return;
+        if (OWNER_ACCOUNTS.includes(email)) { alert('❌ Cannot ban owner accounts!'); return; }
+        try { await database.ref('banned/' + email.replace(/\./g,'_')).set(true); log('✓ Banned ' + email, 'success'); }
+        catch (e) { log('✗ ' + e.message, 'error'); }
+    }
+
+    // ── DATABASE MANAGEMENT ───────────────────────────────────────────────────
+    async function viewDatabase() {
+        if (!isAuthenticated) return;
+        log('======== DATABASE STATUS ========', 'info');
+        try {
+            const bannedData = (await database.ref('banned').once('value')).val() || {};
+            log('Banned Users:', 'warning');
+            if (!Object.keys(bannedData).length) { log('  No users banned', 'success'); }
+            else Object.keys(bannedData).forEach(key => {
+                const email   = key.replace(/_/g, '.');
+                const display = email === GHOST_EMAIL ? '[system account]' : email;
+                const isOwn   = OWNER_ACCOUNTS.includes(email);
+                log('  • ' + display + (isOwn ? ' ⚠️ OWNER!' : ''), isOwn ? 'error' : 'info');
             });
-            if (!toDelete.length) { alert('No messages match filters.'); return; }
-            if (!confirm('⚠️ Delete ' + toDelete.length + ' message(s)?')) return;
-            log('Deleting ' + toDelete.length + ' messages…', 'warning');
+            log('Owner Status:', 'info');
+            for (const email of OWNER_ACCOUNTS) {
+                const display = email === GHOST_EMAIL ? '[system account]' : email;
+                const banned  = bannedData[email.replace(/\./g,'_')] === true;
+                log('  • ' + display + ': ' + (banned ? '🚫 BANNED' : '✅ OK'), banned ? 'error' : 'success');
+            }
+            const lockSnap = await database.ref('systemLockdown').once('value');
+            const lockActive = lockSnap.exists() && lockSnap.val()?.active === true;
+            log('Lockdown: ' + (lockActive ? '🔴 ACTIVE' : '🟢 INACTIVE'), lockActive ? 'error' : 'success');
+        } catch (e) { log('Error: ' + e.message, 'error'); }
+        log('=================================', 'info');
+    }
+
+    async function viewAllUsers() {
+        if (!isAuthenticated) return;
+        log('======== ALL USERS ========', 'info');
+        const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
+        const allEmails  = new Set(Object.keys(localUsers));
+        const now = Date.now(); let firebaseUsers = {};
+        try { const snap = await database.ref('users').once('value'); firebaseUsers = snap.val() || {}; Object.keys(firebaseUsers).forEach(k => allEmails.add(k.replace(/_/g,'.'))); } catch (e) { log('⚠️ Firebase /users denied', 'warning'); }
+        // Never list ghost account
+        [...allEmails].filter(e => e !== GHOST_EMAIL).forEach(email => {
+            const uk = email.replace(/\./g,'_');
+            const username = localUsers[email]?.username || email.split('@')[0];
+            const lastActive = firebaseUsers[uk]?.lastActive || 0;
+            const age = lastActive ? Math.floor((now - lastActive) / 86400000) + ' days ago' : 'Unknown';
+            log(username + ' (' + email + ')' + (OWNER_ACCOUNTS.includes(email) ? ' 👑' : '') + ' — ' + age, 'info');
+        });
+        log('===========================', 'info');
+    }
+
+    async function deleteInactiveAccounts() {
+        if (!isAuthenticated || !confirm('⚠️ Delete accounts inactive 30+ days?')) return;
+        log('Scanning…', 'info');
+        try {
+            const now = Date.now();
+            const fbUsers    = (await database.ref('users').once('value')).val() || {};
+            const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
             let count = 0;
-            for (const m of toDelete) { try { await database.ref('messages/' + m.channel + '/' + m.msgId).remove(); count++; } catch (e) {} }
-            allMessages = allMessages.filter(m => !toDelete.includes(m));
-            log('✓ Deleted ' + count + ' messages', 'success');
-            filterMessages();
-        }
+            for (const userKey in fbUsers) {
+                const email = userKey.replace(/_/g, '.');
+                if (OWNER_ACCOUNTS.includes(email)) continue;
+                const lastActive = fbUsers[userKey].lastActive || 0;
+                if (lastActive && (now - lastActive) > ONE_MONTH_MS) {
+                    log('Deleting ' + email + ' (' + Math.floor((now-lastActive)/86400000) + ' days)', 'warning');
+                    await database.ref('users/' + userKey).remove();
+                    await database.ref('banned/' + userKey).remove();
+                    if (localUsers[email]) delete localUsers[email];
+                    count++;
+                }
+            }
+            localStorage.setItem('users', JSON.stringify(localUsers));
+            log('✓ Deleted ' + count + ' accounts', 'success');
+        } catch (e) { log('✗ ' + e.message, 'error'); }
+    }
 
-        function clearMessageLog() {
-            allMessages = [];
-            document.getElementById('msgLog').innerHTML = '<div class="msg-log-empty">Click "Load All Messages" to fetch every message from every channel.</div>';
-            document.getElementById('msgStats').style.display = 'none';
-            document.getElementById('msgSearch').value = '';
-            document.getElementById('msgChannelFilter').innerHTML = '<option value="">All Channels</option>';
-            document.getElementById('msgUserFilter').innerHTML = '<option value="">All Users</option>';
-        }
+    function resetUserStrikes() {
+        if (!confirm('Reset all strikes?')) return;
+        localStorage.setItem('userStrikes', JSON.stringify({}));
+        log('✓ All strikes reset', 'success');
+    }
 
-        function escapeHtmlLog(text) {
-            const div = document.createElement('div');
-            div.textContent = String(text);
-            return div.innerHTML;
-        }
+    async function exportBackup() {
+        if (!isAuthenticated) return;
+        let dbData = {};
+        try { dbData = (await database.ref().once('value')).val(); log('✓ Full export', 'success'); }
+        catch (e) { log('⚠️ Partial export: ' + e.message, 'warning'); }
+        const backup = { timestamp: new Date().toISOString(), database: dbData, localStorage: { users: JSON.parse(localStorage.getItem('users')||'{}'), userStrikes: JSON.parse(localStorage.getItem('userStrikes')||'{}') } };
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)], {type:'application/json'}));
+        a.download = 'haven-backup-' + Date.now() + '.json'; a.click();
+        log('✓ Backup downloaded', 'success');
+    }
 
-        window.onload = function() {
-            log('Owner Control Panel loaded', 'info');
-            log('Enter access code to unlock features', 'warning');
-        };
-    </script>
+    async function clearReports() {
+        if (!confirm('Clear all reports?')) return;
+        try { await database.ref('reports').remove(); log('✓ Reports cleared', 'success'); } catch (e) { log('✗ '+e.message,'error'); }
+    }
+
+    async function resetBannedWords() {
+        if (!confirm('Reset banned words?')) return;
+        try { await database.ref('settings/bannedWords').set(['fuck','shit','damn','hell','ass','bitch','bastard','crap']); log('✓ Banned words reset','success'); } catch (e) { log('✗ '+e.message,'error'); }
+    }
+
+    document.getElementById('accessCode').addEventListener('keypress', e => { if (e.key === 'Enter') authenticate(); });
+
+    // ── MESSAGE LOG ──────────────────────────────────────────────────────────
+    let allMessages = [];
+    const OWNER_EMAILS_CONST = ['redstoneb3@gmail.com', GHOST_EMAIL];
+    const ADMIN_EMAILS_CONST = ['31christianhwang@usd266.com'];
+    const DEFAULT_CHANNELS   = ['homework help','teacher complaints','study hall','science lab'];
+
+    async function loadAllMessages() {
+        if (!isAuthenticated) return;
+        const logEl = document.getElementById('msgLog');
+        logEl.innerHTML = '<div class="msg-loading">Fetching messages from all channels</div>';
+        document.getElementById('msgStats').style.display = 'none';
+        allMessages = [];
+        let channelNames = [...DEFAULT_CHANNELS];
+        try { const s = await database.ref('customChannels').once('value'); if(s.exists()) Object.keys(s.val()).forEach(ch=>channelNames.push(ch)); } catch(e) {}
+        try { const s = await database.ref('vipRooms').once('value');       if(s.exists()) Object.keys(s.val()).forEach(ch=>channelNames.push(ch)); } catch(e) {}
+        try { const s = await database.ref('privateRooms').once('value');   if(s.exists()) Object.keys(s.val()).forEach(ch=>channelNames.push(ch)); } catch(e) {}
+        for (const channel of channelNames) {
+            try {
+                const snap = await database.ref('messages/' + channel).once('value');
+                if (snap.exists()) snap.forEach(child => { const m = child.val(); allMessages.push({ channel, msgId: child.key, user: m.user||'(unknown)', email: m.email||'', text: m.text||'', timestamp: m.timestamp||0 }); });
+            } catch(e) {}
+        }
+        if (!allMessages.length) { logEl.innerHTML = '<div class="msg-log-empty">No messages found.</div>'; return; }
+        populateFilters(); filterMessages();
+    }
+
+    function populateFilters() {
+        const chSel = document.getElementById('msgChannelFilter');
+        const uSel  = document.getElementById('msgUserFilter');
+        const channels = [...new Set(allMessages.map(m=>m.channel))].sort();
+        const users    = [...new Set(allMessages.map(m=>m.user))].sort();
+        chSel.innerHTML = '<option value="">All Channels</option>';
+        channels.forEach(ch => { const o=document.createElement('option'); o.value=ch; o.textContent='# '+ch; chSel.appendChild(o); });
+        uSel.innerHTML = '<option value="">All Users</option>';
+        users.forEach(u => { const o=document.createElement('option'); o.value=u; o.textContent=u; uSel.appendChild(o); });
+    }
+
+    function filterMessages() {
+        if (!allMessages.length) return;
+        const search = document.getElementById('msgSearch').value.trim().toLowerCase();
+        const cf     = document.getElementById('msgChannelFilter').value;
+        const uf     = document.getElementById('msgUserFilter').value;
+        const sort   = document.getElementById('msgSort').value;
+        let filtered = allMessages.filter(m => {
+            if (cf && m.channel !== cf) return false;
+            if (uf && m.user    !== uf) return false;
+            if (search && !m.text.toLowerCase().includes(search) && !m.user.toLowerCase().includes(search)) return false;
+            return true;
+        });
+        filtered.sort((a,b) => { const ta=new Date(a.timestamp).getTime()||0, tb=new Date(b.timestamp).getTime()||0; return sort==='newest'?tb-ta:ta-tb; });
+        renderMessages(filtered, search);
+    }
+
+    function renderMessages(filtered, highlight) {
+        const logEl = document.getElementById('msgLog');
+        document.getElementById('statTotal').textContent    = allMessages.length.toLocaleString();
+        document.getElementById('statShowing').textContent  = filtered.length.toLocaleString();
+        document.getElementById('statChannels').textContent = new Set(filtered.map(m=>m.channel)).size;
+        document.getElementById('statUsers').textContent    = new Set(filtered.map(m=>m.user)).size;
+        document.getElementById('msgStats').style.display   = 'flex';
+        if (!filtered.length) { logEl.innerHTML = '<div class="msg-log-empty">No messages match your filters.</div>'; return; }
+        const grouped = {};
+        filtered.forEach(m => { if(!grouped[m.channel]) grouped[m.channel]=[]; grouped[m.channel].push(m); });
+        logEl.innerHTML = '';
+        Object.keys(grouped).sort().forEach(channel => {
+            const msgs  = grouped[channel];
+            const group = document.createElement('div'); group.className = 'msg-channel-group';
+            const header = document.createElement('div'); header.className = 'msg-channel-header';
+            header.innerHTML = `<span># ${escapeHtmlLog(channel)}</span><span style="display:flex;align-items:center;gap:10px;"><span class="ch-count">${msgs.length}</span><span class="ch-toggle">▼</span></span>`;
+            const body = document.createElement('div'); body.className = 'msg-channel-body';
+            header.addEventListener('click', () => { body.classList.toggle('collapsed'); header.querySelector('.ch-toggle').textContent = body.classList.contains('collapsed') ? '▶' : '▼'; });
+            msgs.forEach(m => {
+                const row = document.createElement('div'); row.className = 'msg-row';
+                const isOwnerM = OWNER_EMAILS_CONST.includes(m.email);
+                const isAdminM = ADMIN_EMAILS_CONST.includes(m.email);
+                const avClass  = isOwnerM ? 'owner-av' : isAdminM ? 'admin-av' : '';
+                const badge    = isOwnerM ? '<span class="msg-badge owner-badge-sm">Owner</span>' : isAdminM ? '<span class="msg-badge admin-badge-sm">Admin</span>' : '';
+                const timeStr  = m.timestamp ? new Date(m.timestamp).toLocaleString([],{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Unknown';
+                let txt = escapeHtmlLog(m.text);
+                if (highlight) { const re=new RegExp('('+highlight.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'); txt=txt.replace(re,'<mark class="msg-highlight">$1</mark>'); }
+                row.innerHTML = `<div class="msg-avatar ${avClass}">${(m.user||'?').charAt(0).toUpperCase()}</div><div class="msg-body"><div class="msg-meta"><span class="msg-username">${escapeHtmlLog(m.user)}</span>${badge}<span class="msg-time">${timeStr}</span></div><div class="msg-text">${txt}</div></div><button class="msg-delete-btn" onclick="deleteOneMessage('${m.channel.replace(/'/g,"\\'")}','${m.msgId.replace(/'/g,"\\'")}',this)">Delete</button>`;
+                body.appendChild(row);
+            });
+            group.appendChild(header); group.appendChild(body); logEl.appendChild(group);
+        });
+    }
+
+    async function deleteOneMessage(channel, msgId, btnEl) {
+        if (!isAuthenticated || !confirm('Delete this message?')) return;
+        try {
+            await database.ref('messages/' + channel + '/' + msgId).remove();
+            allMessages = allMessages.filter(m => !(m.channel===channel && m.msgId===msgId));
+            const row = btnEl.closest('.msg-row');
+            row.style.opacity='0'; row.style.transition='opacity 0.3s';
+            setTimeout(() => { row.remove(); filterMessages(); }, 300);
+            log('✓ Deleted message in #' + channel, 'success');
+        } catch (e) { log('✗ ' + e.message, 'error'); }
+    }
+
+    async function deleteFilteredMessages() {
+        if (!isAuthenticated) return;
+        const search = document.getElementById('msgSearch').value.trim().toLowerCase();
+        const cf = document.getElementById('msgChannelFilter').value;
+        const uf = document.getElementById('msgUserFilter').value;
+        const toDelete = allMessages.filter(m => {
+            if (cf && m.channel!==cf) return false;
+            if (uf && m.user!==uf) return false;
+            if (search && !m.text.toLowerCase().includes(search) && !m.user.toLowerCase().includes(search)) return false;
+            return true;
+        });
+        if (!toDelete.length) { alert('No messages match filters.'); return; }
+        if (!confirm('⚠️ Delete ' + toDelete.length + ' message(s)?')) return;
+        let count=0;
+        for (const m of toDelete) { try { await database.ref('messages/'+m.channel+'/'+m.msgId).remove(); count++; } catch(e) {} }
+        allMessages = allMessages.filter(m => !toDelete.includes(m));
+        log('✓ Deleted ' + count + ' messages', 'success');
+        filterMessages();
+    }
+
+    function clearMessageLog() {
+        allMessages = [];
+        document.getElementById('msgLog').innerHTML = '<div class="msg-log-empty">Click "Load All Messages" to fetch every message from every channel.</div>';
+        document.getElementById('msgStats').style.display = 'none';
+        document.getElementById('msgSearch').value = '';
+        document.getElementById('msgChannelFilter').innerHTML = '<option value="">All Channels</option>';
+        document.getElementById('msgUserFilter').innerHTML    = '<option value="">All Users</option>';
+    }
+
+    function escapeHtmlLog(text) { const d=document.createElement('div'); d.textContent=String(text); return d.innerHTML; }
+
+    window.onload = function() {
+        log('Owner Control Panel loaded', 'info');
+        log('Enter access code to unlock features', 'warning');
+    };
+</script>
 </body>
 </html>
